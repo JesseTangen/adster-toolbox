@@ -82,3 +82,8 @@
 - [x] Restore separate Desktop JPG and Mobile JPG download buttons.
 - [x] Make Header and Footer non-selectable canvas boundaries and select Hero as the first editable section.
 - [x] Verify separate download behavior and boundary-selection behavior across editor and exports.
+- [x] Structure the supplied SEO, Technical, User, Content, and Google Ads QA materials as reusable checklist definitions.
+- [x] Build an active QA Checklists module with list selection, section progress, filtering, notes, and completion tracking.
+- [x] Activate QA Checklists in the Toolbox registry and document how to add or edit lists.
+- [x] Validate the new QA workspace across desktop/mobile layouts and automated checks.
+- [x] Add persistent per-check QA notes with local completion state and verify note entry in the QA workspace.

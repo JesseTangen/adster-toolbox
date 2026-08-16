@@ -20,16 +20,16 @@ describe("Strategist Toolbox registry", () => {
     expect(toolboxTools.every(tool => tool.category !== undefined)).toBe(true);
   });
 
-  it("activates Wireframe Builder as an available Toolbox route", () => {
-    expect(toolboxTools).toContainEqual(expect.objectContaining({
-      id: "wireframe-builder",
-      path: "/wireframe-builder",
-      status: "available",
-    }));
+  it("activates the planning and quality modules as available Toolbox routes", () => {
+    expect(toolboxTools).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "wireframe-builder", path: "/wireframe-builder", status: "available" }),
+      expect.objectContaining({ id: "qa-checklists", path: "/qa-checklists", status: "available" }),
+    ]));
   });
 
-  it("exposes shared UI and checklist contracts for future tool modules", () => {
+  it("exposes shared UI and a structured QA checklist contract", () => {
     expect(toolboxCardClassNames.available).toContain("border-primary");
-    expect(checklistDefinitions[0]?.items).toHaveLength(4);
+    expect(checklistDefinitions).toHaveLength(5);
+    expect(checklistDefinitions.every(checklist => checklist.sections.length > 0)).toBe(true);
   });
 });

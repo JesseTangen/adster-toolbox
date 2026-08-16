@@ -41,8 +41,9 @@ export const toolboxTools: ToolboxTool[] = [
     id: "qa-checklists",
     name: "QA Checklists",
     category: "Quality",
-    description: "Run reusable launch and handoff checklists without leaving the strategist workspace.",
-    status: "planned",
+    description: "Run SEO, Technical, User, Content, and Google Ads QA workflows from one reusable review workspace.",
+    path: "/qa-checklists",
+    status: "available",
     eyebrow: "Delivery quality",
   },
 ];

@@ -22,11 +22,11 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Braces, label: "LocalBusiness Schema", path: "/local-schema" },
   { icon: Workflow, label: "Wireframe Builder", path: "/wireframe-builder" },
+  { icon: CheckSquare2, label: "QA Checklists", path: "/qa-checklists" },
 ];
 
 const plannedMenuItems = [
   { icon: Boxes, label: "Other Schema" },
-  { icon: CheckSquare2, label: "QA Checklists" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

@@ -13,7 +13,7 @@ import {
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
-import { checklistDefinitions } from "@adster/checklists";
+import { checklistDefinitions, getChecklistItemCount } from "@adster/checklists";
 import { toolboxCategories, toolboxTools, type ToolboxCategory, type ToolboxTool } from "@adster/toolbox-config";
 import { toolboxCardClassNames } from "@adster/toolbox-ui";
 
@@ -40,7 +40,7 @@ export default function Home() {
       return matchesCategory && matchesQuery;
     });
   }, [category, query]);
-  const initialChecklistItemCount = checklistDefinitions[0]?.items.length ?? 0;
+  const checklistItemCount = checklistDefinitions.reduce((count, checklist) => count + getChecklistItemCount(checklist), 0);
 
   const openTool = (tool: ToolboxTool) => {
     if (tool.path) {
@@ -66,8 +66,8 @@ export default function Home() {
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
             <div className="flex items-center gap-2 text-[#b9eeff]"><Sparkles className="h-4 w-4" /><span className="font-mono text-[10px] uppercase tracking-[0.12em]">Current release</span></div>
-            <p className="mt-3 text-lg font-semibold">1 live module</p>
-            <p className="mt-1 text-xs leading-5 text-white/60">LocalBusiness Schema is ready for strategist use. Three future tool slots are defined in the shared registry.</p>
+            <p className="mt-3 text-lg font-semibold">3 live modules</p>
+            <p className="mt-1 text-xs leading-5 text-white/60">LocalBusiness Schema, Wireframe Builder, and QA Checklists are ready for strategist use. One future tool slot remains in the shared registry.</p>
           </div>
         </div>
       </section>
@@ -144,7 +144,7 @@ export default function Home() {
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><Boxes className="h-5 w-5" /></div>
         <div>
           <h2 className="text-sm font-semibold">One shared strategist workspace</h2>
-          <p className="mt-1 text-sm leading-5 text-muted-foreground">New modules will use this catalog, shared navigation, and visual system. The planned QA module already starts with a reusable {initialChecklistItemCount}-point strategy handoff definition.</p>
+          <p className="mt-1 text-sm leading-5 text-muted-foreground">New modules use this catalog, shared navigation, and visual system. QA Checklists now provides {checklistDefinitions.length} reusable review workflows and {checklistItemCount} structured checks.</p>
         </div>
       </section>
     </div>
