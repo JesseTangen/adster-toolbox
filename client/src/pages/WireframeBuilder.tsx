@@ -172,7 +172,7 @@ export default function WireframeBuilder() {
   const [selectedId, setSelectedId] = useState(initialSections[0]?.id ?? "");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [projectName, setProjectName] = useState("Campaign landing page");
-  const [isExporting, setIsExporting] = useState<"desktop" | "mobile" | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   const desktopExportRef = useRef<HTMLDivElement>(null);
   const mobileExportRef = useRef<HTMLDivElement>(null);
 
@@ -237,27 +237,36 @@ export default function WireframeBuilder() {
     setSections(current => moveWireframeSection(current, sourceIndex, targetIndex));
   };
 
-  const exportJpg = async (mode: "desktop" | "mobile") => {
-    const exportNode = mode === "desktop" ? desktopExportRef.current : mobileExportRef.current;
-    if (!exportNode) return;
-    setIsExporting(mode);
+  const exportWireframes = async () => {
+    const exports = [
+      { mode: "desktop", node: desktopExportRef.current },
+      { mode: "mobile", node: mobileExportRef.current },
+    ] as const;
+    if (exports.some(item => !item.node)) return;
+    setIsExporting(true);
     try {
-      const dataUrl = await toJpeg(exportNode, {
-        cacheBust: true,
-        pixelRatio: 2,
-        quality: 0.94,
-        backgroundColor: "#f6fbff",
-        filter: node => !(node instanceof HTMLElement && node.dataset.exportHide === "true"),
+      const baseName = projectName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "wireframe";
+      const images = await Promise.all(exports.map(async ({ mode, node }) => ({
+        mode,
+        dataUrl: await toJpeg(node!, {
+          cacheBust: true,
+          pixelRatio: 2,
+          quality: 0.94,
+          backgroundColor: "#f6fbff",
+          filter: element => !(element instanceof HTMLElement && element.dataset.exportHide === "true"),
+        }),
+      })));
+      images.forEach(({ mode, dataUrl }) => {
+        const link = document.createElement("a");
+        link.download = `${baseName}-${mode}-wireframe.jpg`;
+        link.href = dataUrl;
+        link.click();
       });
-      const link = document.createElement("a");
-      link.download = `${projectName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "wireframe"}-${mode}-wireframe.jpg`;
-      link.href = dataUrl;
-      link.click();
-      toast.success(`${mode === "desktop" ? "Desktop" : "Mobile"} JPG download started`);
+      toast.success("Desktop and mobile JPG downloads started");
     } catch {
-      toast.error("The wireframe JPG could not be exported. Try again after the preview finishes loading.");
+      toast.error("The wireframes could not be exported. Try again after the preview finishes loading.");
     } finally {
-      setIsExporting(null);
+      setIsExporting(false);
     }
   };
 
@@ -270,8 +279,7 @@ export default function WireframeBuilder() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-xl border border-border bg-white p-1"><Button size="sm" variant={previewMode === "desktop" ? "default" : "ghost"} onClick={() => setPreviewMode("desktop")} className="h-8 gap-1.5 rounded-lg px-2.5 text-[11px]"><Monitor className="h-3.5 w-3.5" />Desktop</Button><Button size="sm" variant={previewMode === "mobile" ? "default" : "ghost"} onClick={() => setPreviewMode("mobile")} className="h-8 gap-1.5 rounded-lg px-2.5 text-[11px]"><Smartphone className="h-3.5 w-3.5" />Mobile</Button></div>
-          <Button onClick={() => exportJpg("desktop")} disabled={isExporting !== null} className="h-10 gap-2 rounded-xl px-3 text-xs shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]"><Download className="h-3.5 w-3.5" />{isExporting === "desktop" ? "Preparing" : "Desktop JPG"}</Button>
-          <Button onClick={() => exportJpg("mobile")} disabled={isExporting !== null} variant="outline" className="h-10 gap-2 rounded-xl bg-white px-3 text-xs"><Download className="h-3.5 w-3.5" />{isExporting === "mobile" ? "Preparing" : "Mobile JPG"}</Button>
+          <Button onClick={exportWireframes} disabled={isExporting} aria-busy={isExporting} className="h-10 gap-2 rounded-xl px-3 text-xs shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]"><Download className="h-3.5 w-3.5" />Download Wireframes</Button>
         </div>
       </header>
 

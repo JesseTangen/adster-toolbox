@@ -77,3 +77,5 @@
 - [x] Lock Header and Footer at the top and bottom of the canvas and remove their sidebar options.
 - [x] Verify the refined template options, fixed boundaries, exports, and automated checks.
 - [x] Remove the Editorial cards option from the Card grid template and validate the simplified selector.
+- [x] Replace separate desktop and mobile JPG controls with one Download Wireframes action that downloads both files.
+- [x] Verify the combined download action returns valid desktop and mobile JPG handoffs.
