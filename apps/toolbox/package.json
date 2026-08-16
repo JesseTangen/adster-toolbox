@@ -1,0 +1,7 @@
+{
+  "name": "@adster/toolbox-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Workspace boundary for the Strategist Toolbox delivery application."
+}

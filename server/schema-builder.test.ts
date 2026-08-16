@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findLocalBusinessType, isLocalBusinessType, localBusinessTypes } from "../shared/localbusiness-types";
-import { buildLocalBusinessSchema, createSchemaDraft, validateSchemaDraft } from "../shared/schema-builder";
+import { buildLocalBusinessSchema, createSchemaDraft, findLocalBusinessType, isLocalBusinessType, localBusinessTypes, validateSchemaDraft } from "@adster/schema-core";
 
 describe("LocalBusiness schema builder", () => {
   it("includes the full unique LocalBusiness descendant catalog and resolves core subtype relationships", () => {

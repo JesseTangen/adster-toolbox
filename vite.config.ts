@@ -170,6 +170,10 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@adster/checklists": path.resolve(import.meta.dirname, "packages", "checklists", "src", "index.ts"),
+      "@adster/schema-core": path.resolve(import.meta.dirname, "packages", "schema-core", "src", "index.ts"),
+      "@adster/toolbox-config": path.resolve(import.meta.dirname, "packages", "config", "src", "index.ts"),
+      "@adster/toolbox-ui": path.resolve(import.meta.dirname, "packages", "ui", "src", "index.ts"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },

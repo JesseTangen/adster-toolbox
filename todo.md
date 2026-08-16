@@ -46,3 +46,9 @@
 - [x] Verify the generated Pages artifact references the Adster-Schema-Studio asset path and completes all automated checks.
 - [x] Configure the client router to recognize /Adster-Schema-Studio/ as the GitHub Pages application base path.
 - [x] Verify direct loading and refresh behavior at the deployed repository path in the static build.
+- [x] Reframe the application as a Strategist Toolbox with a shared landing page, tool discovery, categories, and unified navigation.
+- [x] Preserve the LocalBusiness schema generator as the first route-based module at `/local-schema`.
+- [x] Establish the monorepo-oriented workspace boundaries for future shared UI, schema core, checklists, configuration, and tool modules.
+- [x] Validate the reorganized toolbox across core routes and automated checks.
+- [x] Use a real shared UI export and a real checklist definition from the workspace packages.
+- [x] Verify and document the root-application shell as the supported deployment model for the current workspace.

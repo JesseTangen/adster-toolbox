@@ -9,7 +9,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
-import { findLocalBusinessType, localBusinessTypeGroups } from "../../../shared/localbusiness-types";
+import { findLocalBusinessType, localBusinessTypeGroups } from "@adster/schema-core";
 
 type LocalBusinessTypePickerProps = {
   value: string;

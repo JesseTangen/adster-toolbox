@@ -1,343 +1,156 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { LocalBusinessTypePicker } from "@/components/LocalBusinessTypePicker";
 import {
-  AlertCircle,
   ArrowUpRight,
-  Check,
-  Copy,
-  FilePlus2,
-  Globe2,
-  Plus,
-  Save,
-  Trash2,
+  Boxes,
+  Braces,
+  CheckSquare2,
+  Clock3,
+  Search,
+  Sparkles,
+  Workflow,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import {
-  buildLocalBusinessSchema,
-  createSchemaDraft,
-  getEffectiveType,
-  SchemaDraft,
-  validateSchemaDraft,
-} from "../../../shared/schema-builder";
-import { isLocalBusinessType } from "../../../shared/localbusiness-types";
-import { headerLogoSrc } from "@/lib/headerLogo";
+import { useLocation } from "wouter";
+import { checklistDefinitions } from "@adster/checklists";
+import { toolboxCategories, toolboxTools, type ToolboxCategory, type ToolboxTool } from "@adster/toolbox-config";
+import { toolboxCardClassNames } from "@adster/toolbox-ui";
 
-type SavedSchema = {
-  id: string;
-  updatedAt: number;
-  draft: SchemaDraft;
+const toolIcons: Record<ToolboxTool["id"], typeof Braces> = {
+  "local-schema": Braces,
+  "other-schema": Boxes,
+  "wireframe-builder": Workflow,
+  "qa-checklists": CheckSquare2,
 };
 
-const SESSION_STORAGE_KEY = "schema-studio-localbusiness-entries";
-
-const fieldClass =
-  "h-10 rounded-xl border-border/80 bg-white/75 px-3 text-[13px] shadow-[0_1px_0_rgba(255,255,255,0.7)] placeholder:text-muted-foreground/65 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/15";
-const textareaClass =
-  "min-h-[92px] w-full resize-y rounded-xl border border-border/80 bg-white/75 px-3 py-2.5 text-[13px] leading-5 shadow-[0_1px_0_rgba(255,255,255,0.7)] outline-none placeholder:text-muted-foreground/65 transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15";
-
-function FieldLabel({ name, hint }: { name: string; hint?: string }) {
-  return (
-    <div className="mb-1.5 flex items-center gap-2">
-      <label className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-foreground/75">{name}</label>
-      {hint ? <span className="text-[10px] text-muted-foreground">{hint}</span> : null}
-    </div>
-  );
-}
-
-function SectionTitle({ index, title, description }: { index: string; title: string; description: string }) {
-  return (
-    <div className="mb-5 flex gap-3">
-      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-primary/5 font-mono text-[10px] text-primary">
-        {index}
-      </span>
-      <div>
-        <h2 className="text-[15px] font-semibold tracking-tight">{title}</h2>
-        <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">{description}</p>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
-  const [draft, setDraft] = useState<SchemaDraft>(() => createSchemaDraft());
-  const [entries, setEntries] = useState<SavedSchema[]>([]);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
-  const [sessionLoaded, setSessionLoaded] = useState(false);
+  const [, setLocation] = useLocation();
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<ToolboxCategory>("All tools");
 
-  const schema = useMemo(() => buildLocalBusinessSchema(draft), [draft]);
-  const validation = useMemo(() => validateSchemaDraft(draft), [draft]);
-  const serializedSchema = useMemo(() => JSON.stringify(schema, null, 2), [schema]);
-  const subtypeFields = {
-    food: isLocalBusinessType(getEffectiveType(draft), "FoodEstablishment"),
-    medical: isLocalBusinessType(getEffectiveType(draft), "MedicalBusiness"),
-    professional: isLocalBusinessType(getEffectiveType(draft), "LegalService") || getEffectiveType(draft) === "ProfessionalService",
-    store: isLocalBusinessType(getEffectiveType(draft), "Store"),
-  };
-
-  useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
-      if (saved) setEntries(JSON.parse(saved));
-    } catch {
-      toast.error("Could not restore this browser session.");
-    } finally {
-      setSessionLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!sessionLoaded) return;
-    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(entries));
-  }, [entries, sessionLoaded]);
-
-  const updateDraft = <K extends keyof SchemaDraft>(field: K, value: SchemaDraft[K]) => {
-    setDraft(current => ({ ...current, [field]: value }));
-  };
-
-  const changeBusinessType = (type: string) => {
-    setDraft(current => ({ ...current, businessType: type, businessSubtype: type }));
-  };
-
-  const saveSchema = () => {
-    const title = draft.label.trim() || draft.name.trim() || "Untitled LocalBusiness";
-    const storedDraft = { ...draft, label: title };
-    const item: SavedSchema = { id: activeEntryId || draft.id, updatedAt: Date.now(), draft: storedDraft };
-
-    setEntries(current => {
-      const exists = current.some(entry => entry.id === item.id);
-      return exists ? current.map(entry => (entry.id === item.id ? item : entry)) : [item, ...current];
+  const matchingTools = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return toolboxTools.filter(tool => {
+      const matchesCategory = category === "All tools" || tool.category === category;
+      const matchesQuery = !normalizedQuery || [tool.name, tool.description, tool.category, tool.eyebrow]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery);
+      return matchesCategory && matchesQuery;
     });
-    setDraft(storedDraft);
-    setActiveEntryId(item.id);
-    toast.success(activeEntryId ? "Schema entry updated" : "Schema entry saved to this session");
-  };
+  }, [category, query]);
+  const initialChecklistItemCount = checklistDefinitions[0]?.items.length ?? 0;
 
-  const createNew = () => {
-    setDraft(createSchemaDraft());
-    setActiveEntryId(null);
-  };
-
-  const loadEntry = (entry: SavedSchema) => {
-    setDraft(entry.draft);
-    setActiveEntryId(entry.id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const removeEntry = (id: string) => {
-    setEntries(current => current.filter(entry => entry.id !== id));
-    if (activeEntryId === id) createNew();
-    toast.success("Schema entry removed from this session");
-  };
-
-  const copySchema = async () => {
-    const snippet = `<script type="application/ld+json">\n${serializedSchema}\n</script>`;
-    try {
-      await navigator.clipboard.writeText(snippet);
-      toast.success("JSON-LD script copied to clipboard");
-    } catch {
-      toast.error("Clipboard access was unavailable. Select and copy the code manually.");
+  const openTool = (tool: ToolboxTool) => {
+    if (tool.path) {
+      setLocation(tool.path);
+      return;
     }
+    toast.info(`${tool.name} is mapped for a future Strategist Toolbox release.`);
   };
-
-  const statusTone = validation.errors.length > 0 ? "issue" : validation.recommendations.length > 0 ? "review" : "ready";
-  const statusText = validation.errors.length > 0 ? "Needs correction" : validation.recommendations.length > 0 ? "Ready to enrich" : "Schema ready";
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-50 border-b border-border/80 bg-background/95 shadow-[0_8px_30px_-24px_rgba(0,92,145,0.5)] backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl shadow-[0_8px_24px_-12px_rgba(0,174,239,0.55)]">
-              <img
-                src={headerLogoSrc}
-                alt="Schema Studio logo"
-                className="h-full w-full object-contain"
-              />
+    <div className="mx-auto w-full max-w-7xl pb-10 pt-2 sm:pt-6">
+      <section className="relative overflow-hidden rounded-[2rem] border border-white/65 bg-[#18354e] px-5 py-7 text-white shadow-[0_30px_80px_-42px_rgba(14,55,83,0.8)] sm:px-8 sm:py-10">
+        <div className="absolute -right-28 -top-36 h-72 w-72 rounded-full bg-primary/25 blur-3xl" />
+        <div className="absolute -bottom-40 left-[28%] h-64 w-64 rounded-full bg-[#6bd5fa]/20 blur-3xl" />
+        <div className="relative grid gap-7 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
+          <div>
+            <div className="flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#b9eeff]">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              Adster Creative internal tools
             </div>
-            <div className="min-w-0">
-              <p className="font-editorial text-[19px] leading-none tracking-tight">Adster Schema Studio</p>
-              <p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">LocalBusiness JSON-LD</p>
-            </div>
+            <h1 className="mt-4 max-w-3xl font-editorial text-4xl leading-[0.98] tracking-tight sm:text-5xl">
+              Strategist Toolbox
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-[#d8edf7]/78 sm:text-[15px]">
+              A shared home for focused planning, structured-data, and quality-control tools. Each module is designed to fit the same strategist workflow without adding a new destination to manage.
+            </p>
           </div>
-          <div className="hidden items-center gap-2 text-[12px] text-muted-foreground md:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            Session workspace
-            <span className="mx-2 h-4 w-px bg-border" />
-            Schema.org aligned
+          <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-[#b9eeff]"><Sparkles className="h-4 w-4" /><span className="font-mono text-[10px] uppercase tracking-[0.12em]">Current release</span></div>
+            <p className="mt-3 text-lg font-semibold">1 live module</p>
+            <p className="mt-1 text-xs leading-5 text-white/60">Local Schema is ready for strategist use. Three future tool slots are defined in the shared registry.</p>
           </div>
-          <Button onClick={saveSchema} className="h-10 gap-2 rounded-xl px-4 text-[13px] shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]">
-            <Save className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Save schema</span>
-            <span className="sm:hidden">Save</span>
-          </Button>
         </div>
-      </header>
+      </section>
 
-      <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <div className="grid gap-6 xl:grid-cols-[250px_minmax(0,1fr)_minmax(390px,0.88fr)]">
-          <aside className="lift-in-delayed xl:sticky xl:top-24 xl:self-start">
-            <div className="overflow-hidden rounded-2xl border border-border/80 bg-card/80 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]">
-              <div className="flex items-center justify-between border-b border-border/70 px-4 py-3.5">
-                <div>
-                  <p className="text-[13px] font-semibold">Your locations</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">Saved for this session</p>
-                </div>
-                <span className="rounded-full bg-secondary px-2 py-0.5 font-mono text-[10px] text-secondary-foreground">{entries.length}</span>
-              </div>
-              <div className="max-h-[290px] space-y-1 overflow-auto p-2">
-                {entries.length === 0 ? (
-                  <div className="px-3 py-5 text-center">
-                    <FilePlus2 className="mx-auto h-5 w-5 text-muted-foreground/55" />
-                    <p className="mt-2 text-[11px] leading-4 text-muted-foreground">Save a schema to keep multiple locations handy during this session.</p>
-                  </div>
-                ) : (
-                  entries.map(entry => (
-                    <div key={entry.id} className={`group flex items-center gap-1 rounded-xl p-1 ${activeEntryId === entry.id ? "bg-primary/[0.08]" : "hover:bg-secondary/65"}`}>
-                      <button onClick={() => loadEntry(entry)} className="min-w-0 flex-1 rounded-lg px-2 py-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                        <p className="truncate text-[12px] font-medium">{entry.draft.label || entry.draft.name || "Untitled LocalBusiness"}</p>
-                        <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-muted-foreground">{getEffectiveType(entry.draft)}</p>
-                      </button>
-                      <button onClick={() => removeEntry(entry.id)} aria-label="Delete saved schema" className="rounded-lg p-2 text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive focus:opacity-100 focus:outline-none group-hover:opacity-100">
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-              <div className="border-t border-border/70 p-2">
-                <Button variant="outline" onClick={createNew} className="h-9 w-full justify-start gap-2 rounded-xl border-dashed bg-transparent text-[12px] hover:bg-secondary/70">
-                  <Plus className="h-3.5 w-3.5" /> New schema
-                </Button>
-              </div>
-            </div>
-
-          </aside>
-
-          <section className="space-y-5">
-            <div className="rounded-2xl border border-border/80 bg-card/80 p-5 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] sm:p-6">
-              <SectionTitle index="01" title="Identity & classification" description="Define the schema entity before adding the business’s public details." />
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <FieldLabel name="workspace name" hint="Session label" />
-                  <Input value={draft.label} onChange={event => updateDraft("label", event.target.value)} className={fieldClass} placeholder="e.g. Downtown location" />
-                </div>
-                <div className="sm:col-span-2">
-                  <FieldLabel name="@type" hint="131 LocalBusiness types & subtypes" />
-                  <LocalBusinessTypePicker value={getEffectiveType(draft)} onValueChange={changeBusinessType} />
-                </div>
-                <div className="sm:col-span-2">
-                  <FieldLabel name="name" />
-                  <Input value={draft.name} onChange={event => updateDraft("name", event.target.value)} className={fieldClass} placeholder="Business name" />
-                </div>
-                <div className="sm:col-span-2">
-                  <FieldLabel name="description" />
-                  <Textarea value={draft.description} onChange={event => updateDraft("description", event.target.value)} className={textareaClass} placeholder="A concise description of the business." />
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-border/80 bg-card/80 p-5 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] sm:p-6">
-              <SectionTitle index="02" title="Contact & web presence" description="Use canonical URLs and public contact information that belongs to this location." />
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2"><FieldLabel name="url" /> <Input value={draft.url} onChange={event => updateDraft("url", event.target.value)} className={fieldClass} placeholder="https://example.com/location" /></div>
-                <div><FieldLabel name="telephone" /> <Input value={draft.telephone} onChange={event => updateDraft("telephone", event.target.value)} className={fieldClass} placeholder="+1-303-555-0123" /></div>
-                <div><FieldLabel name="email" /> <Input value={draft.email} onChange={event => updateDraft("email", event.target.value)} className={fieldClass} placeholder="hello@example.com" /></div>
-                <div className="sm:col-span-2"><FieldLabel name="logo" /> <Input value={draft.logo} onChange={event => updateDraft("logo", event.target.value)} className={fieldClass} placeholder="https://example.com/logo.png" /></div>
-                <div className="sm:col-span-2"><FieldLabel name="sameAs" hint="One URL per line or comma-separated" /> <Textarea value={draft.sameAs} onChange={event => updateDraft("sameAs", event.target.value)} className={textareaClass} placeholder="https://www.instagram.com/yourbusiness" /></div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-border/80 bg-card/80 p-5 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] sm:p-6">
-              <SectionTitle index="03" title="Address, geo & hours" description="Describe the physical branch using PostalAddress and GeoCoordinates." />
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2"><FieldLabel name="streetAddress" /> <Input value={draft.streetAddress} onChange={event => updateDraft("streetAddress", event.target.value)} className={fieldClass} placeholder="123 Main Street" /></div>
-                <div><FieldLabel name="addressLocality" /> <Input value={draft.addressLocality} onChange={event => updateDraft("addressLocality", event.target.value)} className={fieldClass} placeholder="City" /></div>
-                <div><FieldLabel name="addressRegion" /> <Input value={draft.addressRegion} onChange={event => updateDraft("addressRegion", event.target.value)} className={fieldClass} placeholder="State or region" /></div>
-                <div><FieldLabel name="postalCode" /> <Input value={draft.postalCode} onChange={event => updateDraft("postalCode", event.target.value)} className={fieldClass} placeholder="Postal code" /></div>
-                <div><FieldLabel name="addressCountry" /> <Input value={draft.addressCountry} onChange={event => updateDraft("addressCountry", event.target.value)} className={fieldClass} placeholder="US" /></div>
-                <div><FieldLabel name="latitude" /> <Input value={draft.latitude} onChange={event => updateDraft("latitude", event.target.value)} className={fieldClass} placeholder="39.7392" /></div>
-                <div><FieldLabel name="longitude" /> <Input value={draft.longitude} onChange={event => updateDraft("longitude", event.target.value)} className={fieldClass} placeholder="-104.9903" /></div>
-                <div className="sm:col-span-2"><FieldLabel name="openingHours" hint="e.g. Mo-Fr 09:00-17:00" /> <Textarea value={draft.openingHours} onChange={event => updateDraft("openingHours", event.target.value)} className={textareaClass} placeholder="Mo-Fr 09:00-17:00&#10;Sa 10:00-14:00" /></div>
-                <div><FieldLabel name="priceRange" /> <Input value={draft.priceRange} onChange={event => updateDraft("priceRange", event.target.value)} className={fieldClass} placeholder="$$" /></div>
-              </div>
-            </div>
-
-            {(subtypeFields.food || subtypeFields.medical || subtypeFields.professional || subtypeFields.store) ? (
-              <div className="rounded-2xl border border-primary/20 bg-primary/[0.025] p-5 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] sm:p-6">
-                <SectionTitle index="04" title={`${getEffectiveType(draft)} details`} description="These fields appear because of the selected LocalBusiness type." />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {subtypeFields.food ? <>
-                    <div><FieldLabel name="servesCuisine" hint="Comma-separated" /> <Input value={draft.servesCuisine} onChange={event => updateDraft("servesCuisine", event.target.value)} className={fieldClass} placeholder="Italian, Pizza" /></div>
-                    <div><FieldLabel name="menu" /> <Input value={draft.menu} onChange={event => updateDraft("menu", event.target.value)} className={fieldClass} placeholder="https://example.com/menu" /></div>
-                    <label className="sm:col-span-2 flex cursor-pointer items-center gap-3 rounded-xl border border-border/80 bg-white/75 px-3 py-3 text-[13px]">
-                      <input type="checkbox" checked={draft.acceptsReservations} onChange={event => updateDraft("acceptsReservations", event.target.checked)} className="h-4 w-4 accent-[oklch(0.36_0.06_154)]" />
-                      <span><span className="font-mono text-[11px] font-medium">acceptsReservations</span><span className="ml-2 text-muted-foreground">Reservation availability</span></span>
-                    </label>
-                  </> : null}
-                  {subtypeFields.medical ? <div className="sm:col-span-2"><FieldLabel name="medicalSpecialty" /> <Input value={draft.medicalSpecialty} onChange={event => updateDraft("medicalSpecialty", event.target.value)} className={fieldClass} placeholder="e.g. Dentistry" /></div> : null}
-                  {subtypeFields.professional ? <div className="sm:col-span-2"><FieldLabel name="areaServed" /> <Input value={draft.areaServed} onChange={event => updateDraft("areaServed", event.target.value)} className={fieldClass} placeholder="e.g. Denver metropolitan area" /></div> : null}
-                  {subtypeFields.store ? <>
-                    <div><FieldLabel name="currenciesAccepted" /> <Input value={draft.currenciesAccepted} onChange={event => updateDraft("currenciesAccepted", event.target.value)} className={fieldClass} placeholder="USD" /></div>
-                    <div><FieldLabel name="paymentAccepted" /> <Input value={draft.paymentAccepted} onChange={event => updateDraft("paymentAccepted", event.target.value)} className={fieldClass} placeholder="Cash, Credit Card" /></div>
-                  </> : null}
-                </div>
-              </div>
-            ) : null}
-          </section>
-
-          <aside className="space-y-5 xl:sticky xl:top-24 xl:self-start">
-            <div className="overflow-hidden rounded-2xl border border-[#485a73] bg-[#40516a] text-[#f5fbff] shadow-[0_22px_65px_-34px_rgba(0,92,145,0.6)]">
-              <div className="flex items-start justify-between gap-3 border-b border-white/10 px-5 py-4">
-                <div>
-                  <div className="flex items-center gap-2"><Globe2 className="h-3.5 w-3.5 text-[#b9eeff]" /><p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[#b9eeff]">Live JSON-LD</p></div>
-                  <p className="mt-1 text-[12px] text-white/55">{getEffectiveType(draft)} structured data</p>
-                </div>
-                <Button onClick={copySchema} variant="outline" className="h-8 gap-1.5 rounded-lg border-white/15 bg-white/[0.06] px-2.5 text-[11px] text-white hover:bg-white/[0.12] hover:text-white">
-                  <Copy className="h-3.5 w-3.5" /> Copy
-                </Button>
-              </div>
-              <div className="code-scroll max-h-[480px] overflow-auto p-5">
-                <pre className="font-mono text-[11px] leading-[1.75] text-[#e7f8ff]"><code>{`<script type="application/ld+json">\n${serializedSchema}\n</script>`}</code></pre>
-              </div>
-              <div className="border-t border-white/10 bg-black/10 px-5 py-3 text-[10px] leading-4 text-white/45">Copy the complete script tag and place it in the page source for this business location.</div>
-            </div>
-
-            <div className="rounded-2xl border border-border/80 bg-card/80 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]">
-              <div className="flex items-start justify-between gap-3 border-b border-border/70 px-5 py-4">
-                <div>
-                  <p className="text-[13px] font-semibold">Schema check</p>
-                  <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">Property-level guidance as you build.</p>
-                </div>
-                <span className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] uppercase tracking-[0.08em] ${statusTone === "ready" ? "bg-primary/10 text-primary" : statusTone === "review" ? "bg-[#e0f6ff] text-[#08769f]" : "bg-destructive/10 text-destructive"}`}>{statusText}</span>
-              </div>
-              <div className="space-y-3 p-4">
-                <div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-2.5 text-[11px] leading-4 text-muted-foreground">
-                  <span className="font-medium text-foreground">Specification note.</span> Schema.org does not prescribe universally required LocalBusiness properties; this check separates recommended details from formatting corrections.
-                </div>
-                {validation.errors.map((issue, index) => (
-                  <div key={`${issue.label}-${index}`} className="flex gap-2 rounded-xl bg-destructive/[0.055] px-3 py-2.5 text-[11px] leading-4 text-destructive">
-                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> <span><b className="font-mono font-medium">{issue.label}</b> — {issue.message}</span>
-                  </div>
-                ))}
-                {validation.recommendations.map((issue, index) => (
-                  <div key={`${issue.label}-${index}`} className="flex gap-2 text-[11px] leading-4 text-muted-foreground">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" /> <span><b className="font-mono font-medium text-foreground/75">{issue.label}</b> — {issue.message}</span>
-                  </div>
-                ))}
-                {validation.errors.length === 0 && validation.recommendations.length === 0 ? <div className="flex items-center gap-2 rounded-xl bg-primary/[0.06] px-3 py-2.5 text-[11px] text-primary"><Check className="h-3.5 w-3.5" /> No formatting or enrichment suggestions remain.</div> : null}
-              </div>
-            </div>
-
-            <a href="https://schema.org/LocalBusiness" target="_blank" rel="noreferrer" className="group flex items-center justify-between rounded-2xl border border-border/80 bg-card/65 px-4 py-3.5 text-[12px] shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] transition hover:border-primary/30 hover:bg-card">
-              <span className="flex items-center gap-2 text-muted-foreground"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary"><Globe2 className="h-3.5 w-3.5 text-primary" /></span> Read LocalBusiness documentation</span>
-              <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground transition group-hover:text-primary" />
-            </a>
-          </aside>
+      <section className="mt-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-primary">Tool directory</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight">Find the right workspace</h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">Search the shared catalog or filter by the type of strategic work.</p>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground"><Clock3 className="h-3.5 w-3.5 text-primary" />Tool progress is kept at the module level.</div>
         </div>
-      </main>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              aria-label="Search strategist tools"
+              value={query}
+              onChange={event => setQuery(event.target.value)}
+              placeholder="Search tools, categories, or outcomes"
+              className="h-11 rounded-xl border-border/80 bg-white pl-10 shadow-[0_12px_28px_-24px_rgba(0,92,145,0.45)]"
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:pb-0">
+            {toolboxCategories.map(item => (
+              <Button
+                key={item}
+                size="sm"
+                variant={category === item ? "default" : "outline"}
+                onClick={() => setCategory(item)}
+                className={`h-9 shrink-0 rounded-full px-3.5 text-xs ${category === item ? "shadow-[0_10px_24px_-14px_rgba(0,174,239,0.8)]" : "bg-white/65 hover:bg-white"}`}
+              >
+                {item}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {matchingTools.map(tool => {
+            const Icon = toolIcons[tool.id];
+            const available = tool.status === "available";
+            return (
+              <article key={tool.id} className={`group relative flex min-h-[232px] flex-col rounded-2xl border p-5 shadow-[0_18px_44px_-36px_oklch(0.3_0.03_50)] transition duration-200 ${available ? toolboxCardClassNames.available : toolboxCardClassNames.planned}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${available ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"}`}><Icon className="h-5 w-5" /></div>
+                  <span className={`rounded-full px-2.5 py-1 font-mono text-[9px] font-medium uppercase tracking-[0.09em] ${available ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"}`}>{available ? "Available" : "Planned"}</span>
+                </div>
+                <p className="mt-5 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{tool.eyebrow}</p>
+                <h3 className="mt-2 text-lg font-semibold tracking-tight">{tool.name}</h3>
+                <p className="mt-2 max-w-md text-sm leading-5 text-muted-foreground">{tool.description}</p>
+                <div className="mt-auto pt-5">
+                  <Button onClick={() => openTool(tool)} variant={available ? "default" : "outline"} className={`h-9 gap-2 rounded-xl px-3.5 text-xs ${available ? "" : "bg-transparent"}`}>
+                    {available ? "Open tool" : "View roadmap"}
+                    <ArrowUpRight className="h-3.5 w-3.5 transition duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </Button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {matchingTools.length === 0 ? (
+          <div className="mt-5 rounded-2xl border border-dashed border-border bg-white/50 px-5 py-10 text-center">
+            <p className="text-sm font-medium">No tools match that search.</p>
+            <Button onClick={() => { setQuery(""); setCategory("All tools"); }} variant="link" className="mt-1 h-auto px-0 text-xs">Clear filters</Button>
+          </div>
+        ) : null}
+      </section>
+
+      <section className="mt-8 grid gap-4 rounded-2xl border border-border/80 bg-white/60 p-5 sm:grid-cols-[auto_1fr] sm:items-center sm:p-6">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><Boxes className="h-5 w-5" /></div>
+        <div>
+          <h2 className="text-sm font-semibold">One shared strategist workspace</h2>
+          <p className="mt-1 text-sm leading-5 text-muted-foreground">New modules will use this catalog, shared navigation, and visual system. The planned QA module already starts with a reusable {initialChecklistItemCount}-point strategy handoff definition.</p>
+        </div>
+      </section>
     </div>
   );
 }
