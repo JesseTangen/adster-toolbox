@@ -87,6 +87,10 @@ button:active { transform: scale(0.98); }
 .code-scroll::-webkit-scrollbar { width: 7px; height: 7px; }
 .code-scroll::-webkit-scrollbar-thumb { background: rgb(135 222 255 / 0.52); border-radius: 99px; }
 
+.wireframe-mode-mobile .wireframe-stack { grid-template-columns: minmax(0, 1fr) !important; }
+.wireframe-mode-mobile .wireframe-card-grid { grid-template-columns: minmax(0, 1fr) !important; }
+.wireframe-mode-mobile .wireframe-hide-mobile { display: none !important; }
+
 @media (prefers-reduced-motion: no-preference) {
   .lift-in { animation: lift-in 440ms cubic-bezier(0.23, 1, 0.32, 1) both; }
   .lift-in-delayed { animation: lift-in 440ms 80ms cubic-bezier(0.23, 1, 0.32, 1) both; }

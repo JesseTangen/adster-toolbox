@@ -9,9 +9,8 @@ import {
   type WireframeSection,
   type WireframeSectionType,
 } from "@adster/wireframe-core";
-import { toPng } from "html-to-image";
+import { toJpeg } from "html-to-image";
 import {
-  AlignCenter,
   ArrowDown,
   ArrowUp,
   ChevronDown,
@@ -71,8 +70,6 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   const isDark = section.type === "footer" || (section.type === "hero" && section.variant === "overlay");
   const common = `group relative cursor-pointer overflow-hidden border transition ${selected ? "border-primary ring-2 ring-primary/20" : "border-[#d7e4ee] hover:border-primary/50"} ${isDark ? "bg-[#18354e] text-white" : "bg-white text-[#223b50]"}`;
 
-  const noteBadge = section.note.trim() ? <span className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-full bg-[#fff3d6] px-2 py-1 font-mono text-[8px] font-medium uppercase tracking-[0.08em] text-[#9b6800]"><MessageSquareText className="h-3 w-3" /> Note</span> : null;
-
   const shell = (content: React.ReactNode, className = "") => (
     <section
       draggable
@@ -84,9 +81,7 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
       aria-label={`${definition.label} wireframe section`}
     >
       <div className="absolute left-2 top-2 z-20 flex h-6 w-6 items-center justify-center rounded-md bg-white/80 text-[#597187] opacity-0 shadow-sm transition group-hover:opacity-100"><GripVertical className="h-3.5 w-3.5" /></div>
-      {noteBadge}
       {content}
-      {section.note.trim() ? <div className={`border-t px-4 py-3 text-[10px] leading-4 ${isDark ? "border-white/15 bg-black/10 text-white/75" : "border-primary/15 bg-primary/[0.035] text-muted-foreground"}`}><span className={`mr-1 font-mono text-[8px] font-medium uppercase tracking-[0.1em] ${isDark ? "text-[#b9eeff]" : "text-primary"}`}>Strategist note</span>{section.note}</div> : null}
     </section>
   );
 
@@ -95,27 +90,60 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   }
   if (section.type === "hero") {
     const centered = section.variant === "centered";
-    return shell(<div className={`min-h-[220px] p-8 sm:p-10 ${centered ? "text-center" : "grid gap-7 sm:grid-cols-[1fr_0.72fr] sm:items-center"}`}><div className={centered ? "mx-auto max-w-xl" : ""}><span className={`font-mono text-[9px] uppercase tracking-[0.14em] ${isDark ? "text-[#b9eeff]" : "text-primary"}`}>Hero section</span><h2 className="mt-3 max-w-xl font-editorial text-3xl leading-tight sm:text-4xl">{section.title}</h2><p className={`mt-3 max-w-md text-xs leading-5 ${isDark ? "text-white/70" : "text-muted-foreground"}`}>A concise strategic narrative that frames the value, audience, and action.</p><span className="mt-5 inline-block rounded-md bg-primary px-4 py-2 text-[10px] font-medium text-white">Primary action</span></div>{!centered && <div className={`min-h-[130px] rounded-lg border border-dashed ${isDark ? "border-white/30 bg-white/10" : "border-primary/30 bg-[#e9f8fe]"} p-4`}><ImageIcon className={`h-5 w-5 ${isDark ? "text-white/60" : "text-primary"}`} /><p className={`mt-9 font-mono text-[9px] uppercase tracking-[0.12em] ${isDark ? "text-white/55" : "text-muted-foreground"}`}>Hero visual</p></div>}</div>, section.variant === "overlay" ? "bg-gradient-to-br from-[#18354e] to-[#08769f]" : "");
+    return shell(<div className={`wireframe-stack min-h-[220px] p-8 sm:p-10 ${centered ? "text-center" : "grid gap-7 sm:grid-cols-[1fr_0.72fr] sm:items-center"}`}><div className={centered ? "mx-auto max-w-xl" : ""}><h2 className="max-w-xl font-editorial text-3xl leading-tight sm:text-4xl">{section.title}</h2><p className={`mt-3 max-w-md text-xs leading-5 ${isDark ? "text-white/70" : "text-muted-foreground"}`}>A concise strategic narrative that frames the value, audience, and action.</p><span className="mt-5 inline-block rounded-md bg-primary px-4 py-2 text-[10px] font-medium text-white">Primary action</span></div>{!centered && <div className={`min-h-[130px] rounded-lg border border-dashed ${isDark ? "border-white/30 bg-white/10" : "border-primary/30 bg-[#e9f8fe]"} p-4`}><ImageIcon className={`h-5 w-5 ${isDark ? "text-white/60" : "text-primary"}`} /><p className={`mt-9 font-mono text-[9px] uppercase tracking-[0.12em] ${isDark ? "text-white/55" : "text-muted-foreground"}`}>Hero visual</p></div>}</div>, section.variant === "overlay" ? "bg-gradient-to-br from-[#18354e] to-[#08769f]" : "");
   }
   if (section.type === "cards" || section.type === "articles" || section.type === "products") {
     const isArticles = section.type === "articles";
     const isProducts = section.type === "products";
-    return shell(<div className="p-7"><div className="flex items-end justify-between gap-4"><div><span className="font-mono text-[9px] uppercase tracking-[0.14em] text-primary">{definition.label}</span><h2 className="mt-2 font-editorial text-2xl">{section.title}</h2></div><span className="text-[10px] text-muted-foreground">View all →</span></div><div className={`mt-6 grid gap-3 ${section.variant === "four" ? "grid-cols-2 sm:grid-cols-4" : "sm:grid-cols-3"}`}>{[1, 2, 3].map(item => <div key={item} className="rounded-lg border border-[#d7e4ee] bg-[#fbfdff] p-3"><div className={`h-16 rounded-md ${isProducts ? "bg-[#e9f8fe]" : isArticles ? "bg-[#d9e6f0]" : "bg-[#eff8fc]"}`} /><p className="mt-3 text-[11px] font-semibold">{isProducts ? `Product ${item}` : isArticles ? `Article title ${item}` : `Feature ${item}`}</p><p className="mt-1 text-[9px] leading-4 text-muted-foreground">Supporting detail appears here.</p></div>)}</div></div>);
+    return shell(<div className="p-7"><div className="flex items-end justify-between gap-4"><div><h2 className="font-editorial text-2xl">{section.title}</h2></div><span className="text-[10px] text-muted-foreground">View all →</span></div><div className={`wireframe-card-grid mt-6 grid gap-3 ${section.variant === "four" ? "grid-cols-2 sm:grid-cols-4" : "sm:grid-cols-3"}`}>{[1, 2, 3].map(item => <div key={item} className="rounded-lg border border-[#d7e4ee] bg-[#fbfdff] p-3"><div className={`h-16 rounded-md ${isProducts ? "bg-[#e9f8fe]" : isArticles ? "bg-[#d9e6f0]" : "bg-[#eff8fc]"}`} /><p className="mt-3 text-[11px] font-semibold">{isProducts ? `Product ${item}` : isArticles ? `Article title ${item}` : `Feature ${item}`}</p><p className="mt-1 text-[9px] leading-4 text-muted-foreground">Supporting detail appears here.</p></div>)}</div></div>);
   }
   if (section.type === "split") {
     const imageFirst = section.variant !== "image-right";
     const visual = <div className="min-h-[170px] rounded-lg border border-dashed border-primary/35 bg-[#e9f8fe] p-4"><ImageIcon className="h-5 w-5 text-primary" /><p className="mt-24 font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground">Supporting image</p></div>;
-    const copy = <div className="py-3"><span className="font-mono text-[9px] uppercase tracking-[0.14em] text-primary">Image + content</span><h2 className="mt-3 font-editorial text-2xl leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-muted-foreground">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block text-[10px] font-medium text-primary">Read the story →</span></div>;
-    return shell(<div className="grid gap-6 p-7 sm:grid-cols-2 sm:items-center">{imageFirst ? <>{visual}{copy}</> : <>{copy}{visual}</>}</div>);
+    const copy = <div className="py-3"><h2 className="font-editorial text-2xl leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-muted-foreground">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block text-[10px] font-medium text-primary">Read the story →</span></div>;
+    return shell(<div className="wireframe-stack grid gap-6 p-7 sm:grid-cols-2 sm:items-center">{imageFirst ? <>{visual}{copy}</> : <>{copy}{visual}</>}</div>);
   }
   if (section.type === "text") {
     const statement = section.variant === "statement";
-    return shell(<div className={`p-8 sm:p-10 ${statement ? "bg-[#f2faff]" : ""}`}><div className={statement ? "max-w-3xl" : "max-w-xl"}><span className="font-mono text-[9px] uppercase tracking-[0.14em] text-primary">Text section</span><h2 className={`${statement ? "text-3xl sm:text-4xl" : "text-2xl"} mt-3 font-editorial leading-tight`}>{section.title}</h2><p className="mt-4 text-xs leading-6 text-muted-foreground">A flexible text block for an argument, editorial message, or explanatory bridge between more visual sections.</p></div></div>);
+    return shell(<div className={`p-8 sm:p-10 ${statement ? "bg-[#f2faff]" : ""}`}><div className={statement ? "max-w-3xl" : "max-w-xl"}><h2 className={`${statement ? "text-3xl sm:text-4xl" : "text-2xl"} font-editorial leading-tight`}>{section.title}</h2><p className="mt-4 text-xs leading-6 text-muted-foreground">A flexible text block for an argument, editorial message, or explanatory bridge between more visual sections.</p></div></div>);
   }
   if (section.type === "faq") {
-    return shell(<div className="grid gap-5 p-7 sm:grid-cols-[0.7fr_1.3fr]"><div><span className="font-mono text-[9px] uppercase tracking-[0.14em] text-primary">FAQ</span><h2 className="mt-3 font-editorial text-2xl leading-tight">{section.title}</h2></div><div className="space-y-2">{["What should visitors understand first?", "How does the process work?", "What happens after I get in touch?"].map(question => <div key={question} className="flex items-center justify-between rounded-md border border-[#d7e4ee] px-3 py-3 text-[10px] font-medium"><span>{question}</span><ChevronDown className="h-3.5 w-3.5 text-primary" /></div>)}</div></div>);
+    return shell(<div className="wireframe-stack grid gap-5 p-7 sm:grid-cols-[0.7fr_1.3fr]"><div><h2 className="font-editorial text-2xl leading-tight">{section.title}</h2></div><div className="space-y-2">{["What should visitors understand first?", "How does the process work?", "What happens after I get in touch?"].map(question => <div key={question} className="flex items-center justify-between rounded-md border border-[#d7e4ee] px-3 py-3 text-[10px] font-medium"><span>{question}</span><ChevronDown className="h-3.5 w-3.5 text-primary" /></div>)}</div></div>);
   }
-  return shell(<div className="p-8"><div className="grid gap-6 sm:grid-cols-[1.2fr_0.8fr]"><div><h2 className="font-editorial text-2xl">{section.title}</h2><p className="mt-3 max-w-md text-[11px] leading-5 text-white/65">Close the page with a clear final action and useful navigation routes.</p><span className="mt-5 inline-block rounded-md bg-primary px-4 py-2 text-[10px] font-medium text-white">Contact us</span></div><div className="grid grid-cols-2 gap-3 text-[10px] text-white/65"><div><p className="font-medium text-white">Explore</p><p className="mt-2">Services</p><p className="mt-1">Work</p></div><div><p className="font-medium text-white">Connect</p><p className="mt-2">Instagram</p><p className="mt-1">LinkedIn</p></div></div></div><div className="mt-7 border-t border-white/15 pt-3 font-mono text-[8px] uppercase tracking-[0.11em] text-white/45">© Your company · Privacy · Terms</div></div>);
+  return shell(<div className="p-8"><div className="wireframe-stack grid gap-6 sm:grid-cols-[1.2fr_0.8fr]"><div><h2 className="font-editorial text-2xl">{section.title}</h2><p className="mt-3 max-w-md text-[11px] leading-5 text-white/65">Close the page with a clear final action and useful navigation routes.</p><span className="mt-5 inline-block rounded-md bg-primary px-4 py-2 text-[10px] font-medium text-white">Contact us</span></div><div className="grid grid-cols-2 gap-3 text-[10px] text-white/65"><div><p className="font-medium text-white">Explore</p><p className="mt-2">Services</p><p className="mt-1">Work</p></div><div><p className="font-medium text-white">Connect</p><p className="mt-2">Instagram</p><p className="mt-1">LinkedIn</p></div></div></div><div className="mt-7 border-t border-white/15 pt-3 font-mono text-[8px] uppercase tracking-[0.11em] text-white/45">© Your company · Privacy · Terms</div></div>);
+}
+
+function SectionAnnotation({ section }: { section: WireframeSection }) {
+  const definition = getWireframeSectionDefinition(section.type);
+  return (
+    <aside className="rounded-lg border border-[#cfe3ee] bg-[#eff8fc] p-3 text-left">
+      <p className="font-mono text-[8px] font-medium uppercase tracking-[0.12em] text-primary">Template</p>
+      <p className="mt-1 text-[11px] font-semibold text-[#20364d]">{definition.label}</p>
+      <div className="mt-3 border-t border-primary/15 pt-2">
+        <p className="font-mono text-[8px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Notes</p>
+        <p className="mt-1 text-[9px] leading-4 text-muted-foreground">{section.note.trim() || "No strategist notes added yet."}</p>
+      </div>
+    </aside>
+  );
+}
+
+function WireframeRows({
+  sections,
+  selectedId,
+  mode,
+  onSelect,
+  onDrop,
+  onDragStart,
+}: {
+  sections: WireframeSection[];
+  selectedId: string;
+  mode: "desktop" | "mobile";
+  onSelect?: (id: string) => void;
+  onDrop?: (event: React.DragEvent<HTMLElement>, targetIndex: number) => void;
+  onDragStart?: (event: React.DragEvent<HTMLElement>, index: number) => void;
+}) {
+  const isMobile = mode === "mobile";
+  return <div className="space-y-2">{sections.map((section, index) => <div key={section.id} className={`grid gap-2 ${isMobile ? "grid-cols-1" : "grid-cols-[150px_minmax(0,1fr)]"}`}><SectionAnnotation section={section} /><PreviewSection section={section} selected={section.id === selectedId} onSelect={() => onSelect?.(section.id)} onDragStart={event => onDragStart?.(event, index)} onDrop={event => onDrop?.(event, index)} /></div>)}</div>;
 }
 
 export default function WireframeBuilder() {
@@ -123,8 +151,9 @@ export default function WireframeBuilder() {
   const [selectedId, setSelectedId] = useState(initialSections[0]?.id ?? "");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [projectName, setProjectName] = useState("Campaign landing page");
-  const [isExporting, setIsExporting] = useState(false);
-  const exportRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState<"desktop" | "mobile" | null>(null);
+  const desktopExportRef = useRef<HTMLDivElement>(null);
+  const mobileExportRef = useRef<HTMLDivElement>(null);
 
   const selectedIndex = sections.findIndex(section => section.id === selectedId);
   const selected = sections[selectedIndex] ?? sections[0];
@@ -177,25 +206,27 @@ export default function WireframeBuilder() {
     setSections(current => moveWireframeSection(current, sourceIndex, targetIndex));
   };
 
-  const exportPng = async () => {
-    if (!exportRef.current) return;
-    setIsExporting(true);
+  const exportJpg = async (mode: "desktop" | "mobile") => {
+    const exportNode = mode === "desktop" ? desktopExportRef.current : mobileExportRef.current;
+    if (!exportNode) return;
+    setIsExporting(mode);
     try {
-      const dataUrl = await toPng(exportRef.current, {
+      const dataUrl = await toJpeg(exportNode, {
         cacheBust: true,
         pixelRatio: 2,
+        quality: 0.94,
         backgroundColor: "#f6fbff",
         filter: node => !(node instanceof HTMLElement && node.dataset.exportHide === "true"),
       });
       const link = document.createElement("a");
-      link.download = `${projectName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "wireframe"}-wireframe.png`;
+      link.download = `${projectName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "wireframe"}-${mode}-wireframe.jpg`;
       link.href = dataUrl;
       link.click();
-      toast.success("PNG wireframe download started");
+      toast.success(`${mode === "desktop" ? "Desktop" : "Mobile"} JPG download started`);
     } catch {
-      toast.error("The wireframe image could not be exported. Try again after the preview finishes loading.");
+      toast.error("The wireframe JPG could not be exported. Try again after the preview finishes loading.");
     } finally {
-      setIsExporting(false);
+      setIsExporting(null);
     }
   };
 
@@ -208,7 +239,8 @@ export default function WireframeBuilder() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-xl border border-border bg-white p-1"><Button size="sm" variant={previewMode === "desktop" ? "default" : "ghost"} onClick={() => setPreviewMode("desktop")} className="h-8 gap-1.5 rounded-lg px-2.5 text-[11px]"><Monitor className="h-3.5 w-3.5" />Desktop</Button><Button size="sm" variant={previewMode === "mobile" ? "default" : "ghost"} onClick={() => setPreviewMode("mobile")} className="h-8 gap-1.5 rounded-lg px-2.5 text-[11px]"><Smartphone className="h-3.5 w-3.5" />Mobile</Button></div>
-          <Button onClick={exportPng} disabled={isExporting} className="h-10 gap-2 rounded-xl px-4 text-xs shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]"><Download className="h-3.5 w-3.5" />{isExporting ? "Preparing export" : "Export PNG"}</Button>
+          <Button onClick={() => exportJpg("desktop")} disabled={isExporting !== null} className="h-10 gap-2 rounded-xl px-3 text-xs shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]"><Download className="h-3.5 w-3.5" />{isExporting === "desktop" ? "Preparing" : "Desktop JPG"}</Button>
+          <Button onClick={() => exportJpg("mobile")} disabled={isExporting !== null} variant="outline" className="h-10 gap-2 rounded-xl bg-white px-3 text-xs"><Download className="h-3.5 w-3.5" />{isExporting === "mobile" ? "Preparing" : "Mobile JPG"}</Button>
         </div>
       </header>
 
@@ -221,13 +253,17 @@ export default function WireframeBuilder() {
         <main className="min-w-0">
           <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-border/80 bg-white/70 p-3 shadow-[0_16px_38px_-30px_rgba(0,92,145,0.42)] sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2"><Eye className="h-4 w-4 text-primary" /><div><p className="text-xs font-semibold">Page canvas</p><p className="text-[10px] text-muted-foreground">Drag sections to reorder; select one to refine its intent.</p></div></div><Input value={projectName} onChange={event => setProjectName(event.target.value)} aria-label="Wireframe project name" className="h-9 max-w-xs rounded-lg bg-white text-xs" /></div>
           <div className="overflow-auto rounded-[1.5rem] border border-border/80 bg-[#eaf5fa]/70 p-3 shadow-[0_20px_55px_-40px_rgba(0,92,145,0.55)] sm:p-5">
-            <div ref={exportRef} className={`mx-auto overflow-hidden rounded-lg border border-[#c9dce8] bg-[#f6fbff] shadow-[0_20px_45px_-32px_rgba(20,63,91,0.55)] transition-[max-width] duration-200 ${previewMode === "mobile" ? "max-w-[390px]" : "max-w-[1040px]"}`}>
+            <div data-wireframe-canvas="preview" className={`mx-auto overflow-hidden rounded-lg border border-[#c9dce8] bg-[#f6fbff] shadow-[0_20px_45px_-32px_rgba(20,63,91,0.55)] transition-[max-width] duration-200 ${previewMode === "mobile" ? "max-w-[390px]" : "max-w-[1040px]"}`}>
               <div className="flex items-center justify-between border-b border-[#d7e4ee] bg-white px-4 py-2" data-export-hide="true"><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-primary" /><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">{projectName || "Untitled wireframe"}</span></div><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">{previewMode} preview</span></div>
               <div className="p-2 sm:p-3">
-                {sections.length === 0 ? <button onClick={() => addSection("hero", 0)} onDragOver={event => event.preventDefault()} onDrop={event => handleCanvasDrop(event, 0)} className="flex min-h-[300px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/30 bg-white/60 text-center"><Plus className="h-6 w-6 text-primary" /><p className="mt-3 text-sm font-medium">Start with a section</p><p className="mt-1 text-xs text-muted-foreground">Drag one from the library, or click here to add a hero.</p></button> : sections.map((section, index) => <PreviewSection key={section.id} section={section} selected={section.id === selected?.id} onSelect={() => setSelectedId(section.id)} onDragStart={event => { event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("application/x-adster-wireframe-index", String(index)); }} onDrop={event => handleCanvasDrop(event, index)} />)}
+                {sections.length === 0 ? <button onClick={() => addSection("hero", 0)} onDragOver={event => event.preventDefault()} onDrop={event => handleCanvasDrop(event, 0)} className="flex min-h-[300px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/30 bg-white/60 text-center"><Plus className="h-6 w-6 text-primary" /><p className="mt-3 text-sm font-medium">Start with a section</p><p className="mt-1 text-xs text-muted-foreground">Drag one from the library, or click here to add a hero.</p></button> : <WireframeRows sections={sections} selectedId={selected?.id ?? ""} mode={previewMode} onSelect={setSelectedId} onDragStart={(event, index) => { event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("application/x-adster-wireframe-index", String(index)); }} onDrop={handleCanvasDrop} />}
                 <button data-export-hide="true" onClick={() => addSection("text")} onDragOver={event => event.preventDefault()} onDrop={event => handleCanvasDrop(event, sections.length)} className="flex h-14 w-full items-center justify-center gap-2 border border-dashed border-primary/30 bg-white/75 text-[10px] font-medium text-primary transition hover:bg-primary/[0.04]"><Plus className="h-3.5 w-3.5" />Drop a section here</button>
               </div>
             </div>
+          </div>
+          <div aria-hidden="true" className="pointer-events-none fixed left-[-12000px] top-0">
+            <div ref={desktopExportRef} className="wireframe-mode-desktop w-[1040px] overflow-hidden border border-[#c9dce8] bg-[#f6fbff]"><div className="flex items-center justify-between border-b border-[#d7e4ee] bg-white px-4 py-2"><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">{projectName || "Untitled wireframe"}</span><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">desktop handoff</span></div><div className="p-3"><WireframeRows sections={sections} selectedId="" mode="desktop" /></div></div>
+            <div ref={mobileExportRef} className="wireframe-mode-mobile w-[390px] overflow-hidden border border-[#c9dce8] bg-[#f6fbff]"><div className="flex items-center justify-between border-b border-[#d7e4ee] bg-white px-4 py-2"><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">{projectName || "Untitled wireframe"}</span><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">mobile handoff</span></div><div className="p-3"><WireframeRows sections={sections} selectedId="" mode="mobile" /></div></div>
           </div>
         </main>
 

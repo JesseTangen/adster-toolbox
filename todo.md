@@ -60,3 +60,6 @@
 - [x] Validate the Wireframe Builder interactions, export path, responsive presentation, and automated checks.
 - [x] Manually verify adding, reordering, duplicating, removing, and editing wireframe sections.
 - [x] Exercise the Wireframe Builder PNG export and confirm the exported handoff image contains the composed canvas only.
+- [x] Move each wireframe section template label and strategist notes into a left-side annotation rail.
+- [x] Replace the PNG handoff export with separate desktop and mobile JPG exports.
+- [x] Verify both JPG exports and the revised section annotation layout.
