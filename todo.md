@@ -63,3 +63,5 @@
 - [x] Move each wireframe section template label and strategist notes into a left-side annotation rail.
 - [x] Replace the PNG handoff export with separate desktop and mobile JPG exports.
 - [x] Verify both JPG exports and the revised section annotation layout.
+- [x] Align the LocalBusiness Schema header structure, typography, icon treatment, and controls with Wireframe Builder.
+- [x] Verify the LocalBusiness header at desktop and mobile sizes and run the relevant automated checks.

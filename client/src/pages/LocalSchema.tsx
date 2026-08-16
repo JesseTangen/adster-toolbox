@@ -145,31 +145,19 @@ export default function LocalSchema() {
   const statusText = validation.errors.length > 0 ? "Needs correction" : validation.recommendations.length > 0 ? "Ready to enrich" : "Schema ready";
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-30 border-b border-border/80 bg-background/95 shadow-[0_8px_30px_-24px_rgba(0,92,145,0.5)] backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-mono text-[11px] font-medium text-primary shadow-[0_8px_24px_-12px_rgba(0,174,239,0.55)]">{`{}`}</div>
-            <div className="min-w-0">
-              <p className="font-editorial text-[19px] leading-none tracking-tight">LocalBusiness Schema</p>
-              <p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">Adster Creative Toolbox</p>
-            </div>
-          </div>
-          <div className="hidden items-center gap-2 text-[12px] text-muted-foreground md:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            Session workspace
-            <span className="mx-2 h-4 w-px bg-border" />
-            Schema.org aligned
-          </div>
-          <Button onClick={saveSchema} className="h-10 gap-2 rounded-xl px-4 text-[13px] shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]">
-            <Save className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Save schema</span>
-            <span className="sm:hidden">Save</span>
-          </Button>
+    <div className="mx-auto w-full max-w-[1600px] pb-10">
+      <header className="sticky top-0 z-30 flex flex-col gap-4 border-b border-border/80 bg-background/95 py-4 backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-mono text-[11px] font-medium text-primary">{`{}`}</div>
+          <div className="min-w-0"><p className="font-editorial text-xl leading-none tracking-tight">LocalBusiness Schema</p><p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.13em] text-muted-foreground">Adster Creative Toolbox</p></div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="hidden rounded-xl border border-border bg-white p-1 sm:flex"><span className="flex h-8 items-center gap-2 rounded-lg px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-primary" />Session workspace</span></div>
+          <Button onClick={saveSchema} className="h-10 gap-2 rounded-xl px-3 text-xs shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]"><Save className="h-3.5 w-3.5" /><span>Save schema</span></Button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="grid gap-6 2xl:grid-cols-[250px_minmax(0,1fr)_minmax(390px,0.88fr)]">
           <aside className="lift-in-delayed 2xl:sticky 2xl:top-24 2xl:self-start">
             <div className="overflow-hidden rounded-2xl border border-border/80 bg-card/80 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]">
