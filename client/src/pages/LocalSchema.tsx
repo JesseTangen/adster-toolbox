@@ -157,7 +157,7 @@ export default function LocalSchema() {
         </div>
       </header>
 
-      <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <main className="py-6 lg:py-8">
         <div className="grid gap-6 2xl:grid-cols-[250px_minmax(0,1fr)_minmax(390px,0.88fr)]">
           <aside className="lift-in-delayed 2xl:sticky 2xl:top-24 2xl:self-start">
             <div className="overflow-hidden rounded-2xl border border-border/80 bg-card/80 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]">

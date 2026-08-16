@@ -76,7 +76,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 button:active { transform: scale(0.98); }
 
-.font-editorial { font-family: "Playfair Display", Georgia, serif; }
+/* .font-editorial { font-family: "Playfair Display", Georgia, serif; } */
 
 .paper-grain {
   background-image: linear-gradient(115deg, oklch(1 0 0 / 0.62), oklch(1 0 0 / 0.04));
