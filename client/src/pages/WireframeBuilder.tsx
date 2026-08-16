@@ -235,7 +235,7 @@ export default function WireframeBuilder() {
       <header className="sticky top-0 z-30 flex flex-col gap-4 border-b border-border/80 bg-background/95 py-4 backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><LayoutPanelTop className="h-5 w-5" /></div>
-          <div className="min-w-0"><p className="font-editorial text-xl leading-none tracking-tight">Wireframe Builder</p><p className="mt-1 font-mono text-[9px] uppercase tracking-[0.13em] text-muted-foreground">Strategist Toolbox / developer handoff</p></div>
+          <div className="min-w-0"><p className="font-editorial text-xl leading-none tracking-tight">Wireframe Builder</p><p className="mt-1 font-mono text-[9px] uppercase tracking-[0.13em] text-muted-foreground">Adster Creative Toolbox</p></div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-xl border border-border bg-white p-1"><Button size="sm" variant={previewMode === "desktop" ? "default" : "ghost"} onClick={() => setPreviewMode("desktop")} className="h-8 gap-1.5 rounded-lg px-2.5 text-[11px]"><Monitor className="h-3.5 w-3.5" />Desktop</Button><Button size="sm" variant={previewMode === "mobile" ? "default" : "ghost"} onClick={() => setPreviewMode("mobile")} className="h-8 gap-1.5 rounded-lg px-2.5 text-[11px]"><Smartphone className="h-3.5 w-3.5" />Mobile</Button></div>

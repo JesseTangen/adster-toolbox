@@ -123,7 +123,7 @@ export default function Home() {
                 <p className="mt-2 max-w-md text-sm leading-5 text-muted-foreground">{tool.description}</p>
                 <div className="mt-auto pt-5">
                   <Button onClick={() => openTool(tool)} variant={available ? "default" : "outline"} className={`h-9 gap-2 rounded-xl px-3.5 text-xs ${available ? "" : "bg-transparent"}`}>
-                    {available ? "Open tool" : "View roadmap"}
+                    {available ? "Open tool" : "Coming soon"}
                     <ArrowUpRight className="h-3.5 w-3.5 transition duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </Button>
                 </div>

@@ -151,8 +151,8 @@ export default function LocalSchema() {
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-mono text-[11px] font-medium text-primary shadow-[0_8px_24px_-12px_rgba(0,174,239,0.55)]">{`{}`}</div>
             <div className="min-w-0">
-              <p className="font-editorial text-[19px] leading-none tracking-tight">Adster Schema Studio</p>
-              <p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">Strategist Toolbox / LocalBusiness JSON-LD</p>
+              <p className="font-editorial text-[19px] leading-none tracking-tight">LocalBusiness Schema</p>
+              <p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">Adster Creative Toolbox</p>
             </div>
           </div>
           <div className="hidden items-center gap-2 text-[12px] text-muted-foreground md:flex">
