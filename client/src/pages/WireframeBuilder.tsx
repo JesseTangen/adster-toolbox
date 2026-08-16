@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   createWireframeSection,
   getWireframeSectionDefinition,
+  isWireframeBoundarySection,
   moveWireframeSection,
   wireframeSectionDefinitions,
   type WireframeSection,
@@ -67,20 +68,21 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   onDragStart: (event: React.DragEvent<HTMLElement>) => void;
 }) {
   const definition = getWireframeSectionDefinition(section.type);
+  const isBoundary = isWireframeBoundarySection(section);
   const isDark = section.type === "footer" || (section.type === "hero" && section.variant === "overlay");
   const common = `group relative cursor-pointer overflow-hidden border transition ${selected ? "border-primary ring-2 ring-primary/20" : "border-[#d7e4ee] hover:border-primary/50"} ${isDark ? "bg-[#18354e] text-white" : "bg-white text-[#223b50]"}`;
 
   const shell = (content: React.ReactNode, className = "") => (
     <section
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={event => event.preventDefault()}
-      onDrop={onDrop}
+      draggable={!isBoundary}
+      onDragStart={event => { if (isBoundary) { event.preventDefault(); return; } onDragStart(event); }}
+      onDragOver={event => { if (!isBoundary) event.preventDefault(); }}
+      onDrop={event => { if (!isBoundary) onDrop(event); }}
       onClick={onSelect}
       className={`${common} ${className}`}
       aria-label={`${definition.label} wireframe section`}
     >
-      <div className="absolute left-2 top-2 z-20 flex h-6 w-6 items-center justify-center rounded-md bg-white/80 text-[#597187] opacity-0 shadow-sm transition group-hover:opacity-100"><GripVertical className="h-3.5 w-3.5" /></div>
+      {!isBoundary ? <div className="absolute left-2 top-2 z-20 flex h-6 w-6 items-center justify-center rounded-md bg-white/80 text-[#597187] opacity-0 shadow-sm transition group-hover:opacity-100"><GripVertical className="h-3.5 w-3.5" /></div> : null}
       {content}
     </section>
   );
@@ -103,12 +105,13 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   if (section.type === "split") {
     const imageFirst = section.variant !== "image-right";
     const visual = <div className="min-h-[170px] rounded-lg border border-dashed border-primary/35 bg-[#e9f8fe] p-4"><ImageIcon className="h-5 w-5 text-primary" /><p className="mt-24 font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground">Supporting image</p></div>;
-    const copy = <div className="py-3"><h2 className="font-editorial text-2xl leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-muted-foreground">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block text-[10px] font-medium text-primary">Read the story →</span></div>;
+    const copy = <div className="py-3"><h2 className="font-editorial text-2xl leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-muted-foreground">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block text-[10px] font-medium text-primary">Engaging CTA Text</span></div>;
     return shell(<div className="wireframe-stack grid gap-6 p-7 sm:grid-cols-2 sm:items-center">{imageFirst ? <>{visual}{copy}</> : <>{copy}{visual}</>}</div>);
   }
   if (section.type === "text") {
     const statement = section.variant === "statement";
-    return shell(<div className={`p-8 sm:p-10 ${statement ? "bg-[#f2faff]" : ""}`}><div className={statement ? "max-w-3xl" : "max-w-xl"}><h2 className={`${statement ? "text-3xl sm:text-4xl" : "text-2xl"} font-editorial leading-tight`}>{section.title}</h2><p className="mt-4 text-xs leading-6 text-muted-foreground">A flexible text block for an argument, editorial message, or explanatory bridge between more visual sections.</p></div></div>);
+    const twoColumn = section.variant === "two-column";
+    return shell(<div className={`p-8 sm:p-10 ${statement ? "bg-[#f2faff]" : ""}`}><div className={statement ? "max-w-3xl" : twoColumn ? "max-w-4xl" : "max-w-xl"}><h2 className={`${statement ? "text-3xl sm:text-4xl" : "text-2xl"} font-editorial leading-tight`}>{section.title}</h2>{twoColumn ? <div className="mt-5 grid gap-5 text-xs leading-6 text-muted-foreground sm:grid-cols-2"><p>Use the first column to establish the context, challenge, or core point of view in a clear, readable narrative.</p><p>Use the second column to add supporting proof, process detail, or a practical next step for the visitor.</p></div> : <p className="mt-4 text-xs leading-6 text-muted-foreground">A flexible text block for an argument, editorial message, or explanatory bridge between more visual sections.</p>}</div></div>);
   }
   if (section.type === "faq") {
     return shell(<div className="p-7"><h2 className="w-full font-editorial text-2xl leading-tight">{section.title}</h2><div className="mt-5 space-y-2">{["What should visitors understand first?", "How does the process work?", "What happens after I get in touch?"].map(question => <div key={question} className="flex items-center justify-between rounded-md border border-[#d7e4ee] px-3 py-3 text-[10px] font-medium"><span>{question}</span><ChevronDown className="h-3.5 w-3.5 text-primary" /></div>)}</div></div>);
@@ -137,6 +140,8 @@ function WireframeRows({
   onSelect,
   onDrop,
   onDragStart,
+  showDropTarget = false,
+  onAddAtEnd,
 }: {
   sections: WireframeSection[];
   selectedId: string;
@@ -144,14 +149,22 @@ function WireframeRows({
   onSelect?: (id: string) => void;
   onDrop?: (event: React.DragEvent<HTMLElement>, targetIndex: number) => void;
   onDragStart?: (event: React.DragEvent<HTMLElement>, index: number) => void;
+  showDropTarget?: boolean;
+  onAddAtEnd?: () => void;
 }) {
   const isMobile = mode === "mobile";
-  return <div className="space-y-2">{sections.map((section, index) => {
-    const isFrame = section.type === "header" || section.type === "footer";
+  const header = sections.find(section => section.type === "header");
+  const footer = sections.find(section => section.type === "footer");
+  const contentSections = sections.filter(section => !isWireframeBoundarySection(section));
+  const renderSection = (section: WireframeSection) => {
+    const index = sections.findIndex(item => item.id === section.id);
+    const isFrame = isWireframeBoundarySection(section);
     const preview = <PreviewSection key={section.id} section={section} selected={section.id === selectedId} onSelect={() => onSelect?.(section.id)} onDragStart={event => onDragStart?.(event, index)} onDrop={event => onDrop?.(event, index)} />;
     if (isFrame) return preview;
     return <div key={section.id} className={`grid gap-2 ${isMobile ? "grid-cols-1" : "grid-cols-[150px_minmax(0,1fr)]"}`}><SectionAnnotation section={section} />{preview}</div>;
-  })}</div>;
+  };
+  const footerIndex = footer ? sections.findIndex(section => section.id === footer.id) : sections.length;
+  return <div className="space-y-2">{header ? renderSection(header) : null}{contentSections.map(renderSection)}{showDropTarget ? <button data-export-hide="true" onClick={onAddAtEnd} onDragOver={event => event.preventDefault()} onDrop={event => onDrop?.(event, footerIndex)} className="flex h-14 w-full items-center justify-center gap-2 border border-dashed border-primary/30 bg-white/75 text-[10px] font-medium text-primary transition hover:bg-primary/[0.04]"><Plus className="h-3.5 w-3.5" />Drop a section here</button> : null}{footer ? renderSection(footer) : null}</div>;
 }
 
 export default function WireframeBuilder() {
@@ -166,11 +179,19 @@ export default function WireframeBuilder() {
   const selectedIndex = sections.findIndex(section => section.id === selectedId);
   const selected = sections[selectedIndex] ?? sections[0];
   const selectedDefinition = selected ? getWireframeSectionDefinition(selected.type) : undefined;
-  const groupedDefinitions = useMemo(() => categoryOrder.map(category => ({ category, items: wireframeSectionDefinitions.filter(item => item.category === category) })), []);
+  const selectedIsBoundary = selected ? isWireframeBoundarySection(selected) : false;
+  const groupedDefinitions = useMemo(() => categoryOrder.filter(category => category !== "Frame").map(category => ({ category, items: wireframeSectionDefinitions.filter(item => item.category === category) })), []);
 
-  const addSection = (type: WireframeSectionType, index = sections.length) => {
+  const addSection = (type: WireframeSectionType, index?: number) => {
+    if (type === "header" || type === "footer") return;
     const section = createWireframeSection(type);
-    setSections(current => [...current.slice(0, index), section, ...current.slice(index)]);
+    setSections(current => {
+      const footerIndex = current.findIndex(item => item.type === "footer");
+      const firstContentIndex = current[0]?.type === "header" ? 1 : 0;
+      const finalContentIndex = footerIndex >= 0 ? footerIndex : current.length;
+      const insertAt = Math.min(Math.max(index ?? finalContentIndex, firstContentIndex), finalContentIndex);
+      return [...current.slice(0, insertAt), section, ...current.slice(insertAt)];
+    });
     setSelectedId(section.id);
     toast.success(`${getWireframeSectionDefinition(type).label} added to wireframe`);
   };
@@ -181,14 +202,14 @@ export default function WireframeBuilder() {
   };
 
   const removeSelected = () => {
-    if (!selected) return;
+    if (!selected || isWireframeBoundarySection(selected)) return;
     setSections(current => current.filter(section => section.id !== selected.id));
     setSelectedId(sections.find(section => section.id !== selected.id)?.id ?? "");
     toast.success("Section removed from wireframe");
   };
 
   const duplicateSelected = () => {
-    if (!selected) return;
+    if (!selected || isWireframeBoundarySection(selected)) return;
     const copy = { ...selected, id: `section-${selected.type}-${Math.random().toString(36).slice(2, 9)}`, title: `${selected.title} (copy)` };
     setSections(current => [...current.slice(0, selectedIndex + 1), copy, ...current.slice(selectedIndex + 1)]);
     setSelectedId(copy.id);
@@ -196,6 +217,7 @@ export default function WireframeBuilder() {
   };
 
   const moveSelected = (direction: -1 | 1) => {
+    if (!selected || isWireframeBoundarySection(selected)) return;
     const targetIndex = selectedIndex + direction;
     if (selectedIndex < 0 || targetIndex < 0 || targetIndex >= sections.length) return;
     setSections(current => moveWireframeSection(current, selectedIndex, targetIndex));
@@ -205,6 +227,7 @@ export default function WireframeBuilder() {
     event.preventDefault();
     const newType = event.dataTransfer.getData("application/x-adster-wireframe-new") as WireframeSectionType;
     if (newType) {
+      if (newType === "header" || newType === "footer") return;
       addSection(newType, targetIndex);
       return;
     }
@@ -264,8 +287,7 @@ export default function WireframeBuilder() {
             <div data-wireframe-canvas="preview" className={`mx-auto overflow-hidden rounded-lg border border-[#c9dce8] bg-[#f6fbff] shadow-[0_20px_45px_-32px_rgba(20,63,91,0.55)] transition-[max-width] duration-200 ${previewMode === "mobile" ? "max-w-[390px]" : "max-w-[1040px]"}`}>
               <div className="flex items-center justify-between border-b border-[#d7e4ee] bg-white px-4 py-2" data-export-hide="true"><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-primary" /><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">{projectName || "Untitled wireframe"}</span></div><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">{previewMode} preview</span></div>
               <div className="p-2 sm:p-3">
-                {sections.length === 0 ? <button onClick={() => addSection("hero", 0)} onDragOver={event => event.preventDefault()} onDrop={event => handleCanvasDrop(event, 0)} className="flex min-h-[300px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/30 bg-white/60 text-center"><Plus className="h-6 w-6 text-primary" /><p className="mt-3 text-sm font-medium">Start with a section</p><p className="mt-1 text-xs text-muted-foreground">Drag one from the library, or click here to add a hero.</p></button> : <WireframeRows sections={sections} selectedId={selected?.id ?? ""} mode={previewMode} onSelect={setSelectedId} onDragStart={(event, index) => { event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("application/x-adster-wireframe-index", String(index)); }} onDrop={handleCanvasDrop} />}
-                <button data-export-hide="true" onClick={() => addSection("text")} onDragOver={event => event.preventDefault()} onDrop={event => handleCanvasDrop(event, sections.length)} className="flex h-14 w-full items-center justify-center gap-2 border border-dashed border-primary/30 bg-white/75 text-[10px] font-medium text-primary transition hover:bg-primary/[0.04]"><Plus className="h-3.5 w-3.5" />Drop a section here</button>
+                {sections.length === 0 ? <button onClick={() => addSection("hero", 0)} onDragOver={event => event.preventDefault()} onDrop={event => handleCanvasDrop(event, 0)} className="flex min-h-[300px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/30 bg-white/60 text-center"><Plus className="h-6 w-6 text-primary" /><p className="mt-3 text-sm font-medium">Start with a section</p><p className="mt-1 text-xs text-muted-foreground">Drag one from the library, or click here to add a hero.</p></button> : <WireframeRows sections={sections} selectedId={selected?.id ?? ""} mode={previewMode} onSelect={setSelectedId} onDragStart={(event, index) => { event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("application/x-adster-wireframe-index", String(index)); }} onDrop={handleCanvasDrop} showDropTarget onAddAtEnd={() => addSection("text")} />}
               </div>
             </div>
           </div>
@@ -278,14 +300,14 @@ export default function WireframeBuilder() {
         <aside className="2xl:sticky 2xl:top-24 2xl:self-start">
           {selected && selectedDefinition ? <div className="overflow-hidden rounded-2xl border border-border/80 bg-card/85 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]">
             <div className="border-b border-border/70 px-5 py-4"><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[9px] uppercase tracking-[0.12em] text-primary">Selected section</p><h2 className="mt-1 text-sm font-semibold">{selectedDefinition.label}</h2></div><span className="rounded-full bg-secondary px-2 py-1 font-mono text-[8px] uppercase tracking-[0.08em] text-secondary-foreground">#{selectedIndex + 1}</span></div></div>
-            <div className="space-y-4 p-5">
+            <div className="space-y-4 p-5">{selectedIsBoundary ? <div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-3"><p className="font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-primary">Fixed canvas boundary</p><p className="mt-1 text-xs leading-5 text-muted-foreground">The {selectedDefinition.label} is locked at the {selected.type === "header" ? "top" : "bottom"} of every wireframe and has no editable sidebar options.</p></div> : <>
               <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Style option</label><select value={selected.variant} onChange={event => updateSelected({ variant: event.target.value })} className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20">{selectedDefinition.variants.map(variant => <option key={variant.id} value={variant.id}>{variant.label}</option>)}</select><p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">{selectedDefinition.variants.find(variant => variant.id === selected.variant)?.description}</p></div>
               {selected.type !== "header" ? <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Section heading</label><Input value={selected.title} onChange={event => updateSelected({ title: event.target.value })} className="h-10 rounded-xl bg-white text-xs" /></div> : <div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-2.5"><p className="font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-primary">Brand label</p><p className="mt-1 text-xs text-muted-foreground">[Brand Name] is fixed for developer handoff.</p></div>}
               {selected.type === "cards" ? <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-white px-3 py-2.5 text-xs"><span><span className="block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-foreground/80">View all link</span><span className="mt-0.5 block text-[10px] leading-4 text-muted-foreground">Show a full-width link below the card grid.</span></span><input aria-label="Show View all link" type="checkbox" checked={selected.showViewAll} onChange={event => updateSelected({ showViewAll: event.target.checked })} className="h-4 w-4 accent-[oklch(0.7_0.14_220)]" /></label> : null}
               <div><label className="mb-1.5 flex items-center gap-1.5 font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground"><MessageSquareText className="h-3.5 w-3.5 text-primary" />Strategist / design notes</label><Textarea value={selected.note} onChange={event => updateSelected({ note: event.target.value })} placeholder="Call out requirements, content dependencies, accessibility notes, or visual direction for the developer." className="min-h-[120px] rounded-xl border-border bg-white text-xs leading-5" /></div>
               <div className="grid grid-cols-2 gap-2"><Button variant="outline" onClick={() => moveSelected(-1)} disabled={selectedIndex <= 0} className="h-9 gap-1.5 rounded-xl bg-white text-[11px]"><ArrowUp className="h-3.5 w-3.5" />Move up</Button><Button variant="outline" onClick={() => moveSelected(1)} disabled={selectedIndex >= sections.length - 1} className="h-9 gap-1.5 rounded-xl bg-white text-[11px]"><ArrowDown className="h-3.5 w-3.5" />Move down</Button></div>
               <div className="grid grid-cols-2 gap-2"><Button variant="outline" onClick={duplicateSelected} className="h-9 rounded-xl bg-white text-[11px]">Duplicate</Button><Button variant="outline" onClick={removeSelected} className="h-9 gap-1.5 rounded-xl border-destructive/20 bg-white text-[11px] text-destructive hover:bg-destructive/5 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" />Remove</Button></div>
-            </div>
+            </>}</div>
           </div> : <div className="rounded-2xl border border-dashed border-border bg-card/65 p-6 text-center"><Menu className="mx-auto h-5 w-5 text-primary" /><p className="mt-3 text-sm font-medium">Select a section</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Choose a canvas section to set its style and leave handoff notes.</p></div>}
         </aside>
       </div>

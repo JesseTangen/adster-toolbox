@@ -72,3 +72,7 @@
 - [x] Verify the refined Wireframe Builder templates, exports, responsive layout, and automated checks.
 - [x] Restore left-side template-and-notes annotations for every Wireframe Builder section except Header and Footer.
 - [x] Verify selective annotations across desktop/mobile views, exports, and automated checks.
+- [x] Remove Image + content’s Portrait focus option and update its CTA placeholder.
+- [x] Render the Text block two-column option as a clear two-column text example.
+- [x] Lock Header and Footer at the top and bottom of the canvas and remove their sidebar options.
+- [x] Verify the refined template options, fixed boundaries, exports, and automated checks.

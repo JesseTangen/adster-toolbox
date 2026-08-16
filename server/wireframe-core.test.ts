@@ -6,8 +6,10 @@ describe("wireframe core", () => {
     expect(wireframeSectionDefinitions.map(item => item.type)).toEqual(expect.arrayContaining([
       "header", "hero", "cards", "split", "faq", "articles", "products", "footer",
     ]));
-    expect(wireframeSectionDefinitions.filter(item => item.type !== "header").every(item => item.variants.length >= 3)).toBe(true);
-    expect(wireframeSectionDefinitions.find(item => item.type === "header")?.variants.map(variant => variant.id)).toEqual(["sticky", "static"]);
+    expect(wireframeSectionDefinitions.filter(item => item.type !== "header" && item.type !== "footer" && item.type !== "split").every(item => item.variants.length >= 3)).toBe(true);
+    expect(wireframeSectionDefinitions.find(item => item.type === "header")?.variants).toEqual([]);
+    expect(wireframeSectionDefinitions.find(item => item.type === "footer")?.variants).toEqual([]);
+    expect(wireframeSectionDefinitions.find(item => item.type === "split")?.variants.map(variant => variant.id)).toEqual(["image-left", "image-right"]);
   });
 
   it("creates editable sections and reorders them without changing their content", () => {
@@ -17,10 +19,14 @@ describe("wireframe core", () => {
 
     const header = createWireframeSection("header", "header-1");
     const cards = createWireframeSection("cards", "cards-1");
+    const footer = createWireframeSection("footer", "footer-1");
+    const framedSections = [header, hero, faq, footer];
 
     expect(hero.variant).toBe("split");
     expect(header.title).toBe("[Brand Name]");
     expect(cards.showViewAll).toBe(true);
+    expect(moveWireframeSection(framedSections, 0, 1)).toBe(framedSections);
+    expect(moveWireframeSection(framedSections, 1, 3)).toBe(framedSections);
     expect(reordered.map(section => section.id)).toEqual(["faq-1", "hero-1"]);
   });
 });
