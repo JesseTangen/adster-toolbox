@@ -76,3 +76,4 @@
 - [x] Render the Text block two-column option as a clear two-column text example.
 - [x] Lock Header and Footer at the top and bottom of the canvas and remove their sidebar options.
 - [x] Verify the refined template options, fixed boundaries, exports, and automated checks.
+- [x] Remove the Editorial cards option from the Card grid template and validate the simplified selector.

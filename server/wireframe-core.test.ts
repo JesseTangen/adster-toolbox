@@ -6,10 +6,11 @@ describe("wireframe core", () => {
     expect(wireframeSectionDefinitions.map(item => item.type)).toEqual(expect.arrayContaining([
       "header", "hero", "cards", "split", "faq", "articles", "products", "footer",
     ]));
-    expect(wireframeSectionDefinitions.filter(item => item.type !== "header" && item.type !== "footer" && item.type !== "split").every(item => item.variants.length >= 3)).toBe(true);
+    expect(wireframeSectionDefinitions.filter(item => !["header", "footer", "split", "cards"].includes(item.type)).every(item => item.variants.length >= 3)).toBe(true);
     expect(wireframeSectionDefinitions.find(item => item.type === "header")?.variants).toEqual([]);
     expect(wireframeSectionDefinitions.find(item => item.type === "footer")?.variants).toEqual([]);
     expect(wireframeSectionDefinitions.find(item => item.type === "split")?.variants.map(variant => variant.id)).toEqual(["image-left", "image-right"]);
+    expect(wireframeSectionDefinitions.find(item => item.type === "cards")?.variants.map(variant => variant.id)).toEqual(["three", "four"]);
   });
 
   it("creates editable sections and reorders them without changing their content", () => {
