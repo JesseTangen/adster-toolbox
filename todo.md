@@ -52,3 +52,4 @@
 - [x] Validate the reorganized toolbox across core routes and automated checks.
 - [x] Use a real shared UI export and a real checklist definition from the workspace packages.
 - [x] Verify and document the root-application shell as the supported deployment model for the current workspace.
+- [x] Verify the applied toolbox naming edits.

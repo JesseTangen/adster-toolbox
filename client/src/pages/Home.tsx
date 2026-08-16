@@ -57,12 +57,8 @@ export default function Home() {
         <div className="absolute -bottom-40 left-[28%] h-64 w-64 rounded-full bg-[#6bd5fa]/20 blur-3xl" />
         <div className="relative grid gap-7 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
           <div>
-            <div className="flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#b9eeff]">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Adster Creative internal tools
-            </div>
             <h1 className="mt-4 max-w-3xl font-editorial text-4xl leading-[0.98] tracking-tight sm:text-5xl">
-              Strategist Toolbox
+              Adster Creative Toolbox
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-[#d8edf7]/78 sm:text-[15px]">
               A shared home for focused planning, structured-data, and quality-control tools. Each module is designed to fit the same strategist workflow without adding a new destination to manage.
@@ -71,7 +67,7 @@ export default function Home() {
           <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
             <div className="flex items-center gap-2 text-[#b9eeff]"><Sparkles className="h-4 w-4" /><span className="font-mono text-[10px] uppercase tracking-[0.12em]">Current release</span></div>
             <p className="mt-3 text-lg font-semibold">1 live module</p>
-            <p className="mt-1 text-xs leading-5 text-white/60">Local Schema is ready for strategist use. Three future tool slots are defined in the shared registry.</p>
+            <p className="mt-1 text-xs leading-5 text-white/60">LocalBusiness Schema is ready for strategist use. Three future tool slots are defined in the shared registry.</p>
           </div>
         </div>
       </section>

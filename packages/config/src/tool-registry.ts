@@ -13,7 +13,7 @@ export type ToolboxTool = {
 export const toolboxTools: ToolboxTool[] = [
   {
     id: "local-schema",
-    name: "Local Schema",
+    name: "LocalBusiness Schema",
     category: "Schema",
     description: "Build, validate, save, and copy LocalBusiness JSON-LD for location pages.",
     path: "/local-schema",

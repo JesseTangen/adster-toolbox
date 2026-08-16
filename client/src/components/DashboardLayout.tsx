@@ -19,13 +19,13 @@ import { toast } from "sonner";
 import { useLocation } from "wouter";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Toolbox", path: "/" },
-  { icon: Braces, label: "Local Schema", path: "/local-schema" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Braces, label: "LocalBusiness Schema", path: "/local-schema" },
 ];
 
 const plannedMenuItems = [
   { icon: Boxes, label: "Other Schema" },
-  { icon: Workflow, label: "Wireframes" },
+  { icon: Workflow, label: "Wireframe Builder" },
   { icon: CheckSquare2, label: "QA Checklists" },
 ];
 
@@ -134,7 +134,7 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">Strategist Toolbox</span>
+                  <span className="font-semibold tracking-tight truncate">Toolbox</span>
                 </div>
               ) : null}
             </div>
@@ -208,7 +208,7 @@ function DashboardLayoutContent({
               <div className="flex items-center gap-3">
                 <img src={headerLogoSrc} alt="Adster Creative" className="h-7 w-7 rounded-lg object-contain" />
                 <div className="flex flex-col gap-1">
-                  <span className="tracking-tight text-foreground">{activeMenuItem?.label ?? "Strategist Toolbox"}</span>
+                  <span className="tracking-tight text-foreground">{activeMenuItem?.label ?? "Dashboard"}</span>
                 </div>
               </div>
             </div>

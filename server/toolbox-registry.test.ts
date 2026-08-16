@@ -8,6 +8,7 @@ describe("Strategist Toolbox registry", () => {
     expect(toolboxTools).toContainEqual(
       expect.objectContaining({
         id: "local-schema",
+        name: "LocalBusiness Schema",
         path: "/local-schema",
         status: "available",
       }),
