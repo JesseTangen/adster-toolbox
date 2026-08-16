@@ -1,0 +1,48 @@
+# Project TODO
+
+- [x] Establish the polished light-theme visual system, responsive application shell, and accessible interaction states.
+- [x] Build a manual-entry form for core Schema.org LocalBusiness properties: name, description, URL, telephone, email, PostalAddress, GeoCoordinates, opening hours, price range, logo, and sameAs social URLs.
+- [x] Add a business-type and LocalBusiness-subtype selector with conditional subtype-specific fields for Restaurant, MedicalBusiness, LegalService, Store, and other supported subtypes.
+- [x] Generate a valid, formatted JSON-LD document in real time and provide formatted code preview and one-click copy.
+- [x] Add inline field-level required and recommended-property validation faithful to Schema.org LocalBusiness documentation.
+- [x] Integrate Google Maps Places search to find a business and map supported Places details into the form.
+- [x] Add session-based schema entry saving, switching, renaming, and deletion for multiple business locations.
+- [x] Create automated tests for the schema construction and validation behavior.
+- [x] Verify desktop and mobile layouts, run type checks and tests, and resolve all identified issues.
+- [x] Normalize imported Google Places opening hours to Schema.org-compatible day and time syntax.
+- [x] Handle overnight, 24-hour, and split-day Google Places opening-hour periods in the Schema.org mapper.
+- [x] Expand the LocalBusiness type catalog to cover the full practical Schema.org hierarchy and descendant subtypes.
+- [x] Replace the limited type dropdown with a searchable, grouped type selector that supports the expanded catalog.
+- [x] Test the type catalog and selection behavior across core LocalBusiness categories.
+- [x] Make the application header sticky at the top of the workspace.
+- [x] Remove the introductory structured-data workspace hero section.
+- [x] Apply the supplied #00aeef blue palette consistently across primary actions, accents, and supporting UI states.
+- [x] Verify the refined layout and color system at desktop and mobile breakpoints.
+- [x] Assess and document the build, base-path, and runtime changes required for GitHub Pages hosting.
+- [x] Add a GitHub Pages static-client build with the correct repository base path.
+- [x] Remove Manus server, tRPC, and OAuth runtime dependencies from the browser entry point.
+- [x] Replace the Manus Maps proxy loader with a static-host-compatible Google Maps loader configured at build time.
+- [x] Add a GitHub Actions workflow that builds and deploys the Pages artifact.
+- [x] Build, test, and inspect the static Pages artifact before synchronizing through GitHub.
+- [x] Confirm whether the Google Maps import can run in a standalone GitHub Pages build without an API or proxy.
+- [x] Remove API-dependent Google Maps import functionality and its interface from the static GitHub Pages experience.
+- [x] Verify the API-free Pages build, tests, and responsive interface after removing Maps integration.
+- [x] Verify the API-free interface at mobile and tablet breakpoints after removing Maps integration, and resolve any layout regressions.
+- [x] Record the API-free desktop, tablet, and mobile verification findings for team handoff.
+- [x] Prepare the supplied blue-and-white logo as a web-ready static asset.
+- [x] Replace the header SVG mark with the supplied logo while preserving header accessibility and layout.
+- [x] Verify the new header logo at desktop and mobile breakpoints.
+- [x] Prepare the updated supplied blue logo for self-contained static use.
+- [x] Replace the current header logo with the updated blue logo.
+- [x] Verify the updated logo in the compiled Pages build at desktop and mobile sizes.
+- [x] Verify the applied header title reads “Adster Schema Studio” as requested.
+- [x] Confirm the title change builds and displays correctly before saving a checkpoint.
+- [x] Align the GitHub Pages workflow pnpm setup with the package manager version declared by the repository.
+- [x] Validate the corrected workflow configuration with local type checks, tests, and a static Pages build.
+- [x] Resolve the GitHub Pages initialization prerequisite in repository settings; the workflow requires no additional Pages token.
+- [x] Validate the initialized Pages workflow configuration and static build before re-running the GitHub deployment.
+- [x] Enable GitHub Pages in the repository settings and select GitHub Actions as the publishing source.
+- [x] Change the GitHub Pages base path from the source repository name to /Adster-Schema-Studio/.
+- [x] Verify the generated Pages artifact references the Adster-Schema-Studio asset path and completes all automated checks.
+- [x] Configure the client router to recognize /Adster-Schema-Studio/ as the GitHub Pages application base path.
+- [x] Verify direct loading and refresh behavior at the deployed repository path in the static build.
