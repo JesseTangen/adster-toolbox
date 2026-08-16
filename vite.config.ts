@@ -174,6 +174,7 @@ export default defineConfig({
       "@adster/schema-core": path.resolve(import.meta.dirname, "packages", "schema-core", "src", "index.ts"),
       "@adster/toolbox-config": path.resolve(import.meta.dirname, "packages", "config", "src", "index.ts"),
       "@adster/toolbox-ui": path.resolve(import.meta.dirname, "packages", "ui", "src", "index.ts"),
+      "@adster/wireframe-core": path.resolve(import.meta.dirname, "packages", "wireframe-core", "src", "index.ts"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },

@@ -20,6 +20,14 @@ describe("Strategist Toolbox registry", () => {
     expect(toolboxTools.every(tool => tool.category !== undefined)).toBe(true);
   });
 
+  it("activates Wireframe Builder as an available Toolbox route", () => {
+    expect(toolboxTools).toContainEqual(expect.objectContaining({
+      id: "wireframe-builder",
+      path: "/wireframe-builder",
+      status: "available",
+    }));
+  });
+
   it("exposes shared UI and checklist contracts for future tool modules", () => {
     expect(toolboxCardClassNames.available).toContain("border-primary");
     expect(checklistDefinitions[0]?.items).toHaveLength(4);

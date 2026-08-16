@@ -33,7 +33,8 @@ export const toolboxTools: ToolboxTool[] = [
     name: "Wireframe Builder",
     category: "Planning",
     description: "Turn strategic page requirements into shareable content and wireframe briefs.",
-    status: "planned",
+    path: "/wireframe-builder",
+    status: "available",
     eyebrow: "Experience planning",
   },
   {

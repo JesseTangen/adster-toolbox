@@ -53,3 +53,10 @@
 - [x] Use a real shared UI export and a real checklist definition from the workspace packages.
 - [x] Verify and document the root-application shell as the supported deployment model for the current workspace.
 - [x] Verify the applied toolbox naming edits.
+- [x] Create a drag-and-drop Wireframe Builder route with a reusable website-section catalog.
+- [x] Add visual style variants, per-section editing controls, and strategist/design notes.
+- [x] Add a developer-shareable image export for the composed wireframe.
+- [x] Activate Wireframe Builder in the Toolbox registry and shared navigation.
+- [x] Validate the Wireframe Builder interactions, export path, responsive presentation, and automated checks.
+- [x] Manually verify adding, reordering, duplicating, removing, and editing wireframe sections.
+- [x] Exercise the Wireframe Builder PNG export and confirm the exported handoff image contains the composed canvas only.

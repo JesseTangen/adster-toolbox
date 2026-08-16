@@ -21,7 +21,8 @@
       "@adster/checklists": ["./packages/checklists/src/index.ts"],
       "@adster/schema-core": ["./packages/schema-core/src/index.ts"],
       "@adster/toolbox-config": ["./packages/config/src/index.ts"],
-      "@adster/toolbox-ui": ["./packages/ui/src/index.ts"]
+      "@adster/toolbox-ui": ["./packages/ui/src/index.ts"],
+      "@adster/wireframe-core": ["./packages/wireframe-core/src/index.ts"]
     }
   }
 }

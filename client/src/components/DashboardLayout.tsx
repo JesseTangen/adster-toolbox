@@ -21,11 +21,11 @@ import { useLocation } from "wouter";
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Braces, label: "LocalBusiness Schema", path: "/local-schema" },
+  { icon: Workflow, label: "Wireframe Builder", path: "/wireframe-builder" },
 ];
 
 const plannedMenuItems = [
   { icon: Boxes, label: "Other Schema" },
-  { icon: Workflow, label: "Wireframe Builder" },
   { icon: CheckSquare2, label: "QA Checklists" },
 ];
 
