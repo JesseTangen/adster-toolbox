@@ -65,3 +65,8 @@
 - [x] Verify both JPG exports and the revised section annotation layout.
 - [x] Align the LocalBusiness Schema header structure, typography, icon treatment, and controls with Wireframe Builder.
 - [x] Verify the LocalBusiness header at desktop and mobile sizes and run the relevant automated checks.
+- [x] Simplify the Header template to sticky behavior only, fixed brand text, right-aligned navigation, and no annotation rail.
+- [x] Clarify the Hero image-overlay variant as a background-image treatment rather than a right-side visual.
+- [x] Add a card-grid View all toggle with a full-width link row below the cards.
+- [x] Make the FAQ heading a full-width row above the accordion items.
+- [x] Verify the refined Wireframe Builder templates, exports, responsive layout, and automated checks.

@@ -27,10 +27,11 @@ export type WireframeSection = {
   variant: string;
   title: string;
   note: string;
+  showViewAll: boolean;
 };
 
 export const wireframeSectionDefinitions: WireframeSectionDefinition[] = [
-  { type: "header", label: "Header", category: "Frame", description: "Brand, navigation, and an action.", defaultTitle: "Adster", variants: [{ id: "standard", label: "Standard navigation", description: "Brand left, links and action right." }, { id: "centered", label: "Centered brand", description: "Centered brand with balanced links." }, { id: "utility", label: "Utility bar", description: "Slim announcement plus navigation." }] },
+  { type: "header", label: "Header", category: "Frame", description: "Fixed brand, right-aligned navigation, and an action.", defaultTitle: "[Brand Name]", variants: [{ id: "sticky", label: "Sticky", description: "Header remains in view as visitors move down the page." }, { id: "static", label: "Not sticky", description: "Header scrolls normally with the page." }] },
   { type: "hero", label: "Hero", category: "Content", description: "First impression, primary message, and CTA.", defaultTitle: "A clear message for the people who matter.", variants: [{ id: "split", label: "Split image", description: "Copy beside a visual placeholder." }, { id: "centered", label: "Centered statement", description: "Focused message with supporting CTA." }, { id: "overlay", label: "Image overlay", description: "Copy over a full-bleed visual." }] },
   { type: "cards", label: "Card grid", category: "Content", description: "Feature, service, or proof-point cards.", defaultTitle: "Ways to move the work forward", variants: [{ id: "three", label: "Three columns", description: "Balanced feature comparison." }, { id: "four", label: "Four compact cards", description: "Dense option or category row." }, { id: "editorial", label: "Editorial cards", description: "Image-forward stories with metadata." }] },
   { type: "split", label: "Image + content", category: "Content", description: "An image paired with explanatory content.", defaultTitle: "A considered section with supporting detail", variants: [{ id: "image-left", label: "Image left", description: "Visual first, explanatory copy second." }, { id: "image-right", label: "Image right", description: "Copy first, visual second." }, { id: "portrait", label: "Portrait focus", description: "Tall image treatment for an editorial feel." }] },
@@ -55,6 +56,7 @@ export function createWireframeSection(type: WireframeSectionType, id = `section
     variant: definition.variants[0]?.id ?? "default",
     title: definition.defaultTitle,
     note: "",
+    showViewAll: type === "cards",
   };
 }
 
