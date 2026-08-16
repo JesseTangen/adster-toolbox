@@ -87,3 +87,5 @@
 - [x] Activate QA Checklists in the Toolbox registry and document how to add or edit lists.
 - [x] Validate the new QA workspace across desktop/mobile layouts and automated checks.
 - [x] Add persistent per-check QA notes with local completion state and verify note entry in the QA workspace.
+- [x] Add a lightweight team password gate with session-based access and an honest public-repository security notice.
+- [x] Validate password acceptance, rejection, session persistence, sign-out, and the static build.

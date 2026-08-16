@@ -5,14 +5,17 @@ import NotFound from "@/pages/NotFound";
 import { Route, Router as WouterRouter, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { TEAM_ACCESS_SESSION_KEY } from "./lib/teamAccess";
 import Home from "./pages/Home";
 import LocalSchema from "./pages/LocalSchema";
 import QaChecklists from "./pages/QaChecklists";
+import TeamAccess from "./pages/TeamAccess";
 import WireframeBuilder from "./pages/WireframeBuilder";
+import { useState } from "react";
 
-function AppRoutes() {
+function AppRoutes({ onSignOut }: { onSignOut: () => void }) {
   return (
-    <DashboardLayout>
+    <DashboardLayout onSignOut={onSignOut}>
       <Switch>
         <Route path={"/"} component={Home} />
         <Route path={"/local-schema"} component={LocalSchema} />
@@ -32,7 +35,16 @@ function AppRoutes() {
 
 function App() {
   const pagesBasePath = import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL.replace(/\/$/, "");
-  const routes = <AppRoutes />;
+  const [hasTeamAccess, setHasTeamAccess] = useState(() => sessionStorage.getItem(TEAM_ACCESS_SESSION_KEY) === "granted");
+  const grantAccess = () => {
+    sessionStorage.setItem(TEAM_ACCESS_SESSION_KEY, "granted");
+    setHasTeamAccess(true);
+  };
+  const revokeAccess = () => {
+    sessionStorage.removeItem(TEAM_ACCESS_SESSION_KEY);
+    setHasTeamAccess(false);
+  };
+  const routes = hasTeamAccess ? <AppRoutes onSignOut={revokeAccess} /> : <TeamAccess onGranted={grantAccess} />;
 
   return (
     <ErrorBoundary>

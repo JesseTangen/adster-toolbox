@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
 import { headerLogoSrc } from "@/lib/headerLogo";
-import { Boxes, Braces, CheckSquare2, LayoutDashboard, PanelLeft, Workflow } from "lucide-react";
+import { Boxes, Braces, CheckSquare2, LayoutDashboard, LogOut, PanelLeft, Workflow } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -36,8 +36,10 @@ const MAX_WIDTH = 480;
 
 export default function DashboardLayout({
   children,
+  onSignOut,
 }: {
   children: React.ReactNode;
+  onSignOut: () => void;
 }) {
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
@@ -55,7 +57,7 @@ export default function DashboardLayout({
         } as CSSProperties
       }
     >
-      <DashboardLayoutContent setSidebarWidth={setSidebarWidth}>
+      <DashboardLayoutContent setSidebarWidth={setSidebarWidth} onSignOut={onSignOut}>
         {children}
       </DashboardLayoutContent>
     </SidebarProvider>
@@ -65,11 +67,13 @@ export default function DashboardLayout({
 type DashboardLayoutContentProps = {
   children: React.ReactNode;
   setSidebarWidth: (width: number) => void;
+  onSignOut: () => void;
 };
 
 function DashboardLayoutContent({
   children,
   setSidebarWidth,
+  onSignOut,
 }: DashboardLayoutContentProps) {
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
@@ -180,7 +184,7 @@ function DashboardLayoutContent({
             </div>
           </SidebarContent>
 
-          <SidebarFooter className="p-3">
+          <SidebarFooter className="space-y-2 p-3">
             <div className="flex items-center gap-3 rounded-xl border border-sidebar-border bg-sidebar-accent/45 px-2 py-2 group-data-[collapsible=icon]:justify-center">
               <img src={headerLogoSrc} alt="Adster Creative" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
               <div className="min-w-0 group-data-[collapsible=icon]:hidden">
@@ -188,6 +192,7 @@ function DashboardLayoutContent({
                 <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground">Strategist system</p>
               </div>
             </div>
+            <button onClick={onSignOut} className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-sidebar-border bg-sidebar-accent/30 px-2 text-[10px] font-medium text-muted-foreground transition hover:bg-sidebar-accent group-data-[collapsible=icon]:w-8" aria-label="Sign out of Toolbox"><LogOut className="h-3.5 w-3.5" /><span className="group-data-[collapsible=icon]:hidden">Sign out</span></button>
           </SidebarFooter>
         </Sidebar>
         <div
