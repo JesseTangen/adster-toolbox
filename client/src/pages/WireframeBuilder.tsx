@@ -70,7 +70,7 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   const definition = getWireframeSectionDefinition(section.type);
   const isBoundary = isWireframeBoundarySection(section);
   const isDark = section.type === "footer" || (section.type === "hero" && section.variant === "overlay");
-  const common = `group relative cursor-pointer overflow-hidden border transition ${selected ? "border-primary ring-2 ring-primary/20" : "border-[#d7e4ee] hover:border-primary/50"} ${isDark ? "bg-[#18354e] text-white" : "bg-white text-[#223b50]"}`;
+  const common = `group relative ${isBoundary ? "cursor-default" : "cursor-pointer"} overflow-hidden border transition ${selected ? "border-primary ring-2 ring-primary/20" : "border-[#d7e4ee] hover:border-primary/50"} ${isDark ? "bg-[#18354e] text-white" : "bg-white text-[#223b50]"}`;
 
   const shell = (content: React.ReactNode, className = "") => (
     <section
@@ -78,7 +78,7 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
       onDragStart={event => { if (isBoundary) { event.preventDefault(); return; } onDragStart(event); }}
       onDragOver={event => { if (!isBoundary) event.preventDefault(); }}
       onDrop={event => { if (!isBoundary) onDrop(event); }}
-      onClick={onSelect}
+      onClick={isBoundary ? undefined : onSelect}
       className={`${common} ${className}`}
       aria-label={`${definition.label} wireframe section`}
     >
@@ -169,15 +169,15 @@ function WireframeRows({
 
 export default function WireframeBuilder() {
   const [sections, setSections] = useState<WireframeSection[]>(initialSections);
-  const [selectedId, setSelectedId] = useState(initialSections[0]?.id ?? "");
+  const [selectedId, setSelectedId] = useState(initialSections.find(section => !isWireframeBoundarySection(section))?.id ?? "");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [projectName, setProjectName] = useState("Campaign landing page");
-  const [isExporting, setIsExporting] = useState(false);
+  const [isExporting, setIsExporting] = useState<"desktop" | "mobile" | null>(null);
   const desktopExportRef = useRef<HTMLDivElement>(null);
   const mobileExportRef = useRef<HTMLDivElement>(null);
 
   const selectedIndex = sections.findIndex(section => section.id === selectedId);
-  const selected = sections[selectedIndex] ?? sections[0];
+  const selected = sections[selectedIndex] ?? sections.find(section => !isWireframeBoundarySection(section)) ?? sections[0];
   const selectedDefinition = selected ? getWireframeSectionDefinition(selected.type) : undefined;
   const selectedIsBoundary = selected ? isWireframeBoundarySection(selected) : false;
   const groupedDefinitions = useMemo(() => categoryOrder.filter(category => category !== "Frame").map(category => ({ category, items: wireframeSectionDefinitions.filter(item => item.category === category) })), []);
@@ -237,36 +237,27 @@ export default function WireframeBuilder() {
     setSections(current => moveWireframeSection(current, sourceIndex, targetIndex));
   };
 
-  const exportWireframes = async () => {
-    const exports = [
-      { mode: "desktop", node: desktopExportRef.current },
-      { mode: "mobile", node: mobileExportRef.current },
-    ] as const;
-    if (exports.some(item => !item.node)) return;
-    setIsExporting(true);
+  const exportJpg = async (mode: "desktop" | "mobile") => {
+    const exportNode = mode === "desktop" ? desktopExportRef.current : mobileExportRef.current;
+    if (!exportNode) return;
+    setIsExporting(mode);
     try {
-      const baseName = projectName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "wireframe";
-      const images = await Promise.all(exports.map(async ({ mode, node }) => ({
-        mode,
-        dataUrl: await toJpeg(node!, {
-          cacheBust: true,
-          pixelRatio: 2,
-          quality: 0.94,
-          backgroundColor: "#f6fbff",
-          filter: element => !(element instanceof HTMLElement && element.dataset.exportHide === "true"),
-        }),
-      })));
-      images.forEach(({ mode, dataUrl }) => {
-        const link = document.createElement("a");
-        link.download = `${baseName}-${mode}-wireframe.jpg`;
-        link.href = dataUrl;
-        link.click();
+      const dataUrl = await toJpeg(exportNode, {
+        cacheBust: true,
+        pixelRatio: 2,
+        quality: 0.94,
+        backgroundColor: "#f6fbff",
+        filter: element => !(element instanceof HTMLElement && element.dataset.exportHide === "true"),
       });
-      toast.success("Desktop and mobile JPG downloads started");
+      const link = document.createElement("a");
+      link.download = `${projectName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "wireframe"}-${mode}-wireframe.jpg`;
+      link.href = dataUrl;
+      link.click();
+      toast.success(`${mode === "desktop" ? "Desktop" : "Mobile"} JPG download started`);
     } catch {
-      toast.error("The wireframes could not be exported. Try again after the preview finishes loading.");
+      toast.error("The wireframe JPG could not be exported. Try again after the preview finishes loading.");
     } finally {
-      setIsExporting(false);
+      setIsExporting(null);
     }
   };
 
@@ -279,7 +270,8 @@ export default function WireframeBuilder() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-xl border border-border bg-white p-1"><Button size="sm" variant={previewMode === "desktop" ? "default" : "ghost"} onClick={() => setPreviewMode("desktop")} className="h-8 gap-1.5 rounded-lg px-2.5 text-[11px]"><Monitor className="h-3.5 w-3.5" />Desktop</Button><Button size="sm" variant={previewMode === "mobile" ? "default" : "ghost"} onClick={() => setPreviewMode("mobile")} className="h-8 gap-1.5 rounded-lg px-2.5 text-[11px]"><Smartphone className="h-3.5 w-3.5" />Mobile</Button></div>
-          <Button onClick={exportWireframes} disabled={isExporting} aria-busy={isExporting} className="h-10 gap-2 rounded-xl px-3 text-xs shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]"><Download className="h-3.5 w-3.5" />Download Wireframes</Button>
+          <Button onClick={() => exportJpg("desktop")} disabled={isExporting !== null} className="h-10 gap-2 rounded-xl px-3 text-xs shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]"><Download className="h-3.5 w-3.5" />{isExporting === "desktop" ? "Preparing" : "Desktop JPG"}</Button>
+          <Button onClick={() => exportJpg("mobile")} disabled={isExporting !== null} variant="outline" className="h-10 gap-2 rounded-xl bg-white px-3 text-xs"><Download className="h-3.5 w-3.5" />{isExporting === "mobile" ? "Preparing" : "Mobile JPG"}</Button>
         </div>
       </header>
 
@@ -307,7 +299,7 @@ export default function WireframeBuilder() {
 
         <aside className="2xl:sticky 2xl:top-24 2xl:self-start">
           {selected && selectedDefinition ? <div className="overflow-hidden rounded-2xl border border-border/80 bg-card/85 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]">
-            <div className="border-b border-border/70 px-5 py-4"><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[9px] uppercase tracking-[0.12em] text-primary">Selected section</p><h2 className="mt-1 text-sm font-semibold">{selectedDefinition.label}</h2></div><span className="rounded-full bg-secondary px-2 py-1 font-mono text-[8px] uppercase tracking-[0.08em] text-secondary-foreground">#{selectedIndex + 1}</span></div></div>
+            <div className="border-b border-border/70 px-5 py-4"><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[9px] uppercase tracking-[0.12em] text-primary">Selected section</p><h2 className="mt-1 text-sm font-semibold">{selectedDefinition.label}</h2></div><span className="rounded-full bg-secondary px-2 py-1 font-mono text-[8px] uppercase tracking-[0.08em] text-secondary-foreground">#{sections.filter(section => !isWireframeBoundarySection(section)).findIndex(section => section.id === selected.id) + 1}</span></div></div>
             <div className="space-y-4 p-5">{selectedIsBoundary ? <div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-3"><p className="font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-primary">Fixed canvas boundary</p><p className="mt-1 text-xs leading-5 text-muted-foreground">The {selectedDefinition.label} is locked at the {selected.type === "header" ? "top" : "bottom"} of every wireframe and has no editable sidebar options.</p></div> : <>
               <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Style option</label><select value={selected.variant} onChange={event => updateSelected({ variant: event.target.value })} className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20">{selectedDefinition.variants.map(variant => <option key={variant.id} value={variant.id}>{variant.label}</option>)}</select><p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">{selectedDefinition.variants.find(variant => variant.id === selected.variant)?.description}</p></div>
               {selected.type !== "header" ? <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Section heading</label><Input value={selected.title} onChange={event => updateSelected({ title: event.target.value })} className="h-10 rounded-xl bg-white text-xs" /></div> : <div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-2.5"><p className="font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-primary">Brand label</p><p className="mt-1 text-xs text-muted-foreground">[Brand Name] is fixed for developer handoff.</p></div>}

@@ -79,3 +79,6 @@
 - [x] Remove the Editorial cards option from the Card grid template and validate the simplified selector.
 - [x] Replace separate desktop and mobile JPG controls with one Download Wireframes action that downloads both files.
 - [x] Verify the combined download action returns valid desktop and mobile JPG handoffs.
+- [x] Restore separate Desktop JPG and Mobile JPG download buttons.
+- [x] Make Header and Footer non-selectable canvas boundaries and select Hero as the first editable section.
+- [x] Verify separate download behavior and boundary-selection behavior across editor and exports.
