@@ -70,3 +70,5 @@
 - [x] Add a card-grid View all toggle with a full-width link row below the cards.
 - [x] Make the FAQ heading a full-width row above the accordion items.
 - [x] Verify the refined Wireframe Builder templates, exports, responsive layout, and automated checks.
+- [x] Restore left-side template-and-notes annotations for every Wireframe Builder section except Header and Footer.
+- [x] Verify selective annotations across desktop/mobile views, exports, and automated checks.

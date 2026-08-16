@@ -116,6 +116,20 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   return shell(<div className="p-8"><div className="wireframe-stack grid gap-6 sm:grid-cols-[1.2fr_0.8fr]"><div><h2 className="font-editorial text-2xl">{section.title}</h2><p className="mt-3 max-w-md text-[11px] leading-5 text-white/65">Close the page with a clear final action and useful navigation routes.</p><span className="mt-5 inline-block rounded-md bg-primary px-4 py-2 text-[10px] font-medium text-white">Contact us</span></div><div className="grid grid-cols-2 gap-3 text-[10px] text-white/65"><div><p className="font-medium text-white">Explore</p><p className="mt-2">Services</p><p className="mt-1">Work</p></div><div><p className="font-medium text-white">Connect</p><p className="mt-2">Instagram</p><p className="mt-1">LinkedIn</p></div></div></div><div className="mt-7 border-t border-white/15 pt-3 font-mono text-[8px] uppercase tracking-[0.11em] text-white/45">© Your company · Privacy · Terms</div></div>);
 }
 
+function SectionAnnotation({ section }: { section: WireframeSection }) {
+  const definition = getWireframeSectionDefinition(section.type);
+  return (
+    <aside className="rounded-lg border border-[#cfe3ee] bg-[#eff8fc] p-3 text-left">
+      <p className="font-mono text-[8px] font-medium uppercase tracking-[0.12em] text-primary">Template</p>
+      <p className="mt-1 text-[11px] font-semibold text-[#20364d]">{definition.label}</p>
+      <div className="mt-3 border-t border-primary/15 pt-2">
+        <p className="font-mono text-[8px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Notes</p>
+        <p className="mt-1 text-[9px] leading-4 text-muted-foreground">{section.note.trim() || "No strategist notes added yet."}</p>
+      </div>
+    </aside>
+  );
+}
+
 function WireframeRows({
   sections,
   selectedId,
@@ -131,7 +145,13 @@ function WireframeRows({
   onDrop?: (event: React.DragEvent<HTMLElement>, targetIndex: number) => void;
   onDragStart?: (event: React.DragEvent<HTMLElement>, index: number) => void;
 }) {
-  return <div className="space-y-2">{sections.map((section, index) => <PreviewSection key={section.id} section={section} selected={section.id === selectedId} onSelect={() => onSelect?.(section.id)} onDragStart={event => onDragStart?.(event, index)} onDrop={event => onDrop?.(event, index)} />)}</div>;
+  const isMobile = mode === "mobile";
+  return <div className="space-y-2">{sections.map((section, index) => {
+    const isFrame = section.type === "header" || section.type === "footer";
+    const preview = <PreviewSection key={section.id} section={section} selected={section.id === selectedId} onSelect={() => onSelect?.(section.id)} onDragStart={event => onDragStart?.(event, index)} onDrop={event => onDrop?.(event, index)} />;
+    if (isFrame) return preview;
+    return <div key={section.id} className={`grid gap-2 ${isMobile ? "grid-cols-1" : "grid-cols-[150px_minmax(0,1fr)]"}`}><SectionAnnotation section={section} />{preview}</div>;
+  })}</div>;
 }
 
 export default function WireframeBuilder() {
