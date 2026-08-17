@@ -76,6 +76,8 @@ button { -webkit-tap-highlight-color: transparent; }
 
 button:active { transform: scale(0.98); }
 
+button:not(:disabled) { cursor: pointer; }
+
 /* .font-editorial { font-family: "Playfair Display", Georgia, serif; } */
 
 .paper-grain {

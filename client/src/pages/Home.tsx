@@ -57,17 +57,9 @@ export default function Home() {
         <div className="absolute -bottom-40 left-[28%] h-64 w-64 rounded-full bg-[#6bd5fa]/20 blur-3xl" />
         <div className="relative grid gap-7 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
           <div>
-            <h1 className="mt-4 max-w-3xl font-editorial text-4xl leading-[0.98] tracking-tight sm:text-5xl">
+            <h1 className="max-w-3xl font-editorial text-4xl leading-[0.98] tracking-tight sm:text-5xl">
               Adster Creative Toolbox
             </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-[#d8edf7]/78 sm:text-[15px]">
-              A shared home for focused planning, structured-data, and quality-control tools. Each module is designed to fit the same strategist workflow without adding a new destination to manage.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-[#b9eeff]"><Sparkles className="h-4 w-4" /><span className="font-mono text-[10px] uppercase tracking-[0.12em]">Current release</span></div>
-            <p className="mt-3 text-lg font-semibold">3 live modules</p>
-            <p className="mt-1 text-xs leading-5 text-white/60">LocalBusiness Schema, Wireframe Builder, and QA Checklists are ready for strategist use. One future tool slot remains in the shared registry.</p>
           </div>
         </div>
       </section>
@@ -79,7 +71,6 @@ export default function Home() {
             <h2 className="mt-2 text-2xl font-semibold tracking-tight">Find the right workspace</h2>
             <p className="mt-1.5 text-sm text-muted-foreground">Search the shared catalog or filter by the type of strategic work.</p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground"><Clock3 className="h-3.5 w-3.5 text-primary" />Tool progress is kept at the module level.</div>
         </div>
 
         <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
@@ -138,14 +129,6 @@ export default function Home() {
             <Button onClick={() => { setQuery(""); setCategory("All tools"); }} variant="link" className="mt-1 h-auto px-0 text-xs">Clear filters</Button>
           </div>
         ) : null}
-      </section>
-
-      <section className="mt-8 grid gap-4 rounded-2xl border border-border/80 bg-white/60 p-5 sm:grid-cols-[auto_1fr] sm:items-center sm:p-6">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><Boxes className="h-5 w-5" /></div>
-        <div>
-          <h2 className="text-sm font-semibold">One shared strategist workspace</h2>
-          <p className="mt-1 text-sm leading-5 text-muted-foreground">New modules use this catalog, shared navigation, and visual system. QA Checklists now provides {checklistDefinitions.length} reusable review workflows and {checklistItemCount} structured checks.</p>
-        </div>
       </section>
     </div>
   );

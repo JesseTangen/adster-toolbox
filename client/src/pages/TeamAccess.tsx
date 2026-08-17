@@ -50,8 +50,6 @@ export default function TeamAccess({ onGranted }: { onGranted: () => void }) {
           {error ? <p id="access-error" role="alert" className="text-xs leading-5 text-destructive">{error}</p> : null}
           <Button type="submit" disabled={submitting} className="h-11 w-full gap-2 rounded-xl"><KeyRound className="h-4 w-4" />{submitting ? "Checking access…" : "Open Toolbox"}</Button>
         </form>
-
-        <div id="access-notice" className="mt-6 flex gap-2.5 rounded-xl border border-amber-200/70 bg-amber-50/70 p-3 text-[11px] leading-5 text-amber-950/75"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" /><p><strong>Lightweight access only.</strong> This gate discourages casual access but is not a security boundary for confidential material because the app is publicly deployed.</p></div>
       </section>
     </main>
   );
