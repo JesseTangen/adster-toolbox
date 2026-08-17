@@ -19,3 +19,5 @@ The resulting desktop and mobile JPG handoffs were visually reviewed after dark-
 The live Campaign canvas and Desktop JPG were also reviewed after a new light-mode export. They match the original light grayscale wireframe treatment, confirming the isolation boundary preserves the handoff consistently in both Toolbox themes.
 
 The corresponding light-mode Mobile JPG was reviewed as well and retains the same pale annotation rails, light grayscale canvas, and intentional neutral dark footer wireframe treatment.
+
+After the accent restoration, the dark-mode dashboard and Wireframe Builder were reviewed again. The Toolbox now uses the original blue system—navy surfaces with cyan accents—while the Campaign landing page remains isolated as a light handoff document.

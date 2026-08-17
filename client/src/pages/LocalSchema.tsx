@@ -36,9 +36,9 @@ const SESSION_STORAGE_KEY = "schema-studio-localbusiness-entries";
 const ACTIVE_ENTRY_STORAGE_KEY = "schema-studio-localbusiness-active-entry";
 
 const fieldClass =
-  "h-10 rounded-xl border-border/80 bg-white/75 px-3 text-[13px] shadow-[0_1px_0_rgba(255,255,255,0.7)] placeholder:text-muted-foreground/65 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/15 dark:bg-[#0a241f] dark:shadow-none";
+  "h-10 rounded-xl border-border/80 bg-white/75 px-3 text-[13px] shadow-[0_1px_0_rgba(255,255,255,0.7)] placeholder:text-muted-foreground/65 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/15 dark:bg-[#102b40] dark:shadow-none";
 const textareaClass =
-  "min-h-[92px] w-full resize-y rounded-xl border border-border/80 bg-white/75 px-3 py-2.5 text-[13px] leading-5 shadow-[0_1px_0_rgba(255,255,255,0.7)] outline-none placeholder:text-muted-foreground/65 transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15 dark:bg-[#0a241f] dark:shadow-none";
+  "min-h-[92px] w-full resize-y rounded-xl border border-border/80 bg-white/75 px-3 py-2.5 text-[13px] leading-5 shadow-[0_1px_0_rgba(255,255,255,0.7)] outline-none placeholder:text-muted-foreground/65 transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15 dark:bg-[#102b40] dark:shadow-none";
 
 function FieldLabel({ name, hint }: { name: string; hint?: string }) {
   return (
@@ -200,7 +200,7 @@ export default function LocalSchema() {
           <div className="min-w-0"><p className="font-editorial text-xl leading-none tracking-tight">LocalBusiness Schema</p><p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.13em] text-muted-foreground">Adster Creative Toolbox</p></div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div data-autosave-status className="rounded-xl border border-border bg-white p-1 dark:bg-[#0a241f]"><span className="flex h-8 items-center gap-2 rounded-lg px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">{autoSaveStatus === "saving" ? <LoaderCircle className="h-3.5 w-3.5 animate-spin text-primary" /> : <span className={`h-1.5 w-1.5 rounded-full ${autoSaveStatus === "saved" ? "bg-emerald-500 dark:bg-primary" : "bg-primary"}`} />}{autoSaveText}</span></div>
+          <div data-autosave-status className="rounded-xl border border-border bg-white p-1 dark:bg-[#102b40]"><span className="flex h-8 items-center gap-2 rounded-lg px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">{autoSaveStatus === "saving" ? <LoaderCircle className="h-3.5 w-3.5 animate-spin text-primary" /> : <span className={`h-1.5 w-1.5 rounded-full ${autoSaveStatus === "saved" ? "bg-emerald-500 dark:bg-primary" : "bg-primary"}`} />}{autoSaveText}</span></div>
         </div>
       </header>
 
@@ -300,8 +300,8 @@ export default function LocalSchema() {
                   {subtypeFields.food ? <>
                     <div><FieldLabel name="servesCuisine" hint="Comma-separated" /> <Input value={draft.servesCuisine} onChange={event => updateDraft("servesCuisine", event.target.value)} className={fieldClass} placeholder="Italian, Pizza" /></div>
                     <div><FieldLabel name="menu" /> <Input value={draft.menu} onChange={event => updateDraft("menu", event.target.value)} className={fieldClass} placeholder="https://example.com/menu" /></div>
-                    <label className="sm:col-span-2 flex cursor-pointer items-center gap-3 rounded-xl border border-border/80 bg-white/75 px-3 py-3 text-[13px] dark:bg-[#0a241f]">
-                      <input type="checkbox" checked={draft.acceptsReservations} onChange={event => updateDraft("acceptsReservations", event.target.checked)} className="h-4 w-4 accent-[oklch(0.36_0.06_154)] dark:accent-[#00f7ba]" />
+                    <label className="sm:col-span-2 flex cursor-pointer items-center gap-3 rounded-xl border border-border/80 bg-white/75 px-3 py-3 text-[13px] dark:bg-[#102b40]">
+                      <input type="checkbox" checked={draft.acceptsReservations} onChange={event => updateDraft("acceptsReservations", event.target.checked)} className="h-4 w-4 accent-[oklch(0.36_0.06_154)] dark:accent-[#00aeef]" />
                       <span><span className="font-mono text-[11px] font-medium">acceptsReservations</span><span className="ml-2 text-muted-foreground">Reservation availability</span></span>
                     </label>
                   </> : null}
@@ -317,7 +317,7 @@ export default function LocalSchema() {
           </section>
 
           <aside className="space-y-5 2xl:sticky 2xl:top-24 2xl:self-start">
-            <div className="overflow-hidden rounded-2xl border border-[#485a73] bg-[#40516a] text-[#f5fbff] shadow-[0_22px_65px_-34px_rgba(0,92,145,0.6)] dark:border-[#007a5d] dark:bg-[#073a2e] dark:shadow-[0_22px_65px_-34px_rgba(0,0,0,0.7)]">
+            <div className="overflow-hidden rounded-2xl border border-[#485a73] bg-[#40516a] text-[#f5fbff] shadow-[0_22px_65px_-34px_rgba(0,92,145,0.6)] dark:border-[#2879a5] dark:bg-[#163950] dark:shadow-[0_22px_65px_-34px_rgba(0,0,0,0.7)]">
               <div className="flex items-start justify-between gap-3 border-b border-white/10 px-5 py-4">
                 <div>
                   <div className="flex items-center gap-2"><Globe2 className="h-3.5 w-3.5 text-[#b9eeff]" /><p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[#b9eeff]">Live JSON-LD</p></div>

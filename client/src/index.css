@@ -30,29 +30,29 @@
 }
 
 .dark {
-  --background: #071c19;
-  --foreground: #eafff8;
-  --card: #0c2b25;
-  --card-foreground: #eafff8;
-  --popover: #10342d;
-  --popover-foreground: #eafff8;
-  --primary: #00f7ba;
-  --primary-foreground: #00352b;
-  --secondary: #009973;
-  --secondary-foreground: #d8fff2;
-  --muted: #102e28;
-  --muted-foreground: #9cc9bb;
-  --accent: #007a5d;
-  --accent-foreground: #c8fff0;
+  --background: #0c1c2b;
+  --foreground: #e9f8fe;
+  --card: #122b3f;
+  --card-foreground: #e9f8fe;
+  --popover: #18354e;
+  --popover-foreground: #e9f8fe;
+  --primary: #00aeef;
+  --primary-foreground: #04283b;
+  --secondary: #1a3d59;
+  --secondary-foreground: #b9eeff;
+  --muted: #142d40;
+  --muted-foreground: #9fc2d7;
+  --accent: #1d5273;
+  --accent-foreground: #d8f4ff;
   --destructive: #ff8c8c;
-  --border: #20584a;
-  --input: #286b5a;
-  --ring: #00f7ba;
-  --chart-1: #00f7ba;
-  --chart-2: #009973;
-  --chart-3: #8fffe2;
-  --chart-4: #087b64;
-  --chart-5: #00c995;
+  --border: #2b607e;
+  --input: #397795;
+  --ring: #00aeef;
+  --chart-1: #00aeef;
+  --chart-2: #4774c9;
+  --chart-3: #b9eeff;
+  --chart-4: #2879a5;
+  --chart-5: #63c8f4;
 }
 
 @theme inline {
@@ -98,24 +98,24 @@ body {
 
 .dark body {
   background:
-    radial-gradient(circle at 10% 0%, rgb(0 247 186 / 0.16), transparent 27rem),
-    radial-gradient(circle at 92% 0%, rgb(0 153 115 / 0.18), transparent 30rem),
+    radial-gradient(circle at 10% 0%, rgb(0 174 239 / 0.18), transparent 27rem),
+    radial-gradient(circle at 92% 0%, rgb(71 116 201 / 0.18), transparent 30rem),
     var(--background);
 }
 
 .dark [data-slot="sidebar"] {
-  background: linear-gradient(180deg, #009973 0%, #071c19 70%);
+  background: linear-gradient(180deg, #18354e 0%, #0c1c2b 70%);
   color: var(--foreground);
 }
 
 .dark [data-slot="sidebar"] [data-sidebar="menu-button"][data-active="true"] {
-  background: rgb(0 229 181 / 0.14);
-  color: #eafff8;
+  background: rgb(0 174 239 / 0.14);
+  color: #e9f8fe;
 }
 
 html.dark .toolbox-directory-card {
-  background: #0c2b25 !important;
-  border-color: #20584a !important;
+  background: #122b3f !important;
+  border-color: #2b607e !important;
 }
 
 .dark [class~="bg-white"],
@@ -131,7 +131,7 @@ html.dark .toolbox-directory-card {
 .dark [class~="bg-[#eaf5fa]/70"],
 .dark [class~="bg-[#eff8fc]"],
 .dark [class~="bg-[#e9f8fe]"] {
-  background-color: #0e2d27 !important;
+  background-color: #122b3f !important;
 }
 
 /* The campaign canvas is a client handoff artifact, not Toolbox chrome. */

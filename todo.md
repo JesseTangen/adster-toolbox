@@ -119,3 +119,5 @@
 - [x] Keep Desktop JPG and Mobile JPG wireframe exports light grayscale in both application themes.
 - [x] Verify the campaign canvas and both JPG handoffs under light and dark Toolbox themes.
 - [x] Reverify the live Campaign canvas and both JPG handoffs in light Toolbox mode after the isolation change.
+- [x] Replace dark-mode seafoam accents with the original blue palette across tokens, sidebar, and key Toolbox chrome.
+- [x] Verify blue dark mode, unchanged light mode, and preserved light wireframe canvas/exports.

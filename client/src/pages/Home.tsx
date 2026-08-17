@@ -54,7 +54,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto w-full max-w-7xl pb-10 pt-2 sm:pt-6">
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/65 bg-[#18354e] px-5 py-7 text-white shadow-[0_30px_80px_-42px_rgba(14,55,83,0.8)] dark:border-[#00f7ba]/35 dark:bg-[#009973] dark:shadow-[0_30px_80px_-42px_rgba(0,0,0,0.8)] sm:px-8 sm:py-10">
+      <section className="relative overflow-hidden rounded-[2rem] border border-white/65 bg-[#18354e] px-5 py-7 text-white shadow-[0_30px_80px_-42px_rgba(14,55,83,0.8)] dark:border-[#00aeef]/35 dark:bg-[#18354e] dark:shadow-[0_30px_80px_-42px_rgba(0,0,0,0.8)] sm:px-8 sm:py-10">
         <div className="absolute -right-28 -top-36 h-72 w-72 rounded-full bg-primary/25 blur-3xl" />
         <div className="absolute -bottom-40 left-[28%] h-64 w-64 rounded-full bg-[#6bd5fa]/20 blur-3xl dark:bg-primary/20" />
         <div className="relative grid gap-7 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
@@ -93,7 +93,7 @@ export default function Home() {
                 size="sm"
                 variant={category === item ? "default" : "outline"}
                 onClick={() => setCategory(item)}
-                className={`h-9 shrink-0 rounded-full px-3.5 text-xs ${category === item ? "shadow-[0_10px_24px_-14px_rgba(0,174,239,0.8)] dark:shadow-[0_10px_24px_-14px_rgba(0,229,181,0.6)]" : "bg-white/65 hover:bg-white dark:bg-card dark:hover:bg-accent"}`}
+                className={`h-9 shrink-0 rounded-full px-3.5 text-xs ${category === item ? "shadow-[0_10px_24px_-14px_rgba(0,174,239,0.8)] dark:shadow-[0_10px_24px_-14px_rgba(0,174,239,0.6)]" : "bg-white/65 hover:bg-white dark:bg-card dark:hover:bg-accent"}`}
               >
                 {item}
               </Button>
@@ -106,7 +106,7 @@ export default function Home() {
             const Icon = toolIcons[tool.id];
             const available = tool.status === "available";
             return (
-              <article key={tool.id} style={theme === "dark" ? { background: "#0c2b25", borderColor: "#20584a" } : undefined} className={`toolbox-directory-card group relative flex min-h-[232px] flex-col rounded-2xl border p-5 text-card-foreground shadow-[0_18px_44px_-36px_oklch(0.3_0.03_50)] transition duration-200 dark:border-[#20584a] dark:bg-[#0c2b25] ${available ? toolboxCardClassNames.available : toolboxCardClassNames.planned}`}>
+              <article key={tool.id} style={theme === "dark" ? { background: "#122b3f", borderColor: "#2b607e" } : undefined} className={`toolbox-directory-card group relative flex min-h-[232px] flex-col rounded-2xl border p-5 text-card-foreground shadow-[0_18px_44px_-36px_oklch(0.3_0.03_50)] transition duration-200 dark:border-[#2b607e] dark:bg-[#122b3f] ${available ? toolboxCardClassNames.available : toolboxCardClassNames.planned}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${available ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"}`}><Icon className="h-5 w-5" /></div>
                   <span className={`rounded-full px-2.5 py-1 font-mono text-[9px] font-medium uppercase tracking-[0.09em] ${available ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"}`}>{tool.category}</span>

@@ -14,13 +14,13 @@ describe("dark theme", () => {
     expect(sidebar).toContain('aria-label="Toggle dark mode"');
   });
 
-  it("defines the supplied deep-green and aqua dark theme tokens", () => {
+  it("defines the restored blue dark theme tokens", () => {
     const css = readFileSync(resolve(projectRoot, "client/src/index.css"), "utf8");
 
     expect(css).toContain(".dark {");
-    expect(css).toContain("--background: #071c19");
-    expect(css).toContain("--primary: #00f7ba");
-    expect(css).toContain("--secondary: #009973");
+    expect(css).toContain("--background: #0c1c2b");
+    expect(css).toContain("--primary: #00aeef");
+    expect(css).toContain("--secondary: #1a3d59");
     expect(css).toContain("html.dark .toolbox-directory-card");
   });
 
@@ -29,10 +29,10 @@ describe("dark theme", () => {
     const qaChecklists = readFileSync(resolve(projectRoot, "client/src/pages/QaChecklists.tsx"), "utf8");
 
     expect(localSchema).toContain("bg-white/75");
-    expect(localSchema).toContain("dark:bg-[#0a241f]");
-    expect(localSchema).toContain("dark:bg-[#073a2e]");
-    expect(qaChecklists).toContain("dark:bg-[#0a241f]");
-    expect(qaChecklists).toContain("dark:accent-[#00f7ba]");
+    expect(localSchema).toContain("dark:bg-[#102b40]");
+    expect(localSchema).toContain("dark:bg-[#163950]");
+    expect(qaChecklists).toContain("dark:bg-[#102b40]");
+    expect(qaChecklists).toContain("dark:accent-[#00aeef]");
   });
 
   it("keeps the Campaign canvas and both exports light inside dark mode", () => {
