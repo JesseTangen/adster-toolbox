@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex" />
+    <title>Redirecting to Strategist Toolbox</title>
+    <script>
+      // GitHub Pages only serves physical files. Preserve a requested SPA route,
+      // then send it through the repository root so index.html can restore it.
+      (function () {
+        var location = window.location;
+        var parts = location.pathname.split("/");
+        var repositoryBase = parts.slice(0, 2).join("/") + "/";
+        var appRoute = parts.slice(2).join("/");
+        var query = location.search ? "&" + location.search.slice(1).replace(/&/g, "~and~") : "";
+        location.replace(location.protocol + "//" + location.host + repositoryBase + "?/" + appRoute + query + location.hash);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to Strategist Toolbox…</p>
+  </body>
+</html>

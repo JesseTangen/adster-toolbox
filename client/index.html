@@ -11,6 +11,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // GitHub Pages SPA fallback: restore the nested route preserved by 404.html
+      // before Wouter starts so a refresh returns to the requested module.
+      (function (location) {
+        if (location.search[1] !== "/") return;
+        var route = location.search.slice(1).split("&").map(function (part) {
+          return part.replace(/~and~/g, "&");
+        }).join("?");
+        window.history.replaceState(null, "", location.pathname.slice(0, -1) + route + location.hash);
+      })(window.location);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -89,3 +89,5 @@
 - [x] Add persistent per-check QA notes with local completion state and verify note entry in the QA workspace.
 - [x] Add a lightweight team password gate with session-based access and an honest public-repository security notice.
 - [x] Validate password acceptance, rejection, session persistence, sign-out, and the static build.
+- [x] Add a route-preserving GitHub Pages 404.html SPA fallback for direct module refreshes.
+- [x] Validate fallback route restoration in the static Pages build and automated checks.

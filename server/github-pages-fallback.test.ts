@@ -1,0 +1,20 @@
+import fs from "node:fs";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+
+const projectRoot = path.resolve(import.meta.dirname, "..");
+
+describe("GitHub Pages SPA fallback", () => {
+  it("ships a custom 404 page that preserves the repository base and requested route", () => {
+    const fallback = fs.readFileSync(path.join(projectRoot, "client/public/404.html"), "utf8");
+    expect(fallback).toContain("repositoryBase");
+    expect(fallback).toContain("appRoute");
+    expect(fallback).toContain("?/" + "\" + appRoute");
+  });
+
+  it("restores a preserved fallback route before React loads", () => {
+    const index = fs.readFileSync(path.join(projectRoot, "client/index.html"), "utf8");
+    expect(index).toContain("GitHub Pages SPA fallback");
+    expect(index).toContain("history.replaceState");
+  });
+});
