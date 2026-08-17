@@ -192,7 +192,6 @@ function Sidebar({
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-              "background": "#FFFFFF",
             } as React.CSSProperties
           }
           side={side}
@@ -732,4 +731,3 @@ export {
   SidebarTrigger,
   useSidebar
 };
-

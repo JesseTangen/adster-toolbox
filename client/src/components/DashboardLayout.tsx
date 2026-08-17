@@ -12,8 +12,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
+import { useTheme } from "@/contexts/ThemeContext";
 import { headerLogoSrc } from "@/lib/headerLogo";
-import { Boxes, Braces, CheckSquare2, LayoutDashboard, LogOut, PanelLeft, Workflow } from "lucide-react";
+import { Boxes, Braces, CheckSquare2, LayoutDashboard, LogOut, Moon, PanelLeft, Sun, Workflow } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -82,6 +83,7 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (isCollapsed) {
@@ -193,6 +195,7 @@ function DashboardLayoutContent({
               </div>
             </div>
             <button onClick={onSignOut} className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-sidebar-border bg-sidebar-accent/30 px-2 text-[10px] font-medium text-muted-foreground transition hover:bg-sidebar-accent group-data-[collapsible=icon]:w-8" aria-label="Sign out of Toolbox"><LogOut className="h-3.5 w-3.5" /><span className="group-data-[collapsible=icon]:hidden">Sign out</span></button>
+            <button onClick={toggleTheme} role="switch" aria-checked={theme === "dark"} className="flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-sidebar-border bg-sidebar-accent/30 px-2 text-[10px] font-medium text-muted-foreground transition hover:bg-sidebar-accent group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:justify-center" aria-label="Toggle dark mode"><span className="flex items-center gap-2"><span className="relative flex h-4 w-7 items-center rounded-full bg-muted transition"><span className={`h-3 w-3 rounded-full bg-primary transition-transform ${theme === "dark" ? "translate-x-3.5" : "translate-x-0.5"}`} /></span>{theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}<span className="group-data-[collapsible=icon]:hidden">Dark mode</span></span></button>
           </SidebarFooter>
         </Sidebar>
         <div

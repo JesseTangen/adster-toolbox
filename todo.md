@@ -103,3 +103,15 @@
 - [x] Add Feature, Blog, Service, Product collection, and Product visual/content substyles with their requested media, link, price, and cart treatments.
 - [x] Add media, optional-link, and basic-versus-card presentation controls to the Multi column inspector.
 - [x] Update wireframe library labels, regression tests, desktop/mobile JPG handoffs, and interaction coverage for the Multi column section.
+- [x] Add a persistent dark-mode toggle to the sidebar footer.
+- [x] Create a dark theme using deep green and aqua accents while preserving the existing light theme tokens.
+- [x] Verify the light and dark themes across desktop/mobile Toolbox views and automated checks.
+- [x] Align the dark tokens and accent treatments precisely with the supplied deep-green and aqua palette reference.
+- [x] Audit and correct dark-mode contrast on LocalBusiness Schema and QA Checklists without changing light mode.
+- [x] Verify every active Toolbox module in dark and light modes at desktop and mobile widths.
+- [x] Audit LocalBusiness Schema and QA Checklists source for hardcoded light surfaces and add targeted dark-theme refinements where needed.
+- [x] Add route-specific light/dark desktop/mobile checks for Dashboard, LocalBusiness Schema, Wireframe Builder, and QA Checklists.
+- [x] Capture and assert key content for every active module in light mode at desktop and mobile widths.
+- [x] Capture and assert key content for every active module in dark mode at mobile width.
+- [x] Capture every active module in light desktop and mobile views alongside route assertions.
+- [x] Capture every active module in dark mobile view alongside route assertions.
