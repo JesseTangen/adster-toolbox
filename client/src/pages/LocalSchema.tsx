@@ -9,11 +9,11 @@ import {
   Copy,
   FilePlus2,
   Globe2,
+  LoaderCircle,
   Plus,
-  Save,
   Trash2,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   buildLocalBusinessSchema,
@@ -30,7 +30,10 @@ type SavedSchema = {
   draft: SchemaDraft;
 };
 
+type AutoSaveStatus = "idle" | "saving" | "saved";
+
 const SESSION_STORAGE_KEY = "schema-studio-localbusiness-entries";
+const ACTIVE_ENTRY_STORAGE_KEY = "schema-studio-localbusiness-active-entry";
 
 const fieldClass =
   "h-10 rounded-xl border-border/80 bg-white/75 px-3 text-[13px] shadow-[0_1px_0_rgba(255,255,255,0.7)] placeholder:text-muted-foreground/65 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/15";
@@ -65,6 +68,8 @@ export default function LocalSchema() {
   const [entries, setEntries] = useState<SavedSchema[]>([]);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
+  const [hasDraftChanges, setHasDraftChanges] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<AutoSaveStatus>("idle");
 
   const schema = useMemo(() => buildLocalBusinessSchema(draft), [draft]);
   const validation = useMemo(() => validateSchemaDraft(draft), [draft]);
@@ -79,7 +84,17 @@ export default function LocalSchema() {
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
-      if (saved) setEntries(JSON.parse(saved));
+      if (saved) {
+        const restoredEntries = JSON.parse(saved) as SavedSchema[];
+        setEntries(restoredEntries);
+        const activeId = sessionStorage.getItem(ACTIVE_ENTRY_STORAGE_KEY);
+        const activeEntry = restoredEntries.find(entry => entry.id === activeId);
+        if (activeEntry) {
+          setDraft(activeEntry.draft);
+          setActiveEntryId(activeEntry.id);
+          setAutoSaveStatus("saved");
+        }
+      }
     } catch {
       toast.error("Could not restore this browser session.");
     } finally {
@@ -92,42 +107,74 @@ export default function LocalSchema() {
     sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(entries));
   }, [entries, sessionLoaded]);
 
+  const persistDraft = useCallback((draftToPersist: SchemaDraft) => {
+    const item: SavedSchema = { id: draftToPersist.id, updatedAt: Date.now(), draft: draftToPersist };
+    setEntries(current => {
+      const exists = current.some(entry => entry.id === item.id);
+      const nextEntries = exists ? current.map(entry => (entry.id === item.id ? item : entry)) : [item, ...current];
+      try {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(nextEntries));
+      } catch {
+        toast.error("Could not save this browser session.");
+      }
+      return nextEntries;
+    });
+    setActiveEntryId(item.id);
+    sessionStorage.setItem(ACTIVE_ENTRY_STORAGE_KEY, item.id);
+  }, []);
+
+  useEffect(() => {
+    if (!sessionLoaded || !hasDraftChanges) return;
+    setAutoSaveStatus("saving");
+    const timer = window.setTimeout(() => {
+      persistDraft(draft);
+      setHasDraftChanges(false);
+      setAutoSaveStatus("saved");
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [draft, hasDraftChanges, persistDraft, sessionLoaded]);
+
   const updateDraft = <K extends keyof SchemaDraft>(field: K, value: SchemaDraft[K]) => {
     setDraft(current => ({ ...current, [field]: value }));
+    setHasDraftChanges(true);
   };
 
   const changeBusinessType = (type: string) => {
     setDraft(current => ({ ...current, businessType: type, businessSubtype: type }));
-  };
-
-  const saveSchema = () => {
-    const title = draft.label.trim() || draft.name.trim() || "Untitled LocalBusiness";
-    const storedDraft = { ...draft, label: title };
-    const item: SavedSchema = { id: activeEntryId || draft.id, updatedAt: Date.now(), draft: storedDraft };
-
-    setEntries(current => {
-      const exists = current.some(entry => entry.id === item.id);
-      return exists ? current.map(entry => (entry.id === item.id ? item : entry)) : [item, ...current];
-    });
-    setDraft(storedDraft);
-    setActiveEntryId(item.id);
-    toast.success(activeEntryId ? "Schema entry updated" : "Schema entry saved to this session");
+    setHasDraftChanges(true);
   };
 
   const createNew = () => {
+    if (hasDraftChanges) {
+      persistDraft(draft);
+      setAutoSaveStatus("saved");
+      toast.success("Current schema saved. New schema created.");
+    }
     setDraft(createSchemaDraft());
     setActiveEntryId(null);
+    sessionStorage.removeItem(ACTIVE_ENTRY_STORAGE_KEY);
+    setHasDraftChanges(false);
+    setAutoSaveStatus("idle");
   };
 
   const loadEntry = (entry: SavedSchema) => {
     setDraft(entry.draft);
     setActiveEntryId(entry.id);
+    sessionStorage.setItem(ACTIVE_ENTRY_STORAGE_KEY, entry.id);
+    setHasDraftChanges(false);
+    setAutoSaveStatus("saved");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const removeEntry = (id: string) => {
     setEntries(current => current.filter(entry => entry.id !== id));
-    if (activeEntryId === id) createNew();
+    if (activeEntryId === id) {
+      setDraft(createSchemaDraft());
+      setActiveEntryId(null);
+      sessionStorage.removeItem(ACTIVE_ENTRY_STORAGE_KEY);
+      setHasDraftChanges(false);
+      setAutoSaveStatus("idle");
+    }
     toast.success("Schema entry removed from this session");
   };
 
@@ -143,6 +190,7 @@ export default function LocalSchema() {
 
   const statusTone = validation.errors.length > 0 ? "issue" : validation.recommendations.length > 0 ? "review" : "ready";
   const statusText = validation.errors.length > 0 ? "Needs correction" : validation.recommendations.length > 0 ? "Ready to enrich" : "Schema ready";
+  const autoSaveText = autoSaveStatus === "saving" ? "Saving to session" : autoSaveStatus === "saved" ? "Saved to session" : "Session workspace";
 
   return (
     <div className="mx-auto w-full max-w-[1600px] pb-10">
@@ -152,8 +200,7 @@ export default function LocalSchema() {
           <div className="min-w-0"><p className="font-editorial text-xl leading-none tracking-tight">LocalBusiness Schema</p><p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.13em] text-muted-foreground">Adster Creative Toolbox</p></div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="hidden rounded-xl border border-border bg-white p-1 sm:flex"><span className="flex h-8 items-center gap-2 rounded-lg px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-primary" />Session workspace</span></div>
-          <Button onClick={saveSchema} className="h-10 gap-2 rounded-xl px-3 text-xs shadow-[0_12px_28px_-16px_rgba(0,174,239,0.65)]"><Save className="h-3.5 w-3.5" /><span>Save schema</span></Button>
+          <div data-autosave-status className="rounded-xl border border-border bg-white p-1"><span className="flex h-8 items-center gap-2 rounded-lg px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">{autoSaveStatus === "saving" ? <LoaderCircle className="h-3.5 w-3.5 animate-spin text-primary" /> : <span className={`h-1.5 w-1.5 rounded-full ${autoSaveStatus === "saved" ? "bg-emerald-500" : "bg-primary"}`} />}{autoSaveText}</span></div>
         </div>
       </header>
 
@@ -172,7 +219,7 @@ export default function LocalSchema() {
                 {entries.length === 0 ? (
                   <div className="px-3 py-5 text-center">
                     <FilePlus2 className="mx-auto h-5 w-5 text-muted-foreground/55" />
-                    <p className="mt-2 text-[11px] leading-4 text-muted-foreground">Save a schema to keep multiple locations handy during this session.</p>
+                    <p className="mt-2 text-[11px] leading-4 text-muted-foreground">Start typing to save locations automatically during this session.</p>
                   </div>
                 ) : (
                   entries.map(entry => (

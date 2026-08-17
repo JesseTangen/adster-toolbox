@@ -93,3 +93,7 @@
 - [x] Validate fallback route restoration in the static Pages build and automated checks.
 - [x] Remove Toolbox card eyebrow labels and replace availability pills with category pills.
 - [x] Verify the revised Toolbox directory cards across active and planned tools.
+- [x] Add debounced automatic session saving for LocalBusiness Schema edits and remove the manual save control.
+- [x] Turn the Session workspace pill into live saving/saved feedback and preserve the current draft before New schema creates another.
+- [x] Validate LocalBusiness auto-save, new-schema handoff, responsive header behavior, and automated checks.
+- [x] Verify the LocalBusiness auto-save header and session-status pill at a narrow viewport.
