@@ -34,4 +34,15 @@ describe("dark theme", () => {
     expect(qaChecklists).toContain("dark:bg-[#0a241f]");
     expect(qaChecklists).toContain("dark:accent-[#00f7ba]");
   });
+
+  it("keeps the Campaign canvas and both exports light inside dark mode", () => {
+    const wireframeBuilder = readFileSync(resolve(projectRoot, "client/src/pages/WireframeBuilder.tsx"), "utf8");
+    const css = readFileSync(resolve(projectRoot, "client/src/index.css"), "utf8");
+
+    expect(wireframeBuilder.match(/light-wireframe-document/g)).toHaveLength(3);
+    expect(wireframeBuilder).toContain('data-wireframe-export="desktop"');
+    expect(wireframeBuilder).toContain('data-wireframe-export="mobile"');
+    expect(css).toContain("html.dark .light-wireframe-document");
+    expect(css).toContain('light-wireframe-document [class~="bg-[#eff8fc]"]');
+  });
 });

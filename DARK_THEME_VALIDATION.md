@@ -11,3 +11,11 @@ LocalBusiness Schema and QA Checklists were reviewed at desktop width with the s
 Following a source-level audit, LocalBusiness now applies dark-only field, status-pill, reservation-control, schema-review, and JSON-LD panel treatments. QA Checklists now applies dark-only filter, completion badge, checkbox, note field, and review-status treatments. The updated desktop renders confirm these targeted refinements preserve readable surfaces without altering the existing light-mode classes.
 
 The final route sweep captured sixteen artifacts: Dashboard, LocalBusiness Schema, Wireframe Builder, and QA Checklists in light desktop, dark desktop, light mobile, and dark mobile modes. Every capture was paired with a route-specific visible-content assertion and a theme-state assertion.
+
+The Campaign landing page was separately checked with the surrounding Toolbox in dark mode. Its light grayscale canvas, header, annotation rails, and export documents are intentionally isolated from the green-and-aqua application palette.
+
+The resulting desktop and mobile JPG handoffs were visually reviewed after dark-mode export. Both retain the original light canvas and pale annotation rails, with only the intentional neutral dark hero-overlay and footer wireframe sections remaining dark.
+
+The live Campaign canvas and Desktop JPG were also reviewed after a new light-mode export. They match the original light grayscale wireframe treatment, confirming the isolation boundary preserves the handoff consistently in both Toolbox themes.
+
+The corresponding light-mode Mobile JPG was reviewed as well and retains the same pale annotation rails, light grayscale canvas, and intentional neutral dark footer wireframe treatment.

@@ -115,3 +115,7 @@
 - [x] Capture and assert key content for every active module in dark mode at mobile width.
 - [x] Capture every active module in light desktop and mobile views alongside route assertions.
 - [x] Capture every active module in dark mobile view alongside route assertions.
+- [x] Keep the Wireframe Builder Campaign landing page canvas light grayscale in both application themes.
+- [x] Keep Desktop JPG and Mobile JPG wireframe exports light grayscale in both application themes.
+- [x] Verify the campaign canvas and both JPG handoffs under light and dark Toolbox themes.
+- [x] Reverify the live Campaign canvas and both JPG handoffs in light Toolbox mode after the isolation change.

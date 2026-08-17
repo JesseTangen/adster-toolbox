@@ -134,6 +134,46 @@ html.dark .toolbox-directory-card {
   background-color: #0e2d27 !important;
 }
 
+/* The campaign canvas is a client handoff artifact, not Toolbox chrome. */
+html.dark .light-wireframe-document {
+  color-scheme: light;
+  color: #171717;
+  background: #f6fbff !important;
+  border-color: #c9dce8 !important;
+}
+
+html.dark .light-wireframe-document [class~="bg-white"],
+html.dark .light-wireframe-document [class~="bg-white/60"],
+html.dark .light-wireframe-document [class~="bg-white/75"],
+html.dark .light-wireframe-document [class~="bg-white/90"] {
+  background-color: #ffffff !important;
+}
+
+html.dark .light-wireframe-document [class~="bg-[#f6fbff]"] {
+  background-color: #f6fbff !important;
+}
+
+html.dark .light-wireframe-document [class~="bg-[#eff8fc]"] {
+  background-color: #eff8fc !important;
+}
+
+html.dark .light-wireframe-document [class~="border-[#cfe3ee]"] {
+  border-color: #cfe3ee !important;
+}
+
+html.dark .light-wireframe-document [class~="text-[#20364d]"] {
+  color: #20364d !important;
+}
+
+html.dark .light-wireframe-document [class~="text-muted-foreground"] {
+  color: #597187 !important;
+}
+
+html.dark .light-wireframe-document [class~="text-foreground"],
+html.dark .light-wireframe-document [class~="text-card-foreground"] {
+  color: #20364d !important;
+}
+
 button, input, textarea, select { font: inherit; }
 
 button { -webkit-tap-highlight-color: transparent; }
