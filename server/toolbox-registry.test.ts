@@ -16,8 +16,16 @@ describe("Strategist Toolbox registry", () => {
   });
 
   it("defines discovery categories for current and future tool modules", () => {
-    expect(toolboxCategories).toEqual(["All tools", "Schema", "Planning", "Quality"]);
+    expect(toolboxCategories).toEqual(["All tools", "Schema", "Planning", "Quality", "Knowledge"]);
     expect(toolboxTools.every(tool => tool.category !== undefined)).toBe(true);
+  });
+
+  it("replaces Other Schema with Knowledge Base and Prompt Library as planned modules", () => {
+    expect(toolboxTools).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "knowledge-base", name: "Knowledge Base", status: "planned", category: "Knowledge" }),
+      expect.objectContaining({ id: "prompt-library", name: "Prompt Library", status: "planned", category: "Planning" }),
+    ]));
+    expect(toolboxTools.some(tool => tool.id === "other-schema")).toBe(false);
   });
 
   it("activates the planning and quality modules as available Toolbox routes", () => {

@@ -3,7 +3,7 @@ export type ToolStatus = "available" | "planned";
 export type ToolboxTool = {
   id: string;
   name: string;
-  category: "Schema" | "Planning" | "Quality";
+  category: "Schema" | "Planning" | "Quality" | "Knowledge";
   description: string;
   path?: string;
   status: ToolStatus;
@@ -21,12 +21,12 @@ export const toolboxTools: ToolboxTool[] = [
     eyebrow: "Structured data",
   },
   {
-    id: "other-schema",
-    name: "Other Schema",
-    category: "Schema",
-    description: "A future workspace for the next schema patterns your strategy team standardizes.",
+    id: "knowledge-base",
+    name: "Knowledge Base",
+    category: "Knowledge",
+    description: "A future shared reference library for strategy methods, examples, and team guidance.",
     status: "planned",
-    eyebrow: "Structured data",
+    eyebrow: "Shared knowledge",
   },
   {
     id: "wireframe-builder",
@@ -46,7 +46,15 @@ export const toolboxTools: ToolboxTool[] = [
     status: "available",
     eyebrow: "Delivery quality",
   },
+  {
+    id: "prompt-library",
+    name: "Prompt Library",
+    category: "Planning",
+    description: "A future collection of reusable prompts for research, planning, and production workflows.",
+    status: "planned",
+    eyebrow: "Reusable prompts",
+  },
 ];
 
-export const toolboxCategories = ["All tools", "Schema", "Planning", "Quality"] as const;
+export const toolboxCategories = ["All tools", "Schema", "Planning", "Quality", "Knowledge"] as const;
 export type ToolboxCategory = (typeof toolboxCategories)[number];

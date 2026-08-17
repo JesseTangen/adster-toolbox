@@ -14,7 +14,7 @@ import {
 import { useIsMobile } from "@/hooks/useMobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { headerLogoSrc } from "@/lib/headerLogo";
-import { Boxes, Braces, CheckSquare2, LayoutDashboard, LogOut, Moon, PanelLeft, Sun, Workflow } from "lucide-react";
+import { BookOpen, Braces, CheckSquare2, LayoutDashboard, LogOut, Moon, PanelLeft, Sparkles, Sun, Workflow } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -27,7 +27,8 @@ const menuItems = [
 ];
 
 const plannedMenuItems = [
-  { icon: Boxes, label: "Other Schema" },
+  { icon: BookOpen, label: "Knowledge Base" },
+  { icon: Sparkles, label: "Prompt Library" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

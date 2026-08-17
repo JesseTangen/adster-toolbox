@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ArrowUpRight,
-  Boxes,
+  BookOpen,
   Braces,
   CheckSquare2,
   Clock3,
@@ -20,9 +20,10 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 const toolIcons: Record<ToolboxTool["id"], typeof Braces> = {
   "local-schema": Braces,
-  "other-schema": Boxes,
+  "knowledge-base": BookOpen,
   "wireframe-builder": Workflow,
   "qa-checklists": CheckSquare2,
+  "prompt-library": Sparkles,
 };
 
 export default function Home() {

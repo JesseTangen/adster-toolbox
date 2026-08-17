@@ -121,3 +121,6 @@
 - [x] Reverify the live Campaign canvas and both JPG handoffs in light Toolbox mode after the isolation change.
 - [x] Replace dark-mode seafoam accents with the original blue palette across tokens, sidebar, and key Toolbox chrome.
 - [x] Verify blue dark mode, unchanged light mode, and preserved light wireframe canvas/exports.
+- [x] Remove Other Schema from the planned module catalog and dashboard.
+- [x] Add Knowledge Base and Prompt Library as coming-soon dashboard and navigation modules.
+- [x] Verify the updated planned-module cards, navigation, and automated registry coverage.
