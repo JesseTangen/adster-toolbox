@@ -4,7 +4,7 @@ import { createWireframeSection, moveWireframeSection, multiColumnContentStyles,
 describe("wireframe core", () => {
   it("provides the requested site section catalog with style variants", () => {
     expect(wireframeSectionDefinitions.map(item => item.type)).toEqual(expect.arrayContaining([
-      "header", "hero", "columns", "split", "faq", "articles", "products", "footer",
+      "header", "hero", "columns", "split", "faq", "footer",
     ]));
     expect(wireframeSectionDefinitions.map(item => item.type)).not.toContain("cards");
     expect(wireframeSectionDefinitions.filter(item => !["header", "footer", "split", "columns"].includes(item.type)).every(item => item.variants.length >= 3)).toBe(true);
@@ -12,7 +12,8 @@ describe("wireframe core", () => {
     expect(wireframeSectionDefinitions.find(item => item.type === "footer")?.variants).toEqual([]);
     expect(wireframeSectionDefinitions.find(item => item.type === "split")?.variants.map(variant => variant.id)).toEqual(["image-left", "image-right"]);
     expect(wireframeSectionDefinitions.find(item => item.type === "columns")?.variants.map(variant => variant.id)).toEqual(["two", "three", "four"]);
-    expect(multiColumnContentStyles.map(style => style.id)).toEqual(["feature", "blog", "service", "collection", "product"]);
+    expect(wireframeSectionDefinitions.map(item => item.type)).not.toEqual(expect.arrayContaining(["articles", "products"]));
+    expect(multiColumnContentStyles.map(style => style.id)).toEqual(["feature", "service", "collection"]);
   });
 
   it("creates editable sections and reorders them without changing their content", () => {
@@ -31,6 +32,7 @@ describe("wireframe core", () => {
     expect(columns.multiColumnMedia).toBe("image");
     expect(columns.multiColumnPresentation).toBe("basic");
     expect(columns.showReadMore).toBe(true);
+    expect(columns.showSeeAll).toBe(false);
     expect(moveWireframeSection(framedSections, 0, 1)).toBe(framedSections);
     expect(moveWireframeSection(framedSections, 1, 3)).toBe(framedSections);
     expect(reordered.map(section => section.id)).toEqual(["faq-1", "hero-1"]);

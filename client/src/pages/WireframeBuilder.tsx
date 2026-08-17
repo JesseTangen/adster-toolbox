@@ -17,7 +17,6 @@ import {
   ArrowDown,
   ArrowUp,
   ChevronDown,
-  ClipboardList,
   Columns3,
   Download,
   Eye,
@@ -28,7 +27,6 @@ import {
   Menu,
   MessageSquareText,
   Monitor,
-  Package,
   PanelTop,
   Plus,
   Rows3,
@@ -55,12 +53,10 @@ const typeIcons: Record<WireframeSectionType, typeof PanelTop> = {
   split: Rows3,
   text: FileText,
   faq: MessageSquareText,
-  articles: ClipboardList,
-  products: Package,
   footer: LayoutPanelTop,
 };
 
-const categoryOrder = ["Frame", "Content", "Commerce"] as const;
+const categoryOrder = ["Frame", "Content"] as const;
 
 function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   section: WireframeSection;
@@ -103,17 +99,14 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
     const itemCount = section.variant === "two" ? 2 : section.variant === "four" ? 4 : 3;
     const columnClass = section.variant === "two" ? "sm:grid-cols-2" : section.variant === "four" ? "grid-cols-2 sm:grid-cols-4" : "sm:grid-cols-3";
     const useCards = section.multiColumnPresentation === "card";
-    const showReadMore = contentStyle.id === "blog" || (contentStyle.supportsReadMore && section.showReadMore);
-    const mediaLabel = contentStyle.id === "blog" ? "Post image" : contentStyle.id === "collection" ? "Collection image" : contentStyle.id === "product" ? "Product image" : section.multiColumnMedia === "icon" ? "Icon" : "Image";
+    const showReadMore = contentStyle.supportsReadMore && section.showReadMore;
+    const mediaLabel = contentStyle.id === "collection" ? "Collection image" : section.multiColumnMedia === "icon" ? "Icon" : "Image";
     return shell(<div className="p-7"><h2 className="text-2xl font-semibold">{section.title}</h2><div className={`wireframe-card-grid mt-6 grid gap-3 ${columnClass}`}>{Array.from({ length: itemCount }, (_, index) => index + 1).map(item => <div key={item} className={`${useCards ? "border border-neutral-300 bg-white p-3" : "py-3"}`}>
       {section.multiColumnMedia !== "none" ? section.multiColumnMedia === "icon" ? <div className="flex h-14 w-14 items-center justify-center border border-neutral-300 bg-neutral-100"><Sparkles className="h-4 w-4 text-neutral-600" /></div> : <div className="flex h-16 items-end border border-neutral-300 bg-neutral-200 p-2 font-mono text-[8px] uppercase tracking-[0.1em] text-neutral-500">{mediaLabel}</div> : null}
       <p className="mt-3 text-[11px] font-semibold">{contentStyle.itemLabel} {item}</p>
-      {contentStyle.id === "blog" ? <p className="mt-1 text-[9px] text-neutral-500">By Author name</p> : null}
       {contentStyle.hasSummary ? <p className="mt-1 text-[9px] leading-4 text-neutral-500">Brief summary describing the main value or supporting detail.</p> : null}
-      {contentStyle.hasPrice ? <p className="mt-2 text-[11px] font-semibold">$00.00</p> : null}
-      {contentStyle.hasCart ? <span className="mt-3 inline-block border border-neutral-400 px-2.5 py-1.5 text-[9px] font-medium text-neutral-700">Add to cart</span> : null}
       {showReadMore ? <span className="mt-3 inline-block text-[9px] font-medium text-neutral-800">Read more →</span> : null}
-    </div>)}</div></div>);
+    </div>)}</div>{section.showSeeAll ? <span className="mt-5 flex w-full items-center justify-center border border-neutral-400 bg-neutral-200 px-4 py-2.5 text-[10px] font-medium text-neutral-900">See All →</span> : null}</div>);
   }
   if (section.type === "split") {
     const imageFirst = section.variant !== "image-right";
@@ -323,6 +316,7 @@ export default function WireframeBuilder() {
                   <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Media</label><select aria-label="Multi column media" value={selected.multiColumnMedia} onChange={event => updateSelected({ multiColumnMedia: event.target.value as typeof selected.multiColumnMedia })} className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20">{contentStyle.media.map(media => <option key={media} value={media}>{media === "none" ? "No media" : `${media[0]?.toUpperCase()}${media.slice(1)}`}</option>)}</select><p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">{contentStyle.media.length === 1 ? "This content style uses a consistent image treatment." : "Set the visual treatment for every column."}</p></div>
                   <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Presentation</label><select aria-label="Multi column presentation" value={selected.multiColumnPresentation} onChange={event => updateSelected({ multiColumnPresentation: event.target.value as typeof selected.multiColumnPresentation })} className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20"><option value="basic">Basic</option><option value="card">Card</option></select><p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">Use a simple row treatment or visually separated cards.</p></div>
                   {contentStyle.supportsReadMore ? <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-white px-3 py-2.5 text-xs"><span><span className="block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-foreground/80">Read more links</span><span className="mt-0.5 block text-[10px] leading-4 text-muted-foreground">Show an optional arrow link beneath each item.</span></span><input aria-label="Show Read more links" type="checkbox" checked={selected.showReadMore} onChange={event => updateSelected({ showReadMore: event.target.checked })} className="h-4 w-4 accent-[oklch(0.7_0.14_220)]" /></label> : null}
+                  <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-white px-3 py-2.5 text-xs"><span><span className="block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-foreground/80">See All button</span><span className="mt-0.5 block text-[10px] leading-4 text-muted-foreground">Show a full-width secondary action after the column set.</span></span><input aria-label="Show See All button" type="checkbox" checked={selected.showSeeAll} onChange={event => updateSelected({ showSeeAll: event.target.checked })} className="h-4 w-4 accent-[oklch(0.7_0.14_220)]" /></label>
                 </>;
               })() : null}
               <div><label className="mb-1.5 flex items-center gap-1.5 font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground"><MessageSquareText className="h-3.5 w-3.5 text-primary" />Strategist / design notes</label><Textarea value={selected.note} onChange={event => updateSelected({ note: event.target.value })} placeholder="Call out requirements, content dependencies, accessibility notes, or visual direction for the developer." className="min-h-[120px] rounded-xl border-border bg-white text-xs leading-5" /></div>

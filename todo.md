@@ -124,3 +124,8 @@
 - [x] Remove Other Schema from the planned module catalog and dashboard.
 - [x] Add Knowledge Base and Prompt Library as coming-soon dashboard and navigation modules.
 - [x] Verify the updated planned-module cards, navigation, and automated registry coverage.
+- [x] Update collapsed sidebar footer controls to the compact team, sign-out, and dark-mode icon treatment.
+- [x] Remove Blog articles and Product row blocks from the Wireframe Builder section library and shared model.
+- [x] Add a Multi column See All toggle that renders a full-width secondary action after the columns.
+- [x] Verify collapsed sidebar, Multi column editor/export behavior, and automated coverage.
+- [x] Run the final type check, full automated suite, and static Pages build for the collapsed-sidebar and Multi column refinements.
