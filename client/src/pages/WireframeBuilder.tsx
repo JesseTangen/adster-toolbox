@@ -89,7 +89,7 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
 
   if (section.type === "header") {
     const isSticky = section.variant === "sticky";
-    return shell(<div className={`flex h-16 items-center px-6 ${isSticky ? "border-b-2 border-neutral-800" : ""}`}><div className="flex items-center gap-2 font-semibold"><span className="h-5 w-5 bg-neutral-800" />[Brand Name]</div><div className="ml-auto flex items-center gap-5"><nav className="hidden gap-5 text-[10px] text-neutral-500 sm:flex"><span>Overview</span><span>Approach</span><span>Contact</span></nav><span className="bg-neutral-900 px-3 py-2 text-[10px] text-white">Start here</span></div></div>);
+    return shell(<div className={`flex h-16 items-center px-6 ${isSticky ? "border-b-2 border-neutral-800" : ""}`}><div className="flex items-center gap-2 font-semibold"><span className="h-5 w-5 bg-neutral-800" />[Company]</div><div className="ml-auto flex items-center gap-5"><nav className="hidden gap-5 text-[10px] text-neutral-500 sm:flex"><span>Overview</span><span>Approach</span><span>Contact</span></nav><span className="bg-neutral-900 px-3 py-2 text-[10px] text-white">Start here</span></div></div>);
   }
   if (section.type === "hero") {
     const centered = section.variant === "centered";
@@ -105,7 +105,7 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   if (section.type === "split") {
     const imageFirst = section.variant !== "image-right";
     const visual = <div className="min-h-[170px] border border-dashed border-neutral-400 bg-neutral-100 p-4"><ImageIcon className="h-5 w-5 text-neutral-500" /><p className="mt-24 font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">Supporting image</p></div>;
-    const copy = <div className="py-3"><h2 className="text-2xl font-semibold leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-neutral-500">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block text-[10px] font-medium text-neutral-800">Engaging CTA Text</span></div>;
+    const copy = <div className="py-3"><h2 className="text-2xl font-semibold leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-neutral-500">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block text-[10px] font-medium text-neutral-800">Primary Action</span></div>;
     return shell(<div className="wireframe-stack grid gap-6 p-7 sm:grid-cols-2 sm:items-center">{imageFirst ? <>{visual}{copy}</> : <>{copy}{visual}</>}</div>);
   }
   if (section.type === "text") {
@@ -116,7 +116,7 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
   if (section.type === "faq") {
     return shell(<div className="p-7"><h2 className="w-full text-2xl font-semibold leading-tight">{section.title}</h2><div className="mt-5 space-y-2">{["What should visitors understand first?", "How does the process work?", "What happens after I get in touch?"].map(question => <div key={question} className="flex items-center justify-between border border-neutral-300 px-3 py-3 text-[10px] font-medium"><span>{question}</span><ChevronDown className="h-3.5 w-3.5 text-neutral-500" /></div>)}</div></div>);
   }
-  return shell(<div className="p-8"><div className="wireframe-stack grid gap-6 sm:grid-cols-[1.2fr_0.8fr]"><div><h2 className="text-2xl font-semibold">{section.title}</h2><p className="mt-3 max-w-md text-[11px] leading-5 text-white/65">Close the page with a clear final action and useful navigation routes.</p><span className="mt-5 inline-block bg-white px-4 py-2 text-[10px] font-medium text-neutral-900">Contact us</span></div><div className="grid grid-cols-2 gap-3 text-[10px] text-white/65"><div><p className="font-medium text-white">Explore</p><p className="mt-2">Services</p><p className="mt-1">Work</p></div><div><p className="font-medium text-white">Connect</p><p className="mt-2">Instagram</p><p className="mt-1">LinkedIn</p></div></div></div><div className="mt-7 border-t border-white/15 pt-3 font-mono text-[8px] uppercase tracking-[0.11em] text-white/45">© Your company · Privacy · Terms</div></div>);
+  return shell(<div className="p-8"><div className="wireframe-stack grid gap-6 sm:grid-cols-[1.2fr_0.8fr]"><div><h2 className="text-2xl font-semibold">{section.title}</h2><p className="mt-3 max-w-md text-[11px] leading-5 text-white/65">Close the page with a clear final action and useful navigation routes.</p><span className="mt-5 inline-block bg-white px-4 py-2 text-[10px] font-medium text-neutral-900">Contact us</span></div><div className="grid grid-cols-2 gap-3 text-[10px] text-white/65"><div><p className="font-medium text-white">Explore</p><p className="mt-2">Services</p><p className="mt-1">Work</p></div><div><p className="font-medium text-white">Connect</p><p className="mt-2">Instagram</p><p className="mt-1">LinkedIn</p></div></div></div><div className="mt-7 border-t border-white/15 pt-3 font-mono text-[8px] uppercase tracking-[0.11em] text-white/45">© [Company] · Privacy · Terms</div></div>);
 }
 
 function SectionAnnotation({ section }: { section: WireframeSection }) {
