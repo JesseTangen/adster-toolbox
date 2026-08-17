@@ -107,10 +107,9 @@ export default function Home() {
               <article key={tool.id} className={`group relative flex min-h-[232px] flex-col rounded-2xl border p-5 shadow-[0_18px_44px_-36px_oklch(0.3_0.03_50)] transition duration-200 ${available ? toolboxCardClassNames.available : toolboxCardClassNames.planned}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${available ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"}`}><Icon className="h-5 w-5" /></div>
-                  <span className={`rounded-full px-2.5 py-1 font-mono text-[9px] font-medium uppercase tracking-[0.09em] ${available ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"}`}>{available ? "Available" : "Planned"}</span>
+                  <span className={`rounded-full px-2.5 py-1 font-mono text-[9px] font-medium uppercase tracking-[0.09em] ${available ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"}`}>{tool.category}</span>
                 </div>
-                <p className="mt-5 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{tool.eyebrow}</p>
-                <h3 className="mt-2 text-lg font-semibold tracking-tight">{tool.name}</h3>
+                <h3 className="mt-5 text-lg font-semibold tracking-tight">{tool.name}</h3>
                 <p className="mt-2 max-w-md text-sm leading-5 text-muted-foreground">{tool.description}</p>
                 <div className="mt-auto pt-5">
                   <Button onClick={() => openTool(tool)} variant={available ? "default" : "outline"} className={`h-9 gap-2 rounded-xl px-3.5 text-xs ${available ? "" : "bg-transparent"}`}>

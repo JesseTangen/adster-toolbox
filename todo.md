@@ -91,3 +91,5 @@
 - [x] Validate password acceptance, rejection, session persistence, sign-out, and the static build.
 - [x] Add a route-preserving GitHub Pages 404.html SPA fallback for direct module refreshes.
 - [x] Validate fallback route restoration in the static Pages build and automated checks.
+- [x] Remove Toolbox card eyebrow labels and replace availability pills with category pills.
+- [x] Verify the revised Toolbox directory cards across active and planned tools.
