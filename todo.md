@@ -97,3 +97,5 @@
 - [x] Turn the Session workspace pill into live saving/saved feedback and preserve the current draft before New schema creates another.
 - [x] Validate LocalBusiness auto-save, new-schema handoff, responsive header behavior, and automated checks.
 - [x] Verify the LocalBusiness auto-save header and session-status pill at a narrow viewport.
+- [x] Restyle only Wireframe Builder website sections with a grayscale, sharp-cornered wireframe treatment.
+- [x] Preserve the existing toolbox chrome, editor panels, and annotation rails while verifying neutral desktop/mobile and JPG handoff output.
