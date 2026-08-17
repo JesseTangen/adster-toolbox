@@ -99,3 +99,7 @@
 - [x] Verify the LocalBusiness auto-save header and session-status pill at a narrow viewport.
 - [x] Restyle only Wireframe Builder website sections with a grayscale, sharp-cornered wireframe treatment.
 - [x] Preserve the existing toolbox chrome, editor panels, and annotation rails while verifying neutral desktop/mobile and JPG handoff output.
+- [x] Replace the Card grid section with a Multi column section that supports two, three, and four columns.
+- [x] Add Feature, Blog, Service, Product collection, and Product visual/content substyles with their requested media, link, price, and cart treatments.
+- [x] Add media, optional-link, and basic-versus-card presentation controls to the Multi column inspector.
+- [x] Update wireframe library labels, regression tests, desktop/mobile JPG handoffs, and interaction coverage for the Multi column section.

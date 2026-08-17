@@ -3,9 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   createWireframeSection,
+  getMultiColumnContentStyle,
   getWireframeSectionDefinition,
   isWireframeBoundarySection,
   moveWireframeSection,
+  multiColumnContentStyles,
   wireframeSectionDefinitions,
   type WireframeSection,
   type WireframeSectionType,
@@ -40,7 +42,7 @@ import { toast } from "sonner";
 const initialSections: WireframeSection[] = [
   createWireframeSection("header", "wf-header"),
   createWireframeSection("hero", "wf-hero"),
-  createWireframeSection("cards", "wf-cards"),
+  createWireframeSection("columns", "wf-columns"),
   createWireframeSection("split", "wf-split"),
   createWireframeSection("faq", "wf-faq"),
   createWireframeSection("footer", "wf-footer"),
@@ -49,7 +51,7 @@ const initialSections: WireframeSection[] = [
 const typeIcons: Record<WireframeSectionType, typeof PanelTop> = {
   header: PanelTop,
   hero: Sparkles,
-  cards: Columns3,
+  columns: Columns3,
   split: Rows3,
   text: FileText,
   faq: MessageSquareText,
@@ -96,11 +98,22 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
     const overlay = section.variant === "overlay";
     return shell(<div className={`relative min-h-[220px] overflow-hidden p-8 sm:p-10 ${centered || overlay ? "" : "wireframe-stack grid gap-7 sm:grid-cols-[1fr_0.72fr] sm:items-center"} ${centered ? "text-center" : ""}`}><div className="absolute inset-0 hidden bg-[linear-gradient(135deg,rgba(23,23,23,0.72),rgba(64,64,64,0.9)),repeating-linear-gradient(45deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_14px)] overlay:block" /><div className={`relative ${centered || overlay ? "max-w-xl" : ""} ${centered ? "mx-auto" : ""}`}><span className={`mb-3 inline-flex border border-white/35 bg-white/10 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.12em] text-white ${overlay ? "" : "hidden"}`}>Background image behind overlay</span><h2 className="max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">{section.title}</h2><p className={`mt-3 max-w-md text-xs leading-5 ${isDark ? "text-white/70" : "text-neutral-500"}`}>A concise strategic narrative that frames the value, audience, and action.</p><span className="mt-5 inline-block bg-neutral-900 px-4 py-2 text-[10px] font-medium text-white">Primary action</span></div>{!centered && !overlay && <div className="min-h-[130px] border border-dashed border-neutral-400 bg-neutral-100 p-4"><ImageIcon className="h-5 w-5 text-neutral-500" /><p className="mt-9 font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">Hero visual</p></div>}</div>, overlay ? "bg-neutral-800 text-white" : "");
   }
-  if (section.type === "cards" || section.type === "articles" || section.type === "products") {
-    const isArticles = section.type === "articles";
-    const isProducts = section.type === "products";
-    const showViewAll = section.type === "cards" && section.showViewAll;
-    return shell(<div className="p-7"><h2 className="text-2xl font-semibold">{section.title}</h2><div className={`wireframe-card-grid mt-6 grid gap-3 ${section.variant === "four" ? "grid-cols-2 sm:grid-cols-4" : "sm:grid-cols-3"}`}>{[1, 2, 3].map(item => <div key={item} className="border border-neutral-300 bg-white p-3"><div className="h-16 bg-neutral-200" /><p className="mt-3 text-[11px] font-semibold">{isProducts ? `Product ${item}` : isArticles ? `Article title ${item}` : `Feature ${item}`}</p><p className="mt-1 text-[9px] leading-4 text-neutral-500">Supporting detail appears here.</p></div>)}</div>{showViewAll ? <span className="mt-4 block w-full border-t border-neutral-300 pt-3 text-center text-[10px] font-medium text-neutral-800">View all →</span> : null}</div>);
+  if (section.type === "columns") {
+    const contentStyle = getMultiColumnContentStyle(section.multiColumnStyle);
+    const itemCount = section.variant === "two" ? 2 : section.variant === "four" ? 4 : 3;
+    const columnClass = section.variant === "two" ? "sm:grid-cols-2" : section.variant === "four" ? "grid-cols-2 sm:grid-cols-4" : "sm:grid-cols-3";
+    const useCards = section.multiColumnPresentation === "card";
+    const showReadMore = contentStyle.id === "blog" || (contentStyle.supportsReadMore && section.showReadMore);
+    const mediaLabel = contentStyle.id === "blog" ? "Post image" : contentStyle.id === "collection" ? "Collection image" : contentStyle.id === "product" ? "Product image" : section.multiColumnMedia === "icon" ? "Icon" : "Image";
+    return shell(<div className="p-7"><h2 className="text-2xl font-semibold">{section.title}</h2><div className={`wireframe-card-grid mt-6 grid gap-3 ${columnClass}`}>{Array.from({ length: itemCount }, (_, index) => index + 1).map(item => <div key={item} className={`${useCards ? "border border-neutral-300 bg-white p-3" : "border-t border-neutral-300 py-3"}`}>
+      {section.multiColumnMedia !== "none" ? section.multiColumnMedia === "icon" ? <div className="flex h-14 w-14 items-center justify-center border border-neutral-300 bg-neutral-100"><Sparkles className="h-4 w-4 text-neutral-600" /></div> : <div className="flex h-16 items-end border border-neutral-300 bg-neutral-200 p-2 font-mono text-[8px] uppercase tracking-[0.1em] text-neutral-500">{mediaLabel}</div> : null}
+      <p className="mt-3 text-[11px] font-semibold">{contentStyle.itemLabel} {item}</p>
+      {contentStyle.id === "blog" ? <p className="mt-1 text-[9px] text-neutral-500">By Author name</p> : null}
+      {contentStyle.hasSummary ? <p className="mt-1 text-[9px] leading-4 text-neutral-500">Brief summary describing the main value or supporting detail.</p> : null}
+      {contentStyle.hasPrice ? <p className="mt-2 text-[11px] font-semibold">$00.00</p> : null}
+      {contentStyle.hasCart ? <span className="mt-3 inline-block border border-neutral-400 px-2.5 py-1.5 text-[9px] font-medium text-neutral-700">Add to cart</span> : null}
+      {showReadMore ? <span className="mt-3 inline-block text-[9px] font-medium text-neutral-800">Read more →</span> : null}
+    </div>)}</div></div>);
   }
   if (section.type === "split") {
     const imageFirst = section.variant !== "image-right";
@@ -303,7 +316,15 @@ export default function WireframeBuilder() {
             <div className="space-y-4 p-5">{selectedIsBoundary ? <div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-3"><p className="font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-primary">Fixed canvas boundary</p><p className="mt-1 text-xs leading-5 text-muted-foreground">The {selectedDefinition.label} is locked at the {selected.type === "header" ? "top" : "bottom"} of every wireframe and has no editable sidebar options.</p></div> : <>
               <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Style option</label><select value={selected.variant} onChange={event => updateSelected({ variant: event.target.value })} className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20">{selectedDefinition.variants.map(variant => <option key={variant.id} value={variant.id}>{variant.label}</option>)}</select><p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">{selectedDefinition.variants.find(variant => variant.id === selected.variant)?.description}</p></div>
               {selected.type !== "header" ? <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Section heading</label><Input value={selected.title} onChange={event => updateSelected({ title: event.target.value })} className="h-10 rounded-xl bg-white text-xs" /></div> : <div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-2.5"><p className="font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-primary">Brand label</p><p className="mt-1 text-xs text-muted-foreground">[Brand Name] is fixed for developer handoff.</p></div>}
-              {selected.type === "cards" ? <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-white px-3 py-2.5 text-xs"><span><span className="block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-foreground/80">View all link</span><span className="mt-0.5 block text-[10px] leading-4 text-muted-foreground">Show a full-width link below the card grid.</span></span><input aria-label="Show View all link" type="checkbox" checked={selected.showViewAll} onChange={event => updateSelected({ showViewAll: event.target.checked })} className="h-4 w-4 accent-[oklch(0.7_0.14_220)]" /></label> : null}
+              {selected.type === "columns" ? (() => {
+                const contentStyle = getMultiColumnContentStyle(selected.multiColumnStyle);
+                return <>
+                  <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Content style</label><select aria-label="Multi column content style" value={selected.multiColumnStyle} onChange={event => { const nextStyle = getMultiColumnContentStyle(event.target.value as typeof selected.multiColumnStyle); updateSelected({ multiColumnStyle: nextStyle.id, multiColumnMedia: nextStyle.media[0], showReadMore: nextStyle.supportsReadMore, title: nextStyle.defaultTitle }); }} className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20">{multiColumnContentStyles.map(style => <option key={style.id} value={style.id}>{style.label}</option>)}</select><p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">Choose the content and visual treatment for each column.</p></div>
+                  <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Media</label><select aria-label="Multi column media" value={selected.multiColumnMedia} onChange={event => updateSelected({ multiColumnMedia: event.target.value as typeof selected.multiColumnMedia })} className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20">{contentStyle.media.map(media => <option key={media} value={media}>{media === "none" ? "No media" : `${media[0]?.toUpperCase()}${media.slice(1)}`}</option>)}</select><p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">{contentStyle.media.length === 1 ? "This content style uses a consistent image treatment." : "Set the visual treatment for every column."}</p></div>
+                  <div><label className="mb-1.5 block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground">Presentation</label><select aria-label="Multi column presentation" value={selected.multiColumnPresentation} onChange={event => updateSelected({ multiColumnPresentation: event.target.value as typeof selected.multiColumnPresentation })} className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:ring-2 focus:ring-primary/20"><option value="basic">Basic</option><option value="card">Card</option></select><p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">Use a simple row treatment or visually separated cards.</p></div>
+                  {contentStyle.supportsReadMore ? <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-white px-3 py-2.5 text-xs"><span><span className="block font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-foreground/80">Read more links</span><span className="mt-0.5 block text-[10px] leading-4 text-muted-foreground">Show an optional arrow link beneath each item.</span></span><input aria-label="Show Read more links" type="checkbox" checked={selected.showReadMore} onChange={event => updateSelected({ showReadMore: event.target.checked })} className="h-4 w-4 accent-[oklch(0.7_0.14_220)]" /></label> : null}
+                </>;
+              })() : null}
               <div><label className="mb-1.5 flex items-center gap-1.5 font-mono text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground"><MessageSquareText className="h-3.5 w-3.5 text-primary" />Strategist / design notes</label><Textarea value={selected.note} onChange={event => updateSelected({ note: event.target.value })} placeholder="Call out requirements, content dependencies, accessibility notes, or visual direction for the developer." className="min-h-[120px] rounded-xl border-border bg-white text-xs leading-5" /></div>
               <div className="grid grid-cols-2 gap-2"><Button variant="outline" onClick={() => moveSelected(-1)} disabled={selectedIndex <= 0} className="h-9 gap-1.5 rounded-xl bg-white text-[11px]"><ArrowUp className="h-3.5 w-3.5" />Move up</Button><Button variant="outline" onClick={() => moveSelected(1)} disabled={selectedIndex >= sections.length - 1} className="h-9 gap-1.5 rounded-xl bg-white text-[11px]"><ArrowDown className="h-3.5 w-3.5" />Move down</Button></div>
               <div className="grid grid-cols-2 gap-2"><Button variant="outline" onClick={duplicateSelected} className="h-9 rounded-xl bg-white text-[11px]">Duplicate</Button><Button variant="outline" onClick={removeSelected} className="h-9 gap-1.5 rounded-xl border-destructive/20 bg-white text-[11px] text-destructive hover:bg-destructive/5 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" />Remove</Button></div>
