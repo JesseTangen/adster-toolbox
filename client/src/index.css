@@ -96,6 +96,10 @@ body {
   font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
+[data-slot="sidebar"] {
+  background: radial-gradient(circle at 11% 0%, #00aeef2e, transparent 27rem), radial-gradient(circle at 92% 0%, #4774c924, transparent 30rem), var(--background);
+}
+
 .dark body {
   background:
     radial-gradient(circle at 10% 0%, rgb(0 174 239 / 0.18), transparent 27rem),

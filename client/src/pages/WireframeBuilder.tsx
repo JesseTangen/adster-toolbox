@@ -106,12 +106,12 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
       <p className="mt-3 text-[11px] font-semibold">{contentStyle.itemLabel} {item}</p>
       {contentStyle.hasSummary ? <p className="mt-1 text-[9px] leading-4 text-neutral-500">Brief summary describing the main value or supporting detail.</p> : null}
       {showReadMore ? <span className="mt-3 inline-block text-[9px] font-medium text-neutral-800">Read more →</span> : null}
-    </div>)}</div>{section.showSeeAll ? <span className="mt-5 flex w-full items-center justify-center border border-neutral-400 bg-neutral-200 px-4 py-2.5 text-[10px] font-medium text-neutral-900">See All →</span> : null}</div>);
+    </div>)}</div>{section.showSeeAll ? <span className="mt-5 mx-auto flex w-fit items-center justify-center border border-neutral-400 bg-neutral-200 px-4 py-2.5 text-[10px] font-medium text-neutral-900">See All</span> : null}</div>);
   }
   if (section.type === "split") {
     const imageFirst = section.variant !== "image-right";
     const visual = <div className="min-h-[170px] border border-dashed border-neutral-400 bg-neutral-100 p-4"><ImageIcon className="h-5 w-5 text-neutral-500" /><p className="mt-24 font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">Supporting image</p></div>;
-    const copy = <div className="py-3"><h2 className="text-2xl font-semibold leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-neutral-500">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block text-[10px] font-medium text-neutral-800">Primary Action</span></div>;
+    const copy = <div className="py-3"><h2 className="text-2xl font-semibold leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-neutral-500">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block bg-neutral-900 px-4 py-2 text-[10px] font-medium text-white">Primary Action</span></div>;
     return shell(<div className="wireframe-stack grid gap-6 p-7 sm:grid-cols-2 sm:items-center">{imageFirst ? <>{visual}{copy}</> : <>{copy}{visual}</>}</div>);
   }
   if (section.type === "text") {
