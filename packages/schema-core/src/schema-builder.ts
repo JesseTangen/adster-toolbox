@@ -84,6 +84,66 @@ function splitLines(value: string) {
     .filter(Boolean);
 }
 
+const schemaDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
+
+const dayAliases: Record<string, (typeof schemaDays)[number]> = {
+  mo: "Monday", mon: "Monday", monday: "Monday",
+  tu: "Tuesday", tue: "Tuesday", tues: "Tuesday", tuesday: "Tuesday",
+  we: "Wednesday", wed: "Wednesday", wednesday: "Wednesday",
+  th: "Thursday", thu: "Thursday", thur: "Thursday", thurs: "Thursday", thursday: "Thursday",
+  fr: "Friday", fri: "Friday", friday: "Friday",
+  sa: "Saturday", sat: "Saturday", saturday: "Saturday",
+  su: "Sunday", sun: "Sunday", sunday: "Sunday",
+};
+
+type OpeningHoursSpecification = {
+  "@type": "OpeningHoursSpecification";
+  dayOfWeek: (typeof schemaDays)[number][];
+  opens: string;
+  closes: string;
+};
+
+function normalizeTime(value: string) {
+  const [hours, minutes] = value.split(":");
+  return `${hours?.padStart(2, "0")}:${minutes}`;
+}
+
+function expandDayRange(value: string) {
+  return value.split(",").flatMap(part => {
+    const [startToken, endToken] = part.trim().toLowerCase().split(/\s*[-–]\s*/);
+    const start = startToken ? dayAliases[startToken] : undefined;
+    const end = endToken ? dayAliases[endToken] : undefined;
+    if (!start) return [];
+    if (!end) return [start];
+    const startIndex = schemaDays.indexOf(start);
+    const endIndex = schemaDays.indexOf(end);
+    if (startIndex <= endIndex) return schemaDays.slice(startIndex, endIndex + 1);
+    return [...schemaDays.slice(startIndex), ...schemaDays.slice(0, endIndex + 1)];
+  });
+}
+
+function parseOpeningHoursSpecification(value: string): OpeningHoursSpecification | undefined {
+  const match = value.match(/^([A-Za-z]+(?:\s*[-–]\s*[A-Za-z]+)?(?:\s*,\s*[A-Za-z]+(?:\s*[-–]\s*[A-Za-z]+)?)*)\s*:?\s+(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})$/);
+  if (!match) return undefined;
+  const days = expandDayRange(match[1] ?? "");
+  if (!days.length) return undefined;
+  return { "@type": "OpeningHoursSpecification", dayOfWeek: days, opens: normalizeTime(match[2] ?? ""), closes: normalizeTime(match[3] ?? "") };
+}
+
+function groupOpeningHours(lines: string[]) {
+  const specifications = lines.map(parseOpeningHoursSpecification);
+  if (!specifications.every(Boolean)) return undefined;
+  const grouped = new Map<string, OpeningHoursSpecification>();
+  for (const specification of specifications) {
+    if (!specification) continue;
+    const key = `${specification.opens}-${specification.closes}`;
+    const existing = grouped.get(key);
+    if (existing) existing.dayOfWeek.push(...specification.dayOfWeek);
+    else grouped.set(key, specification);
+  }
+  return Array.from(grouped.values());
+}
+
 export function getEffectiveType(draft: SchemaDraft) {
   return draft.businessSubtype || draft.businessType || "LocalBusiness";
 }
@@ -103,6 +163,7 @@ export function buildLocalBusinessSchema(draft: SchemaDraft) {
     longitude: draft.longitude,
   });
   const openingHours = splitLines(draft.openingHours);
+  const openingHoursSpecification = groupOpeningHours(openingHours);
   const sameAs = splitLines(draft.sameAs);
   const servesCuisine = splitLines(draft.servesCuisine);
 
@@ -116,7 +177,8 @@ export function buildLocalBusinessSchema(draft: SchemaDraft) {
     email: draft.email,
     address: Object.keys(address).length > 1 ? address : undefined,
     geo: Object.keys(geo).length > 1 ? geo : undefined,
-    openingHours: openingHours.length === 1 ? openingHours[0] : openingHours,
+    openingHours: openingHoursSpecification ? undefined : openingHours.length === 1 ? openingHours[0] : openingHours,
+    openingHoursSpecification,
     priceRange: draft.priceRange,
     logo: draft.logo,
     sameAs,

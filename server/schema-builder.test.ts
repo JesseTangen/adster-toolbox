@@ -35,12 +35,30 @@ describe("LocalBusiness schema builder", () => {
       "@context": "https://schema.org",
       "@type": "Restaurant",
       name: "Example Restaurant",
-      openingHours: ["Mo-Fr 11:00-22:00", "Sa-Su 12:00-22:00"],
+      openingHoursSpecification: [
+        { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "11:00", closes: "22:00" },
+        { "@type": "OpeningHoursSpecification", dayOfWeek: ["Saturday", "Sunday"], opens: "12:00", closes: "22:00" },
+      ],
       servesCuisine: ["Italian", "Pizza"],
       acceptsReservations: true,
       address: { "@type": "PostalAddress", addressLocality: "Denver" },
       geo: { "@type": "GeoCoordinates", latitude: "39.7392", longitude: "-104.9903" },
     });
+  });
+
+  it("groups separately entered matching weekday hours and leaves unstructured closing notes untouched", () => {
+    const grouped = buildLocalBusinessSchema({
+      ...createSchemaDraft(),
+      openingHours: "Monday 8:30-16:30\nTuesday 08:30-16:30\nWednesday 08:30-16:30\nThursday 08:30-16:30\nFriday 08:30-16:30",
+    });
+    const closed = buildLocalBusinessSchema({ ...createSchemaDraft(), openingHours: "Mo closed" });
+
+    expect(grouped).toMatchObject({
+      openingHoursSpecification: [{ "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "08:30", closes: "16:30" }],
+    });
+    expect(grouped).not.toHaveProperty("openingHours");
+    expect(closed).toMatchObject({ openingHours: "Mo closed" });
+    expect(closed).not.toHaveProperty("openingHoursSpecification");
   });
 
   it("does not emit empty properties", () => {

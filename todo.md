@@ -129,3 +129,5 @@
 - [x] Add a Multi column See All toggle that renders a full-width secondary action after the columns.
 - [x] Verify collapsed sidebar, Multi column editor/export behavior, and automated coverage.
 - [x] Run the final type check, full automated suite, and static Pages build for the collapsed-sidebar and Multi column refinements.
+- [x] Group LocalBusiness days with identical opening hours into JSON-LD dayOfWeek arrays.
+- [x] Validate grouped weekday, split-hour, closed-day, and static Pages output behavior.
