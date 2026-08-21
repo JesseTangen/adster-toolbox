@@ -151,3 +151,8 @@
 - [x] Add six-dot-handle drag-and-drop reordering for Sitemap Planner page siblings.
 - [x] Preserve page hierarchy, browser persistence, and accessible Move up/Move down alternatives.
 - [x] Validate desktop/mobile drag interaction and persisted page order.
+- [x] Remove Sitemap Planner six-dot handles and native drag-and-drop sibling reordering.
+- [x] Retain and verify Move up/Move down page ordering controls and simplified responsive tree presentation.
+- [x] Explicitly verify Move up and Move down ordering plus persisted page order after drag removal.
+- [x] Assert the simplified no-handle sitemap canvas remains clean at desktop and mobile widths.
+- [x] Explicitly assert the desktop sitemap canvas has no handles, no overflow, and the expected page-card structure.

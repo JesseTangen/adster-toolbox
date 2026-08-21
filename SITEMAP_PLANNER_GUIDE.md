@@ -10,4 +10,4 @@ Desktop review confirmed the connected tree canvas, nested page markers, and sel
 
 The header metrics use a responsive layout. At larger widths, the narrow Pages/Depth card stacks both values vertically and centers them; at smaller widths, the summary retains its original two-column arrangement.
 
-Each page card in the navigation canvas now includes a six-dot drag handle. Dragging a non-root handle onto a sibling reorders it before that sibling and persists the new order in browser storage. The Homepage handle is intentionally fixed; **Move up** and **Move down** remain available as accessible non-drag alternatives.
+Page ordering is managed from the selected-page inspector. **Move up** and **Move down** reorder siblings and persist the resulting structure in browser storage.
