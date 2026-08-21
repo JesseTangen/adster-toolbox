@@ -138,3 +138,7 @@
 - [x] Make structured-hours weekday selection span the full schedule row.
 - [x] Place Opens and Closes as equal half-width controls beneath the weekday selection.
 - [x] Verify the revised schedule-row layout at desktop and mobile widths.
+- [x] Apply genuine mobile section layouts in the Wireframe Builder Mobile preview instead of narrowed desktop grids.
+- [x] Ensure the Mobile JPG handoff uses the same responsive section layouts.
+- [x] Verify Hero, Multi column, Image + content, Text block, FAQ, and footer behavior in the corrected mobile preview.
+- [x] Add explicit mobile-preview assertions for Text block, FAQ, and Footer layouts, then rerun full validation.

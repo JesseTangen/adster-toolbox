@@ -58,15 +58,17 @@ const typeIcons: Record<WireframeSectionType, typeof PanelTop> = {
 
 const categoryOrder = ["Frame", "Content"] as const;
 
-function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
+function PreviewSection({ section, selected, mode, onSelect, onDrop, onDragStart }: {
   section: WireframeSection;
   selected: boolean;
+  mode: "desktop" | "mobile";
   onSelect: () => void;
   onDrop: (event: React.DragEvent<HTMLElement>) => void;
   onDragStart: (event: React.DragEvent<HTMLElement>) => void;
 }) {
   const definition = getWireframeSectionDefinition(section.type);
   const isBoundary = isWireframeBoundarySection(section);
+  const isMobile = mode === "mobile";
   const isDark = section.type === "footer" || (section.type === "hero" && section.variant === "overlay");
   const common = `group relative ${isBoundary ? "cursor-default" : "cursor-pointer"} overflow-hidden border border-neutral-300 transition ${selected ? "border-neutral-900 ring-1 ring-neutral-500" : "hover:border-neutral-600"} ${isDark ? "bg-neutral-800 text-white" : "bg-white text-neutral-900"}`;
 
@@ -78,6 +80,8 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
       onDrop={event => { if (!isBoundary) onDrop(event); }}
       onClick={isBoundary ? undefined : onSelect}
       className={`${common} ${className}`}
+      data-wireframe-section={section.type}
+      data-wireframe-layout={mode}
       aria-label={`${definition.label} wireframe section`}
     >
       {!isBoundary ? <div className="absolute left-2 top-2 z-20 flex h-6 w-6 items-center justify-center bg-white/90 text-neutral-500 opacity-0 transition group-hover:opacity-100"><GripVertical className="h-3.5 w-3.5" /></div> : null}
@@ -87,42 +91,55 @@ function PreviewSection({ section, selected, onSelect, onDrop, onDragStart }: {
 
   if (section.type === "header") {
     const isSticky = section.variant === "sticky";
-    return shell(<div className={`flex h-16 items-center px-6 ${isSticky ? "border-b-2 border-neutral-800" : ""}`}><div className="flex items-center gap-2 font-semibold"><span className="h-5 w-5 bg-neutral-800" />[Company]</div><div className="ml-auto flex items-center gap-5"><nav className="hidden gap-5 text-[10px] text-neutral-500 sm:flex"><span>Overview</span><span>Approach</span><span>Contact</span></nav><span className="bg-neutral-900 px-3 py-2 text-[10px] text-white">Start here</span></div></div>);
+    const headerClass = ["flex items-center", isMobile ? "h-14 px-4" : "h-16 px-6", isSticky ? "border-b-2 border-neutral-800" : ""].join(" ");
+    const headerNavClass = `${isMobile ? "hidden" : "flex"} gap-5 text-[10px] text-neutral-500`;
+    return shell(<div className={headerClass}><div className="flex items-center gap-2 font-semibold"><span className="h-5 w-5 bg-neutral-800" />[Company]</div><div className="ml-auto flex items-center gap-5"><nav className={headerNavClass}><span>Overview</span><span>Approach</span><span>Contact</span></nav><span className="bg-neutral-900 px-3 py-2 text-[10px] text-white">Start here</span></div></div>);
   }
   if (section.type === "hero") {
     const centered = section.variant === "centered";
     const overlay = section.variant === "overlay";
-    return shell(<div className={`relative min-h-[220px] overflow-hidden p-8 sm:p-10 ${centered || overlay ? "" : "wireframe-stack grid gap-7 sm:grid-cols-[1fr_0.72fr] sm:items-center"} ${centered ? "text-center" : ""}`}><div className="absolute inset-0 hidden bg-[linear-gradient(135deg,rgba(23,23,23,0.72),rgba(64,64,64,0.9)),repeating-linear-gradient(45deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_14px)] overlay:block" /><div className={`relative ${centered || overlay ? "max-w-xl" : ""} ${centered ? "mx-auto" : ""}`}><span className={`mb-3 inline-flex border border-white/35 bg-white/10 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.12em] text-white ${overlay ? "" : "hidden"}`}>Background image behind overlay</span><h2 className="max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">{section.title}</h2><p className={`mt-3 max-w-md text-xs leading-5 ${isDark ? "text-white/70" : "text-neutral-500"}`}>A concise strategic narrative that frames the value, audience, and action.</p><span className="mt-5 inline-block bg-neutral-900 px-4 py-2 text-[10px] font-medium text-white">Primary action</span></div>{!centered && !overlay && <div className="min-h-[130px] border border-dashed border-neutral-400 bg-neutral-100 p-4"><ImageIcon className="h-5 w-5 text-neutral-500" /><p className="mt-9 font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">Hero visual</p></div>}</div>, overlay ? "bg-neutral-800 text-white" : "");
+    const heroClass = ["relative min-h-[220px] overflow-hidden", isMobile ? "p-5" : "p-8 sm:p-10", !centered && !overlay ? (isMobile ? "grid gap-5" : "wireframe-stack grid gap-7 sm:grid-cols-[1fr_0.72fr] sm:items-center") : "", centered ? "text-center" : ""].join(" ");
+    const heroCopyClass = ["relative", centered || overlay ? "max-w-xl" : "", centered ? "mx-auto" : ""].join(" ");
+    const heroKickerClass = ["mb-3 inline-flex border border-white/35 bg-white/10 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.12em] text-white", overlay ? "" : "hidden"].join(" ");
+    const heroTitleClass = `max-w-xl font-semibold leading-tight ${isMobile ? "text-[28px]" : "text-3xl sm:text-4xl"}`;
+    const heroBodyClass = `mt-3 max-w-md text-xs leading-5 ${isDark ? "text-white/70" : "text-neutral-500"}`;
+    return shell(<div className={heroClass}><div className="absolute inset-0 hidden bg-[linear-gradient(135deg,rgba(23,23,23,0.72),rgba(64,64,64,0.9)),repeating-linear-gradient(45deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_14px)] overlay:block" /><div className={heroCopyClass}><span className={heroKickerClass}>Background image behind overlay</span><h2 className={heroTitleClass}>{section.title}</h2><p className={heroBodyClass}>A concise strategic narrative that frames the value, audience, and action.</p><span className="mt-5 inline-block bg-neutral-900 px-4 py-2 text-[10px] font-medium text-white">Primary action</span></div>{!centered && !overlay && <div className="min-h-[150px] border border-dashed border-neutral-400 bg-neutral-100 p-4"><ImageIcon className="h-5 w-5 text-neutral-500" /><p className="mt-9 font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">Hero visual</p></div>}</div>, overlay ? "bg-neutral-800 text-white" : "");
   }
   if (section.type === "columns") {
     const contentStyle = getMultiColumnContentStyle(section.multiColumnStyle);
     const itemCount = section.variant === "two" ? 2 : section.variant === "four" ? 4 : 3;
-    const columnClass = section.variant === "two" ? "sm:grid-cols-2" : section.variant === "four" ? "grid-cols-2 sm:grid-cols-4" : "sm:grid-cols-3";
+    const columnClass = isMobile ? "grid-cols-1" : section.variant === "two" ? "sm:grid-cols-2" : section.variant === "four" ? "grid-cols-2 sm:grid-cols-4" : "sm:grid-cols-3";
     const useCards = section.multiColumnPresentation === "card";
     const showReadMore = contentStyle.supportsReadMore && section.showReadMore;
     const mediaLabel = contentStyle.id === "collection" ? "Collection image" : section.multiColumnMedia === "icon" ? "Icon" : "Image";
-    return shell(<div className="p-7"><h2 className="text-2xl font-semibold">{section.title}</h2><div className={`wireframe-card-grid mt-6 grid gap-3 ${columnClass}`}>{Array.from({ length: itemCount }, (_, index) => index + 1).map(item => <div key={item} className={`${useCards ? "border border-neutral-300 bg-white p-3" : "py-3"}`}>
+    return shell(<div className={isMobile ? "p-5" : "p-7"}><h2 className="text-2xl font-semibold">{section.title}</h2><div className={`wireframe-card-grid mt-6 grid gap-3 ${columnClass}`}>{Array.from({ length: itemCount }, (_, index) => index + 1).map(item => <div key={item} className={`${useCards ? "border border-neutral-300 bg-white p-3" : "py-3"}`}>
       {section.multiColumnMedia !== "none" ? section.multiColumnMedia === "icon" ? <div className="flex h-14 w-14 items-center justify-center border border-neutral-300 bg-neutral-100"><Sparkles className="h-4 w-4 text-neutral-600" /></div> : <div className="flex h-16 items-end border border-neutral-300 bg-neutral-200 p-2 font-mono text-[8px] uppercase tracking-[0.1em] text-neutral-500">{mediaLabel}</div> : null}
       <p className="mt-3 text-[11px] font-semibold">{contentStyle.itemLabel} {item}</p>
       {contentStyle.hasSummary ? <p className="mt-1 text-[9px] leading-4 text-neutral-500">Brief summary describing the main value or supporting detail.</p> : null}
       {showReadMore ? <span className="mt-3 inline-block text-[9px] font-medium text-neutral-800">Read more →</span> : null}
-    </div>)}</div>{section.showSeeAll ? <span className="mt-5 mx-auto flex w-fit items-center justify-center border border-neutral-400 bg-neutral-200 px-4 py-2.5 text-[10px] font-medium text-neutral-900">See All</span> : null}</div>);
+    </div>)}</div>{section.showSeeAll ? <span className="mt-5 flex w-full items-center justify-center border border-neutral-400 bg-neutral-200 px-4 py-2.5 text-[10px] font-medium text-neutral-900">See All</span> : null}</div>);
   }
   if (section.type === "split") {
     const imageFirst = section.variant !== "image-right";
-    const visual = <div className="min-h-[170px] border border-dashed border-neutral-400 bg-neutral-100 p-4"><ImageIcon className="h-5 w-5 text-neutral-500" /><p className="mt-24 font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">Supporting image</p></div>;
+    const visualClass = `${isMobile ? "min-h-[190px]" : "min-h-[170px]"} border border-dashed border-neutral-400 bg-neutral-100 p-4`;
+    const visual = <div className={visualClass}><ImageIcon className="h-5 w-5 text-neutral-500" /><p className="mt-24 font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">Supporting image</p></div>;
     const copy = <div className="py-3"><h2 className="text-2xl font-semibold leading-tight">{section.title}</h2><p className="mt-3 text-[11px] leading-5 text-neutral-500">Use this space to explain a key process, product difference, or strategic detail.</p><span className="mt-5 inline-block bg-neutral-900 px-4 py-2 text-[10px] font-medium text-white">Primary Action</span></div>;
-    return shell(<div className="wireframe-stack grid gap-6 p-7 sm:grid-cols-2 sm:items-center">{imageFirst ? <>{visual}{copy}</> : <>{copy}{visual}</>}</div>);
+    const splitLayout = isMobile ? "grid grid-cols-1 gap-6 p-5" : "wireframe-stack grid gap-6 p-7 sm:grid-cols-2 sm:items-center";
+    return shell(<div className={splitLayout}>{imageFirst ? <>{visual}{copy}</> : <>{copy}{visual}</>}</div>);
   }
   if (section.type === "text") {
     const statement = section.variant === "statement";
     const twoColumn = section.variant === "two-column";
-    return shell(<div className={`p-8 sm:p-10 ${statement ? "bg-neutral-100" : ""}`}><div className={statement ? "max-w-3xl" : twoColumn ? "max-w-4xl" : "max-w-xl"}><h2 className={`${statement ? "text-3xl sm:text-4xl" : "text-2xl"} font-semibold leading-tight`}>{section.title}</h2>{twoColumn ? <div className="mt-5 grid gap-5 text-xs leading-6 text-neutral-500 sm:grid-cols-2"><p>Use the first column to establish the context, challenge, or core point of view in a clear, readable narrative.</p><p>Use the second column to add supporting proof, process detail, or a practical next step for the visitor.</p></div> : <p className="mt-4 text-xs leading-6 text-neutral-500">A flexible text block for an argument, editorial message, or explanatory bridge between more visual sections.</p>}</div></div>);
+    const textShell = `${isMobile ? "p-5" : "p-8 sm:p-10"} ${statement ? "bg-neutral-100" : ""}`;
+    const titleClass = `${statement ? (isMobile ? "text-3xl" : "text-3xl sm:text-4xl") : "text-2xl"} font-semibold leading-tight`;
+    const columnsClass = isMobile ? "mt-5 grid grid-cols-1 gap-5 text-xs leading-6 text-neutral-500" : "mt-5 grid gap-5 text-xs leading-6 text-neutral-500 sm:grid-cols-2";
+    return shell(<div className={textShell}><div className={statement ? "max-w-3xl" : twoColumn ? "max-w-4xl" : "max-w-xl"}><h2 className={titleClass}>{section.title}</h2>{twoColumn ? <div className={columnsClass}><p>Use the first column to establish the context, challenge, or core point of view in a clear, readable narrative.</p><p>Use the second column to add supporting proof, process detail, or a practical next step for the visitor.</p></div> : <p className="mt-4 text-xs leading-6 text-neutral-500">A flexible text block for an argument, editorial message, or explanatory bridge between more visual sections.</p>}</div></div>);
   }
   if (section.type === "faq") {
     return shell(<div className="p-7"><h2 className="w-full text-2xl font-semibold leading-tight">{section.title}</h2><div className="mt-5 space-y-2">{["What should visitors understand first?", "How does the process work?", "What happens after I get in touch?"].map(question => <div key={question} className="flex items-center justify-between border border-neutral-300 px-3 py-3 text-[10px] font-medium"><span>{question}</span><ChevronDown className="h-3.5 w-3.5 text-neutral-500" /></div>)}</div></div>);
   }
-  return shell(<div className="p-8"><div className="wireframe-stack grid gap-6 sm:grid-cols-[1.2fr_0.8fr]"><div><h2 className="text-2xl font-semibold">[Company]</h2><p className="mt-3 max-w-md text-[11px] leading-5 text-white/65">Close the page with a clear final action and useful navigation routes.</p></div><div className="grid grid-cols-2 gap-3 text-[10px] text-white/65"><div><p className="font-medium text-white">Explore</p><p className="mt-2">Services</p><p className="mt-1">Work</p></div><div><p className="font-medium text-white">Connect</p><p className="mt-2">Instagram</p><p className="mt-1">LinkedIn</p></div></div></div><div className="mt-7 border-t border-white/15 pt-3 font-mono text-[8px] uppercase tracking-[0.11em] text-white/45">© [Company] · Privacy · Terms</div></div>);
+  const footerLayout = isMobile ? "grid grid-cols-1 gap-6" : "wireframe-stack grid gap-6 sm:grid-cols-[1.2fr_0.8fr]";
+  return shell(<div className={isMobile ? "p-5" : "p-8"}><div className={footerLayout}><div><h2 className="text-2xl font-semibold">[Company]</h2><p className="mt-3 max-w-md text-[11px] leading-5 text-white/65">Close the page with a clear final action and useful navigation routes.</p></div><div className="grid grid-cols-2 gap-3 text-[10px] text-white/65"><div><p className="font-medium text-white">Explore</p><p className="mt-2">Services</p><p className="mt-1">Work</p></div><div><p className="font-medium text-white">Connect</p><p className="mt-2">Instagram</p><p className="mt-1">LinkedIn</p></div></div></div><div className="mt-7 border-t border-white/15 pt-3 font-mono text-[8px] uppercase tracking-[0.11em] text-white/45">© [Company] · Privacy · Terms</div></div>);
 }
 
 function SectionAnnotation({ section }: { section: WireframeSection }) {
@@ -165,7 +182,7 @@ function WireframeRows({
   const renderSection = (section: WireframeSection) => {
     const index = sections.findIndex(item => item.id === section.id);
     const isFrame = isWireframeBoundarySection(section);
-    const preview = <PreviewSection key={section.id} section={section} selected={section.id === selectedId} onSelect={() => onSelect?.(section.id)} onDragStart={event => onDragStart?.(event, index)} onDrop={event => onDrop?.(event, index)} />;
+    const preview = <PreviewSection key={section.id} section={section} selected={section.id === selectedId} mode={mode} onSelect={() => onSelect?.(section.id)} onDragStart={event => onDragStart?.(event, index)} onDrop={event => onDrop?.(event, index)} />;
     if (isFrame) return preview;
     return <div key={section.id} className={`grid gap-2 ${isMobile ? "grid-cols-1" : "grid-cols-[150px_minmax(0,1fr)]"}`}><SectionAnnotation section={section} />{preview}</div>;
   };
