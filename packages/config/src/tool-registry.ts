@@ -38,6 +38,15 @@ export const toolboxTools: ToolboxTool[] = [
     eyebrow: "Experience planning",
   },
   {
+    id: "sitemap-planner",
+    name: "Sitemap Planner",
+    category: "Planning",
+    description: "Build a clear website page tree, map navigation depth, and align strategy with production structure.",
+    path: "/sitemap-planner",
+    status: "available",
+    eyebrow: "Navigation planning",
+  },
+  {
     id: "qa-checklists",
     name: "QA Checklists",
     category: "Quality",

@@ -6,6 +6,7 @@ import {
   Braces,
   CheckSquare2,
   Clock3,
+  Network,
   Search,
   Sparkles,
   Workflow,
@@ -22,6 +23,7 @@ const toolIcons: Record<ToolboxTool["id"], typeof Braces> = {
   "local-schema": Braces,
   "knowledge-base": BookOpen,
   "wireframe-builder": Workflow,
+  "sitemap-planner": Network,
   "qa-checklists": CheckSquare2,
   "prompt-library": Sparkles,
 };

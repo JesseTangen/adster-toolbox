@@ -9,6 +9,7 @@ import { TEAM_ACCESS_SESSION_KEY } from "./lib/teamAccess";
 import Home from "./pages/Home";
 import LocalSchema from "./pages/LocalSchema";
 import QaChecklists from "./pages/QaChecklists";
+import SitemapPlanner from "./pages/SitemapPlanner";
 import TeamAccess from "./pages/TeamAccess";
 import WireframeBuilder from "./pages/WireframeBuilder";
 import { useState } from "react";
@@ -20,6 +21,7 @@ function AppRoutes({ onSignOut }: { onSignOut: () => void }) {
         <Route path={"/"} component={Home} />
         <Route path={"/local-schema"} component={LocalSchema} />
         <Route path={"/wireframe-builder"} component={WireframeBuilder} />
+        <Route path={"/sitemap-planner"} component={SitemapPlanner} />
         <Route path={"/qa-checklists"} component={QaChecklists} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />

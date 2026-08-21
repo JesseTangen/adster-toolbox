@@ -142,3 +142,7 @@
 - [x] Ensure the Mobile JPG handoff uses the same responsive section layouts.
 - [x] Verify Hero, Multi column, Image + content, Text block, FAQ, and footer behavior in the corrected mobile preview.
 - [x] Add explicit mobile-preview assertions for Text block, FAQ, and Footer layouts, then rerun full validation.
+- [x] Define a reusable Sitemap Planner page-tree model with page metadata and safe hierarchy operations.
+- [x] Build the Sitemap Planner workspace with add, nest, rename, reorder, and remove controls plus local session persistence.
+- [x] Activate Sitemap Planner in the Toolbox catalog, sidebar, filters, and registry coverage.
+- [x] Validate sitemap tree editing, responsive presentation, persistence, and automated checks.

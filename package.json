@@ -16,6 +16,7 @@
   "dependencies": {
     "@adster/checklists": "workspace:*",
     "@adster/schema-core": "workspace:*",
+    "@adster/sitemap-core": "workspace:*",
     "@adster/toolbox-config": "workspace:*",
     "@adster/toolbox-ui": "workspace:*",
     "@adster/wireframe-core": "workspace:*",

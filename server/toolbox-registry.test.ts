@@ -31,6 +31,7 @@ describe("Strategist Toolbox registry", () => {
   it("activates the planning and quality modules as available Toolbox routes", () => {
     expect(toolboxTools).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "wireframe-builder", path: "/wireframe-builder", status: "available" }),
+      expect.objectContaining({ id: "sitemap-planner", name: "Sitemap Planner", path: "/sitemap-planner", status: "available", category: "Planning" }),
       expect.objectContaining({ id: "qa-checklists", path: "/qa-checklists", status: "available" }),
     ]));
   });
