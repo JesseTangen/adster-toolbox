@@ -131,3 +131,7 @@
 - [x] Run the final type check, full automated suite, and static Pages build for the collapsed-sidebar and Multi column refinements.
 - [x] Group LocalBusiness days with identical opening hours into JSON-LD dayOfWeek arrays.
 - [x] Validate grouped weekday, split-hour, closed-day, and static Pages output behavior.
+- [x] Add structured opening-hours rows with multi-day selection, open/close times, add/remove controls, and grouped JSON-LD specifications.
+- [x] Preserve compatibility with existing opening-hours draft data and session auto-save.
+- [x] Add a Duplicate schema action that clones the current location into a new session draft without overwriting the original.
+- [x] Validate structured hours, JSON-LD output, duplicate drafts, session persistence, responsive layouts, and automated checks.

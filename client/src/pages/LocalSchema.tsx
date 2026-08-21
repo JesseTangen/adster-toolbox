@@ -7,6 +7,7 @@ import {
   ArrowUpRight,
   Check,
   Copy,
+  CopyPlus,
   FilePlus2,
   Globe2,
   LoaderCircle,
@@ -17,9 +18,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   buildLocalBusinessSchema,
+  createOpeningHoursRow,
   createSchemaDraft,
   getEffectiveType,
   SchemaDraft,
+  schemaDays,
   validateSchemaDraft,
   isLocalBusinessType,
 } from "@adster/schema-core";
@@ -139,6 +142,13 @@ export default function LocalSchema() {
     setHasDraftChanges(true);
   };
 
+  const openingHoursRows = draft.openingHoursRows ?? [];
+  const updateHoursRow = (id: string, update: Partial<(typeof openingHoursRows)[number]>) => {
+    updateDraft("openingHoursRows", openingHoursRows.map(row => row.id === id ? { ...row, ...update } : row));
+  };
+  const addHoursRow = () => updateDraft("openingHoursRows", [...openingHoursRows, createOpeningHoursRow()]);
+  const removeHoursRow = (id: string) => updateDraft("openingHoursRows", openingHoursRows.filter(row => row.id !== id));
+
   const changeBusinessType = (type: string) => {
     setDraft(current => ({ ...current, businessType: type, businessSubtype: type }));
     setHasDraftChanges(true);
@@ -163,6 +173,22 @@ export default function LocalSchema() {
     sessionStorage.setItem(ACTIVE_ENTRY_STORAGE_KEY, entry.id);
     setHasDraftChanges(false);
     setAutoSaveStatus("saved");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const duplicateEntry = (entry: SavedSchema) => {
+    const duplicate: SchemaDraft = {
+      ...entry.draft,
+      id: crypto.randomUUID(),
+      label: entry.draft.label ? `${entry.draft.label} copy` : "Location copy",
+      openingHoursRows: entry.draft.openingHoursRows ?? [],
+      open24Hours: entry.draft.open24Hours ?? false,
+    };
+    persistDraft(duplicate);
+    setDraft(duplicate);
+    setHasDraftChanges(false);
+    setAutoSaveStatus("saved");
+    toast.success("Location duplicate created. Update the few location-specific fields.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -228,6 +254,9 @@ export default function LocalSchema() {
                         <p className="truncate text-[12px] font-medium">{entry.draft.label || entry.draft.name || "Untitled LocalBusiness"}</p>
                         <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-muted-foreground">{getEffectiveType(entry.draft)}</p>
                       </button>
+                      <button onClick={() => duplicateEntry(entry)} aria-label="Duplicate saved schema" className="rounded-lg p-2 text-muted-foreground opacity-0 transition hover:bg-primary/10 hover:text-primary focus:opacity-100 focus:outline-none group-hover:opacity-100">
+                        <CopyPlus className="h-3.5 w-3.5" />
+                      </button>
                       <button onClick={() => removeEntry(entry.id)} aria-label="Delete saved schema" className="rounded-lg p-2 text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive focus:opacity-100 focus:outline-none group-hover:opacity-100">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -288,7 +317,20 @@ export default function LocalSchema() {
                 <div><FieldLabel name="addressCountry" /> <Input value={draft.addressCountry} onChange={event => updateDraft("addressCountry", event.target.value)} className={fieldClass} placeholder="US" /></div>
                 <div><FieldLabel name="latitude" /> <Input value={draft.latitude} onChange={event => updateDraft("latitude", event.target.value)} className={fieldClass} placeholder="39.7392" /></div>
                 <div><FieldLabel name="longitude" /> <Input value={draft.longitude} onChange={event => updateDraft("longitude", event.target.value)} className={fieldClass} placeholder="-104.9903" /></div>
-                <div className="sm:col-span-2"><FieldLabel name="openingHours" hint="e.g. Mo-Fr 09:00-17:00" /> <Textarea value={draft.openingHours} onChange={event => updateDraft("openingHours", event.target.value)} className={textareaClass} placeholder="Mo-Fr 09:00-17:00&#10;Sa 10:00-14:00" /></div>
+                <div className="sm:col-span-2" data-opening-hours-editor>
+                  <FieldLabel name="Opening hours" hint="Add each unique schedule once, then choose the days it applies to." />
+                  <div className="space-y-3 rounded-xl border border-border/80 bg-secondary/[0.22] p-3 dark:bg-[#102b40]/60">
+                    <label className="flex cursor-pointer items-center gap-2.5 text-[12px] font-medium"><input aria-label="Open 24 hours" type="checkbox" checked={draft.open24Hours ?? false} onChange={event => updateDraft("open24Hours", event.target.checked)} className="h-4 w-4 accent-primary" /> Open 24/7</label>
+                    {!(draft.open24Hours ?? false) ? <>
+                      {openingHoursRows.map((row, rowIndex) => <div key={row.id} className="rounded-lg border border-border/70 bg-white/85 p-3 dark:bg-[#163950]">
+                        <div className="flex items-center justify-between gap-3"><p className="font-mono text-[9px] uppercase tracking-[0.11em] text-muted-foreground">Schedule {rowIndex + 1}</p><button onClick={() => removeHoursRow(row.id)} aria-label="Remove opening hours row" className="rounded-md p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button></div>
+                        <div className="mt-2 grid gap-3 sm:grid-cols-[minmax(0,1fr)_112px_112px] sm:items-end"><div><p className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground">Days of week</p><div className="flex flex-wrap gap-1.5">{schemaDays.map(day => <label key={day} className={`cursor-pointer rounded-md border px-2 py-1 text-[10px] transition ${row.dayOfWeek.includes(day) ? "border-primary/45 bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground"}`}><input className="sr-only" type="checkbox" checked={row.dayOfWeek.includes(day)} onChange={event => updateHoursRow(row.id, { dayOfWeek: event.target.checked ? [...row.dayOfWeek, day] : row.dayOfWeek.filter(item => item !== day) })} />{day.slice(0, 3)}</label>)}</div></div><div><p className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground">Opens</p><Input aria-label={`Opens schedule ${rowIndex + 1}`} type="time" value={row.opens} onChange={event => updateHoursRow(row.id, { opens: event.target.value })} className={fieldClass} /></div><div><p className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground">Closes</p><Input aria-label={`Closes schedule ${rowIndex + 1}`} type="time" value={row.closes} onChange={event => updateHoursRow(row.id, { closes: event.target.value })} className={fieldClass} /></div></div>
+                      </div>)}
+                      <Button type="button" variant="outline" onClick={addHoursRow} className="h-9 w-full gap-2 rounded-lg border-dashed bg-background text-[11px]"><Plus className="h-3.5 w-3.5" /> Add opening hours</Button>
+                      {openingHoursRows.length === 0 && draft.openingHours ? <p className="text-[11px] leading-4 text-muted-foreground">Your existing text schedule is preserved until you add a structured schedule row.</p> : null}
+                    </> : <p className="text-[11px] leading-4 text-muted-foreground">This outputs one all-days OpeningHoursSpecification from 00:00 to 23:59.</p>}
+                  </div>
+                </div>
                 <div><FieldLabel name="priceRange" /> <Input value={draft.priceRange} onChange={event => updateDraft("priceRange", event.target.value)} className={fieldClass} placeholder="$$" /></div>
               </div>
             </div>

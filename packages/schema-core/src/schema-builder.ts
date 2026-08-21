@@ -1,5 +1,15 @@
 export type BusinessFamily = string;
 
+export const schemaDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
+export type SchemaDay = (typeof schemaDays)[number];
+
+export type OpeningHoursRow = {
+  id: string;
+  dayOfWeek: SchemaDay[];
+  opens: string;
+  closes: string;
+};
+
 export type SchemaDraft = {
   id: string;
   label: string;
@@ -18,6 +28,8 @@ export type SchemaDraft = {
   latitude: string;
   longitude: string;
   openingHours: string;
+  openingHoursRows: OpeningHoursRow[];
+  open24Hours: boolean;
   priceRange: string;
   logo: string;
   sameAs: string;
@@ -55,6 +67,8 @@ export const createSchemaDraft = (): SchemaDraft => ({
   latitude: "",
   longitude: "",
   openingHours: "",
+  openingHoursRows: [],
+  open24Hours: false,
   priceRange: "",
   logo: "",
   sameAs: "",
@@ -84,9 +98,7 @@ function splitLines(value: string) {
     .filter(Boolean);
 }
 
-const schemaDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
-
-const dayAliases: Record<string, (typeof schemaDays)[number]> = {
+const dayAliases: Record<string, SchemaDay> = {
   mo: "Monday", mon: "Monday", monday: "Monday",
   tu: "Tuesday", tue: "Tuesday", tues: "Tuesday", tuesday: "Tuesday",
   we: "Wednesday", wed: "Wednesday", wednesday: "Wednesday",
@@ -96,9 +108,9 @@ const dayAliases: Record<string, (typeof schemaDays)[number]> = {
   su: "Sunday", sun: "Sunday", sunday: "Sunday",
 };
 
-type OpeningHoursSpecification = {
+export type OpeningHoursSpecification = {
   "@type": "OpeningHoursSpecification";
-  dayOfWeek: (typeof schemaDays)[number][];
+  dayOfWeek: SchemaDay[];
   opens: string;
   closes: string;
 };
@@ -144,6 +156,28 @@ function groupOpeningHours(lines: string[]) {
   return Array.from(grouped.values());
 }
 
+export function createOpeningHoursRow(): OpeningHoursRow {
+  return { id: crypto.randomUUID(), dayOfWeek: [], opens: "09:00", closes: "17:00" };
+}
+
+export function buildOpeningHoursSpecifications(rows: OpeningHoursRow[] = [], open24Hours = false) {
+  if (open24Hours) {
+    return [{ "@type": "OpeningHoursSpecification" as const, dayOfWeek: [...schemaDays], opens: "00:00", closes: "23:59" }];
+  }
+  const grouped = new Map<string, OpeningHoursSpecification>();
+  for (const row of rows) {
+    const days = row.dayOfWeek.filter(day => schemaDays.includes(day));
+    if (!days.length || !/^\d{1,2}:\d{2}$/.test(row.opens) || !/^\d{1,2}:\d{2}$/.test(row.closes)) continue;
+    const opens = normalizeTime(row.opens);
+    const closes = normalizeTime(row.closes);
+    const key = `${opens}-${closes}`;
+    const existing = grouped.get(key);
+    if (existing) existing.dayOfWeek.push(...days);
+    else grouped.set(key, { "@type": "OpeningHoursSpecification", dayOfWeek: [...days], opens, closes });
+  }
+  return Array.from(grouped.values()).map(specification => ({ ...specification, dayOfWeek: schemaDays.filter(day => specification.dayOfWeek.includes(day)) }));
+}
+
 export function getEffectiveType(draft: SchemaDraft) {
   return draft.businessSubtype || draft.businessType || "LocalBusiness";
 }
@@ -163,7 +197,9 @@ export function buildLocalBusinessSchema(draft: SchemaDraft) {
     longitude: draft.longitude,
   });
   const openingHours = splitLines(draft.openingHours);
-  const openingHoursSpecification = groupOpeningHours(openingHours);
+  const structuredHours = buildOpeningHoursSpecifications(draft.openingHoursRows ?? [], draft.open24Hours ?? false);
+  const usesStructuredHours = Boolean(draft.open24Hours) || (draft.openingHoursRows?.length ?? 0) > 0;
+  const openingHoursSpecification = usesStructuredHours ? structuredHours : groupOpeningHours(openingHours);
   const sameAs = splitLines(draft.sameAs);
   const servesCuisine = splitLines(draft.servesCuisine);
 
@@ -243,7 +279,7 @@ export function validateSchemaDraft(draft: SchemaDraft) {
       severity: "recommended",
     });
   }
-  if (!draft.openingHours.trim()) {
+  if (!draft.openingHours.trim() && !(draft.openingHoursRows?.length ?? 0) && !draft.open24Hours) {
     recommendations.push({
       field: "openingHours",
       label: "openingHours",

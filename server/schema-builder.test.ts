@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildLocalBusinessSchema, createSchemaDraft, findLocalBusinessType, isLocalBusinessType, localBusinessTypes, validateSchemaDraft } from "@adster/schema-core";
+import { buildLocalBusinessSchema, createOpeningHoursRow, createSchemaDraft, findLocalBusinessType, isLocalBusinessType, localBusinessTypes, validateSchemaDraft } from "@adster/schema-core";
 
 describe("LocalBusiness schema builder", () => {
   it("includes the full unique LocalBusiness descendant catalog and resolves core subtype relationships", () => {
@@ -59,6 +59,19 @@ describe("LocalBusiness schema builder", () => {
     expect(grouped).not.toHaveProperty("openingHours");
     expect(closed).toMatchObject({ openingHours: "Mo closed" });
     expect(closed).not.toHaveProperty("openingHoursSpecification");
+  });
+
+  it("builds structured schedules and 24/7 output without relying on legacy hour text", () => {
+    const weekday = { ...createOpeningHoursRow(), dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] as const, opens: "08:30", closes: "16:30" };
+    const saturday = { ...createOpeningHoursRow(), dayOfWeek: ["Saturday"] as const, opens: "09:00", closes: "13:00" };
+    const structured = buildLocalBusinessSchema({ ...createSchemaDraft(), openingHoursRows: [weekday, saturday] });
+    const open24 = buildLocalBusinessSchema({ ...createSchemaDraft(), open24Hours: true });
+
+    expect(structured).toMatchObject({ openingHoursSpecification: [
+      { dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "08:30", closes: "16:30" },
+      { dayOfWeek: ["Saturday"], opens: "09:00", closes: "13:00" },
+    ] });
+    expect(open24).toMatchObject({ openingHoursSpecification: [{ dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "00:00", closes: "23:59" }] });
   });
 
   it("does not emit empty properties", () => {
