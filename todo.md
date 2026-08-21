@@ -135,3 +135,6 @@
 - [x] Preserve compatibility with existing opening-hours draft data and session auto-save.
 - [x] Add a Duplicate schema action that clones the current location into a new session draft without overwriting the original.
 - [x] Validate structured hours, JSON-LD output, duplicate drafts, session persistence, responsive layouts, and automated checks.
+- [x] Make structured-hours weekday selection span the full schedule row.
+- [x] Place Opens and Closes as equal half-width controls beneath the weekday selection.
+- [x] Verify the revised schedule-row layout at desktop and mobile widths.
