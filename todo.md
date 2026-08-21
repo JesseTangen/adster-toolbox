@@ -146,3 +146,5 @@
 - [x] Build the Sitemap Planner workspace with add, nest, rename, reorder, and remove controls plus local session persistence.
 - [x] Activate Sitemap Planner in the Toolbox catalog, sidebar, filters, and registry coverage.
 - [x] Validate sitemap tree editing, responsive presentation, persistence, and automated checks.
+- [x] Stack and center-align Sitemap Planner Pages and Depth statistics on larger screens.
+- [x] Verify the refined desktop statistics card while preserving the existing mobile layout.
