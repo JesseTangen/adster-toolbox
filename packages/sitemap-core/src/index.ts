@@ -85,6 +85,28 @@ export function moveSitemapPage(root: SitemapPage, id: string, direction: -1 | 1
   };
 }
 
+function reorderSiblingList(children: SitemapPage[], draggedId: string, targetId: string) {
+  const draggedIndex = children.findIndex(page => page.id === draggedId);
+  const targetIndex = children.findIndex(page => page.id === targetId);
+  if (draggedIndex < 0 || targetIndex < 0 || draggedIndex === targetIndex) return children;
+  const reordered = [...children];
+  const [dragged] = reordered.splice(draggedIndex, 1);
+  const insertionIndex = reordered.findIndex(page => page.id === targetId);
+  reordered.splice(insertionIndex, 0, dragged);
+  return reordered;
+}
+
+/** Reorders a page before a sibling target. Pages in different branches are intentionally left unchanged. */
+export function reorderSitemapSibling(root: SitemapPage, draggedId: string, targetId: string): SitemapPage {
+  return {
+    ...root,
+    children: reorderSiblingList(root.children, draggedId, targetId).map(page => ({
+      ...page,
+      children: reorderSitemapSibling(page, draggedId, targetId).children,
+    })),
+  };
+}
+
 export function getSitemapStats(root: SitemapPage) {
   const walk = (page: SitemapPage, depth: number): { pages: number; maxDepth: number } => page.children.reduce(
     (result, child) => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addSitemapChild, cloneSitemapTree, createSitemapPage, defaultSitemap, findSitemapPage, getSitemapStats, moveSitemapPage, removeSitemapPage, slugifySitemapTitle, updateSitemapPage } from "@adster/sitemap-core";
+import { addSitemapChild, cloneSitemapTree, createSitemapPage, defaultSitemap, findSitemapPage, getSitemapStats, moveSitemapPage, removeSitemapPage, reorderSitemapSibling, slugifySitemapTitle, updateSitemapPage } from "@adster/sitemap-core";
 
 describe("sitemap core", () => {
   it("adds, updates, and finds nested pages without mutating the starter tree", () => {
@@ -24,5 +24,14 @@ describe("sitemap core", () => {
 
   it("creates predictable starter slugs", () => {
     expect(slugifySitemapTitle("  Our Work & Case Studies ")).toBe("/our-work-case-studies");
+  });
+
+  it("reorders only sibling pages for handle-based dragging", () => {
+    const tree = cloneSitemapTree(defaultSitemap);
+    const reordered = reorderSitemapSibling(tree, "contact", "about");
+    const invalidBranchMove = reorderSitemapSibling(reordered, "service-detail", "about");
+
+    expect(reordered.children.map(page => page.id)).toEqual(["services", "contact", "about", "resources"]);
+    expect(invalidBranchMove.children.map(page => page.id)).toEqual(["services", "contact", "about", "resources"]);
   });
 });

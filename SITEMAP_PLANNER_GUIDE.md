@@ -9,3 +9,5 @@ The Planner’s core interaction model is deliberately compact. **Add top-level 
 Desktop review confirmed the connected tree canvas, nested page markers, and selected-page inspector form clearly show hierarchy and editing context. On mobile, the catalog, tree, canvas, and inspector stack into a single vertical planning flow while preserving the page controls and navigation relationships.
 
 The header metrics use a responsive layout. At larger widths, the narrow Pages/Depth card stacks both values vertically and centers them; at smaller widths, the summary retains its original two-column arrangement.
+
+Each page card in the navigation canvas now includes a six-dot drag handle. Dragging a non-root handle onto a sibling reorders it before that sibling and persists the new order in browser storage. The Homepage handle is intentionally fixed; **Move up** and **Move down** remain available as accessible non-drag alternatives.

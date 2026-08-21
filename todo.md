@@ -148,3 +148,6 @@
 - [x] Validate sitemap tree editing, responsive presentation, persistence, and automated checks.
 - [x] Stack and center-align Sitemap Planner Pages and Depth statistics on larger screens.
 - [x] Verify the refined desktop statistics card while preserving the existing mobile layout.
+- [x] Add six-dot-handle drag-and-drop reordering for Sitemap Planner page siblings.
+- [x] Preserve page hierarchy, browser persistence, and accessible Move up/Move down alternatives.
+- [x] Validate desktop/mobile drag interaction and persisted page order.
