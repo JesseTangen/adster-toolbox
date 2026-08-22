@@ -4,12 +4,12 @@ import {
   ArrowUpRight,
   BookOpen,
   Braces,
-  CheckSquare2,
+  ClipboardCheck,
   Clock3,
   Network,
   Search,
   Sparkles,
-  Workflow,
+  LayoutPanelTop,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -22,9 +22,9 @@ import { useTheme } from "@/contexts/ThemeContext";
 const toolIcons: Record<ToolboxTool["id"], typeof Braces> = {
   "local-schema": Braces,
   "knowledge-base": BookOpen,
-  "wireframe-builder": Workflow,
+  "wireframe-builder": LayoutPanelTop,
   "sitemap-planner": Network,
-  "qa-checklists": CheckSquare2,
+  "qa-checklists": ClipboardCheck,
   "prompt-library": Sparkles,
 };
 
