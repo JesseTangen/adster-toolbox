@@ -35,7 +35,7 @@ function TreeNode({ page, depth, selectedId, onSelect }: { page: SitemapPage; de
   const selected = page.id === selectedId;
   return (
     <li className="relative" role="treeitem" aria-selected={selected}>
-      {depth > 0 ? <span className="absolute -left-3 top-0 h-6 w-3 border-b border-l border-primary/25" /> : null}
+      {depth > 0 ? <span className="absolute -left-3 top-0 h-6 w-3 border-b border-primary/25" /> : null}
       <button onClick={() => onSelect(page.id)} className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition ${selected ? "border-primary/40 bg-primary/[0.08] shadow-sm" : "border-transparent hover:border-primary/20 hover:bg-primary/[0.025]"}`}>
         <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}><Layers3 className="h-3.5 w-3.5" /></span>
         <span className="min-w-0 flex-1"><span className="block truncate text-[11px] font-semibold">{page.title}</span><span className="mt-0.5 block truncate font-mono text-[8px] text-muted-foreground">{page.slug}</span></span>
@@ -50,7 +50,6 @@ function CanvasNode({ page, depth, selectedId, onSelect }: { page: SitemapPage; 
   const selected = page.id === selectedId;
   return (
     <li data-sitemap-page-id={page.id} className="relative pl-7" role="treeitem" aria-selected={selected}>
-      {depth > 0 ? <span className="absolute left-0 top-0 h-7 w-6 border-b border-l border-primary/35" /> : null}
       <button onClick={() => onSelect(page.id)} className={`group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition sm:p-4 ${selected ? "border-primary/45 bg-primary/[0.07] ring-1 ring-primary/15" : "border-border/80 bg-white/80 hover:border-primary/30 dark:bg-[#102b40]"}`}>
         <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}><Link2 className="h-4 w-4" /></div>
         <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{page.title}</p><p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-muted-foreground">{page.slug}</p></div>
