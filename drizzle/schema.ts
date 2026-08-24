@@ -22,6 +22,14 @@ export const users = mysqlTable("users", {
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
+export const promptLibrarySnapshots = mysqlTable("prompt_library_snapshots", {
+  id: int("id").primaryKey(),
+  sourceTitle: varchar("sourceTitle", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  promptCount: int("promptCount").notNull(),
+  refreshedAt: timestamp("refreshedAt").notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 

@@ -19,6 +19,9 @@ importers:
       '@adster/checklists':
         specifier: workspace:*
         version: link:packages/checklists
+      '@adster/prompt-library':
+        specifier: workspace:*
+        version: link:packages/prompt-library
       '@adster/schema-core':
         specifier: workspace:*
         version: link:packages/schema-core
@@ -305,6 +308,8 @@ importers:
   packages/checklists: {}
 
   packages/config: {}
+
+  packages/prompt-library: {}
 
   packages/schema-core: {}
 

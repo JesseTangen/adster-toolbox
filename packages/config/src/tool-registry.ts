@@ -59,8 +59,9 @@ export const toolboxTools: ToolboxTool[] = [
     id: "prompt-library",
     name: "Prompt Library",
     category: "Planning",
-    description: "A future collection of reusable prompts for research, planning, and production workflows.",
-    status: "planned",
+    description: "Load, search, and copy approved research, planning, and production prompts from the team’s Google Sheet.",
+    path: "/prompt-library",
+    status: "available",
     eyebrow: "Reusable prompts",
   },
 ];

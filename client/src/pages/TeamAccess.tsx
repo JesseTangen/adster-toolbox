@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { headerLogoSrc } from "@/lib/headerLogo";
+import { trpc } from "@/lib/trpc";
 import { verifyTeamAccessCode } from "@/lib/teamAccess";
 import { KeyRound, LockKeyhole, ShieldAlert } from "lucide-react";
 import { FormEvent, useState } from "react";
@@ -8,7 +9,8 @@ import { FormEvent, useState } from "react";
 export default function TeamAccess({ onGranted }: { onGranted: () => void }) {
   const [accessCode, setAccessCode] = useState("");
   const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const verifyAccess = trpc.teamAccess.verify.useMutation();
+  const isStaticExport = import.meta.env.BASE_URL !== "/";
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -17,12 +19,18 @@ export default function TeamAccess({ onGranted }: { onGranted: () => void }) {
       return;
     }
 
-    setSubmitting(true);
     setError("");
-    const accepted = await verifyTeamAccessCode(accessCode);
-    setSubmitting(false);
-
-    if (!accepted) {
+    if (isStaticExport) {
+      if (!await verifyTeamAccessCode(accessCode)) {
+        setError("That access code is not recognized. Please check with the team.");
+        return;
+      }
+      onGranted();
+      return;
+    }
+    try {
+      await verifyAccess.mutateAsync({ code: accessCode });
+    } catch {
       setError("That access code is not recognized. Please check with the team.");
       return;
     }
@@ -48,7 +56,7 @@ export default function TeamAccess({ onGranted }: { onGranted: () => void }) {
           <label className="block text-xs font-medium" htmlFor="team-access-code">Team access code</label>
           <Input id="team-access-code" type="password" autoComplete="current-password" value={accessCode} onChange={event => setAccessCode(event.target.value)} aria-describedby={error ? "access-error" : "access-notice"} className="h-11 rounded-xl bg-white dark:bg-background" placeholder="Enter the shared code" />
           {error ? <p id="access-error" role="alert" className="text-xs leading-5 text-destructive">{error}</p> : null}
-          <Button type="submit" disabled={submitting} className="h-11 w-full gap-2 rounded-xl"><KeyRound className="h-4 w-4" />{submitting ? "Checking access…" : "Open Toolbox"}</Button>
+          <Button type="submit" disabled={verifyAccess.isPending} className="h-11 w-full gap-2 rounded-xl"><KeyRound className="h-4 w-4" />{verifyAccess.isPending ? "Checking access…" : "Open Toolbox"}</Button>
         </form>
       </section>
     </main>

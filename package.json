@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@adster/checklists": "workspace:*",
+    "@adster/prompt-library": "workspace:*",
     "@adster/schema-core": "workspace:*",
     "@adster/sitemap-core": "workspace:*",
     "@adster/toolbox-config": "workspace:*",

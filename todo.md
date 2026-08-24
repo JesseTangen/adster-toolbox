@@ -156,3 +156,20 @@
 - [x] Explicitly verify Move up and Move down ordering plus persisted page order after drag removal.
 - [x] Assert the simplified no-handle sitemap canvas remains clean at desktop and mobile widths.
 - [x] Explicitly assert the desktop sitemap canvas has no handles, no overflow, and the expected page-card structure.
+- [x] Authorize secure read-only access to the supplied private Google Sheet and inspect its prompt-library fields.
+- [x] Define a private server-side source mapping and refresh strategy that keeps sheet content out of the static client bundle.
+- [x] Build and activate a searchable Prompt Library route, catalog card, and sidebar entry from the authorized source.
+- [x] Add source refresh, loading, empty, and unavailable states without fabricating prompt content.
+- [x] Validate the private source integration, responsive library workflow, automated coverage, and full-stack build.
+- [x] Superseded the shared private-sheet connection plan with a service-account source owned by the Toolbox.
+- [x] Superseded the browser Google OAuth client configuration because it is not required for the selected private-source architecture.
+- [x] Superseded individual Google sign-in and expiry handling with a server-owned source reader and cached prompts.
+- [x] Resolved the Google OAuth `invalid_client` exploration by removing browser OAuth from the selected architecture.
+- [x] Replace the per-user Google sign-in approach with the selected secure, low-friction proprietary-source integration.
+- [x] Configure a read-only service account, grant it access only to the Prompt Library sheet, and store its credential as a server-only deployment secret.
+- [x] Build a signed Google Apps Script sheet-edit webhook endpoint and document its source-refresh setup.
+- [x] Move the shared Toolbox access code to a signed server session before exposing proprietary Prompt Library data.
+- [x] Store and refresh normalized prompt records through a protected server-side cache rather than browser Google OAuth.
+- [ ] Publish the full-stack Toolbox and install the documented Apps Script trigger with the deployed Prompt Library webhook URL.
+- [x] Add a dedicated empty-source state when the authorized Sheet returns no prompt rows.
+- [x] Verify source load, search, selection, and manual refresh in the Prompt Library mobile layout.

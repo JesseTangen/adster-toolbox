@@ -20,10 +20,10 @@ describe("Strategist Toolbox registry", () => {
     expect(toolboxTools.every(tool => tool.category !== undefined)).toBe(true);
   });
 
-  it("replaces Other Schema with Knowledge Base and Prompt Library as planned modules", () => {
+  it("keeps Knowledge Base planned while activating Prompt Library from its route", () => {
     expect(toolboxTools).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "knowledge-base", name: "Knowledge Base", status: "planned", category: "Knowledge" }),
-      expect.objectContaining({ id: "prompt-library", name: "Prompt Library", status: "planned", category: "Planning" }),
+      expect.objectContaining({ id: "prompt-library", name: "Prompt Library", path: "/prompt-library", status: "available", category: "Planning" }),
     ]));
     expect(toolboxTools.some(tool => tool.id === "other-schema")).toBe(false);
   });

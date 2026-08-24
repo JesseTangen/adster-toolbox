@@ -25,11 +25,11 @@ const menuItems = [
   { icon: LayoutPanelTop, label: "Wireframe Builder", path: "/wireframe-builder" },
   { icon: Network, label: "Sitemap Planner", path: "/sitemap-planner" },
   { icon: ClipboardCheck, label: "QA Checklists", path: "/qa-checklists" },
+  { icon: Sparkles, label: "Prompt Library", path: "/prompt-library" },
 ];
 
 const plannedMenuItems = [
   { icon: BookOpen, label: "Knowledge Base" },
-  { icon: Sparkles, label: "Prompt Library" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

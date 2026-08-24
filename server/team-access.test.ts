@@ -1,13 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { TEAM_ACCESS_HASH, hashTeamAccessCode, verifyTeamAccessCode } from "../client/src/lib/teamAccess";
+import { clearTeamAccessCookie, createTeamAccessSession, hasTeamAccess, teamAccessCookie, verifyTeamAccessCode } from "./teamAccess";
 
-describe("team access verifier", () => {
-  it("uses a SHA-256 verifier instead of storing the clear-text access code", async () => {
-    expect(TEAM_ACCESS_HASH).toMatch(/^[a-f0-9]{64}$/);
-    expect(await hashTeamAccessCode("")).toBe("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+describe("server-enforced Team access", () => {
+  it("validates the server-only access code without retaining it in the client", () => {
+    expect(verifyTeamAccessCode(process.env.TEAM_ACCESS_CODE!)).toBe(true);
+    expect(verifyTeamAccessCode("not-the-team-code")).toBe(false);
   });
 
-  it("rejects an empty access attempt", async () => {
-    expect(await verifyTeamAccessCode("")).toBe(false);
+  it("accepts a signed, unexpired HTTP-only session and rejects a tampered value", () => {
+    const now = 1_730_000_000_000;
+    const token = createTeamAccessSession(now);
+    expect(hasTeamAccess({ headers: { cookie: `adster_team_access=${token}` } }, now + 1)).toBe(true);
+    expect(hasTeamAccess({ headers: { cookie: `adster_team_access=${token}x` } }, now + 1)).toBe(false);
+    expect(teamAccessCookie(token)).toContain("HttpOnly");
+    expect(clearTeamAccessCookie()).toContain("Max-Age=0");
   });
 });

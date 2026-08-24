@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, promptLibrarySnapshots, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import type { PromptLibraryItem } from "@adster/prompt-library";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -87,6 +88,37 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+export type StoredPromptLibrarySnapshot = {
+  sourceTitle: string;
+  items: PromptLibraryItem[];
+  refreshedAt: Date;
+};
+
+export async function getPromptLibrarySnapshot(): Promise<StoredPromptLibrarySnapshot | null> {
+  const db = await getDb();
+  if (!db) return null;
+  const [snapshot] = await db.select().from(promptLibrarySnapshots).where(eq(promptLibrarySnapshots.id, 1)).limit(1);
+  if (!snapshot) return null;
+  try {
+    return { sourceTitle: snapshot.sourceTitle, items: JSON.parse(snapshot.content) as PromptLibraryItem[], refreshedAt: snapshot.refreshedAt };
+  } catch {
+    return null;
+  }
+}
+
+export async function savePromptLibrarySnapshot(snapshot: StoredPromptLibrarySnapshot) {
+  const db = await getDb();
+  if (!db) throw new Error("The Prompt Library cache database is unavailable.");
+  const values = {
+    id: 1,
+    sourceTitle: snapshot.sourceTitle,
+    content: JSON.stringify(snapshot.items),
+    promptCount: snapshot.items.length,
+    refreshedAt: snapshot.refreshedAt,
+  };
+  await db.insert(promptLibrarySnapshots).values(values).onDuplicateKeyUpdate({ set: values });
 }
 
 // TODO: add feature queries here as your schema grows.

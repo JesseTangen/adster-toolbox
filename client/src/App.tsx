@@ -6,8 +6,10 @@ import { Route, Router as WouterRouter, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TEAM_ACCESS_SESSION_KEY } from "./lib/teamAccess";
+import { trpc } from "./lib/trpc";
 import Home from "./pages/Home";
 import LocalSchema from "./pages/LocalSchema";
+import PromptLibrary from "./pages/PromptLibrary";
 import QaChecklists from "./pages/QaChecklists";
 import SitemapPlanner from "./pages/SitemapPlanner";
 import TeamAccess from "./pages/TeamAccess";
@@ -23,6 +25,7 @@ function AppRoutes({ onSignOut }: { onSignOut: () => void }) {
         <Route path={"/wireframe-builder"} component={WireframeBuilder} />
         <Route path={"/sitemap-planner"} component={SitemapPlanner} />
         <Route path={"/qa-checklists"} component={QaChecklists} />
+        <Route path={"/prompt-library"} component={PromptLibrary} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>
@@ -37,16 +40,20 @@ function AppRoutes({ onSignOut }: { onSignOut: () => void }) {
 
 function App() {
   const pagesBasePath = import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL.replace(/\/$/, "");
+  const isStaticExport = import.meta.env.BASE_URL !== "/";
+  const teamAccess = trpc.teamAccess.status.useQuery(undefined, { retry: false, enabled: !isStaticExport });
+  const signOut = trpc.teamAccess.signOut.useMutation();
   const [hasTeamAccess, setHasTeamAccess] = useState(() => sessionStorage.getItem(TEAM_ACCESS_SESSION_KEY) === "granted");
   const grantAccess = () => {
     sessionStorage.setItem(TEAM_ACCESS_SESSION_KEY, "granted");
     setHasTeamAccess(true);
   };
   const revokeAccess = () => {
+    signOut.mutate();
     sessionStorage.removeItem(TEAM_ACCESS_SESSION_KEY);
     setHasTeamAccess(false);
   };
-  const routes = hasTeamAccess ? <AppRoutes onSignOut={revokeAccess} /> : <TeamAccess onGranted={grantAccess} />;
+  const routes = (hasTeamAccess || teamAccess.data?.hasAccess) ? <AppRoutes onSignOut={revokeAccess} /> : <TeamAccess onGranted={grantAccess} />;
 
   return (
     <ErrorBoundary>

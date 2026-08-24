@@ -171,6 +171,7 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@adster/checklists": path.resolve(import.meta.dirname, "packages", "checklists", "src", "index.ts"),
+      "@adster/prompt-library": path.resolve(import.meta.dirname, "packages", "prompt-library", "src", "index.ts"),
       "@adster/schema-core": path.resolve(import.meta.dirname, "packages", "schema-core", "src", "index.ts"),
       "@adster/sitemap-core": path.resolve(import.meta.dirname, "packages", "sitemap-core", "src", "index.ts"),
       "@adster/toolbox-config": path.resolve(import.meta.dirname, "packages", "config", "src", "index.ts"),
