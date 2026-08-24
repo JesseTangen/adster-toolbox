@@ -170,6 +170,8 @@
 - [x] Build a signed Google Apps Script sheet-edit webhook endpoint and document its source-refresh setup.
 - [x] Move the shared Toolbox access code to a signed server session before exposing proprietary Prompt Library data.
 - [x] Store and refresh normalized prompt records through a protected server-side cache rather than browser Google OAuth.
-- [ ] Publish the full-stack Toolbox and install the documented Apps Script trigger with the deployed Prompt Library webhook URL.
+- [x] Supersede the full-stack deployment and its Apps Script trigger because the live Toolbox is constrained to GitHub Pages-only hosting.
+- [ ] Replace the full-stack-only Prompt Library source architecture with a GitHub Pages-compatible approach selected after reviewing the exposure and update tradeoffs.
+- [x] Define the protected external-proxy topology, identity gate, server-side sheet access, and secure edit-webhook workflow for a GitHub Pages deployment.
 - [x] Add a dedicated empty-source state when the authorized Sheet returns no prompt rows.
 - [x] Verify source load, search, selection, and manual refresh in the Prompt Library mobile layout.
