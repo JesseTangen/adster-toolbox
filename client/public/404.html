@@ -6,14 +6,12 @@
     <title>Redirecting to Strategist Toolbox</title>
     <script>
       // GitHub Pages only serves physical files. Preserve a requested SPA route,
-      // then send it through the repository root so index.html can restore it.
+      // then send it through the custom-domain root so index.html can restore it.
       (function () {
         var location = window.location;
-        var parts = location.pathname.split("/");
-        var repositoryBase = parts.slice(0, 2).join("/") + "/";
-        var appRoute = parts.slice(2).join("/");
+        var appRoute = location.pathname.slice(1);
         var query = location.search ? "&" + location.search.slice(1).replace(/&/g, "~and~") : "";
-        location.replace(location.protocol + "//" + location.host + repositoryBase + "?/" + appRoute + query + location.hash);
+        location.replace(location.protocol + "//" + location.host + "/?/" + appRoute + query + location.hash);
       })();
     </script>
   </head>

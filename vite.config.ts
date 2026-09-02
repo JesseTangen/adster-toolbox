@@ -151,6 +151,7 @@ function vitePluginManusDebugCollector(): Plugin {
 }
 
 const isGitHubPagesBuild = process.env.GITHUB_PAGES === "true";
+const isGitHubPagesCustomDomain = process.env.GITHUB_PAGES_CUSTOM_DOMAIN === "true";
 const githubPagesRepository = process.env.GITHUB_REPOSITORY?.split("/")[1] || "Adster-Schema-Studio";
 const plugins = [
   react(),
@@ -162,9 +163,12 @@ const plugins = [
 ];
 
 export default defineConfig({
-  // GitHub Pages projects publish beneath their repository path. GitHub Actions
-  // provides GITHUB_REPOSITORY, while the fallback keeps local Pages builds aligned.
-  base: isGitHubPagesBuild ? `/${githubPagesRepository}/` : "/",
+  // Project Pages use the repository path by default. A configured custom domain
+  // serves the same artifact at its root, so assets and client routes must be root-relative.
+  base: isGitHubPagesBuild && !isGitHubPagesCustomDomain ? `/${githubPagesRepository}/` : "/",
+  define: {
+    "import.meta.env.VITE_STATIC_EXPORT": JSON.stringify(isGitHubPagesBuild ? "true" : "false"),
+  },
   plugins,
   resolve: {
     alias: {

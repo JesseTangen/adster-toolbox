@@ -40,7 +40,7 @@ function AppRoutes({ onSignOut }: { onSignOut: () => void }) {
 
 function App() {
   const pagesBasePath = import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL.replace(/\/$/, "");
-  const isStaticExport = import.meta.env.BASE_URL !== "/";
+  const isStaticExport = import.meta.env.VITE_STATIC_EXPORT === "true";
   const teamAccess = trpc.teamAccess.status.useQuery(undefined, { retry: false, enabled: !isStaticExport });
   const signOut = trpc.teamAccess.signOut.useMutation();
   const [hasTeamAccess, setHasTeamAccess] = useState(() => sessionStorage.getItem(TEAM_ACCESS_SESSION_KEY) === "granted");

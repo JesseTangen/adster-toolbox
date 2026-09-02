@@ -172,6 +172,10 @@
 - [x] Store and refresh normalized prompt records through a protected server-side cache rather than browser Google OAuth.
 - [x] Supersede the full-stack deployment and its Apps Script trigger because the live Toolbox is constrained to GitHub Pages-only hosting.
 - [ ] Replace the full-stack-only Prompt Library source architecture with a GitHub Pages-compatible approach selected after reviewing the exposure and update tradeoffs.
+- [x] Diagnose the failed `toolbox.adster.ca` GitHub Pages DNS check and confirm the required public DNS record.
+- [x] Confirm public propagation of the correctly configured `toolbox.adster.ca` CNAME before rerunning GitHub Pages validation.
+- [x] Reconfigure the GitHub Pages output and client router to serve the Toolbox from the `toolbox.adster.ca` root rather than `/adster-toolbox/`.
+- [x] Validate root-domain assets, direct module URLs, and SPA fallback behavior in the custom-domain Pages build.
 - [x] Define the protected external-proxy topology, identity gate, server-side sheet access, and secure edit-webhook workflow for a GitHub Pages deployment.
 - [x] Add a dedicated empty-source state when the authorized Sheet returns no prompt rows.
 - [x] Verify source load, search, selection, and manual refresh in the Prompt Library mobile layout.
