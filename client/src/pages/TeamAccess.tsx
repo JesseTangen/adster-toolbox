@@ -10,7 +10,7 @@ export default function TeamAccess({ onGranted }: { onGranted: () => void }) {
   const [accessCode, setAccessCode] = useState("");
   const [error, setError] = useState("");
   const verifyAccess = trpc.teamAccess.verify.useMutation();
-  const isStaticExport = import.meta.env.BASE_URL !== "/";
+  const isStaticExport = import.meta.env.VITE_STATIC_EXPORT === "true";
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

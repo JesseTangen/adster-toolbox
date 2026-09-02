@@ -4,10 +4,12 @@ import { describe, expect, it } from "vitest";
 describe("GitHub Pages router base", () => {
   it("uses Vite's deployed base path while detecting static export independently", () => {
     const source = readFileSync(new URL("../client/src/App.tsx", import.meta.url), "utf8");
+    const teamAccess = readFileSync(new URL("../client/src/pages/TeamAccess.tsx", import.meta.url), "utf8");
 
     expect(source).toContain("const pagesBasePath = import.meta.env.BASE_URL");
     expect(source).toContain('const isStaticExport = import.meta.env.VITE_STATIC_EXPORT === "true"');
     expect(source).toContain("<WouterRouter base={pagesBasePath}>{routes}</WouterRouter>");
+    expect(teamAccess).toContain('const isStaticExport = import.meta.env.VITE_STATIC_EXPORT === "true"');
   });
 
   it("builds the configured custom-domain Pages artifact from the domain root", () => {

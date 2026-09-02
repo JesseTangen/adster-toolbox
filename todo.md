@@ -176,6 +176,8 @@
 - [x] Confirm public propagation of the correctly configured `toolbox.adster.ca` CNAME before rerunning GitHub Pages validation.
 - [x] Reconfigure the GitHub Pages output and client router to serve the Toolbox from the `toolbox.adster.ca` root rather than `/adster-toolbox/`.
 - [x] Validate root-domain assets, direct module URLs, and SPA fallback behavior in the custom-domain Pages build.
+- [x] Diagnose and correct the live GitHub Pages team access-code submission failure at `toolbox.adster.ca`.
+- [x] Verify valid access-code submission and persisted session behavior in the custom-domain static artifact.
 - [x] Define the protected external-proxy topology, identity gate, server-side sheet access, and secure edit-webhook workflow for a GitHub Pages deployment.
 - [x] Add a dedicated empty-source state when the authorized Sheet returns no prompt rows.
 - [x] Verify source load, search, selection, and manual refresh in the Prompt Library mobile layout.
