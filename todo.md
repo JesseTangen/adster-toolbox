@@ -178,6 +178,8 @@
 - [x] Validate root-domain assets, direct module URLs, and SPA fallback behavior in the custom-domain Pages build.
 - [x] Diagnose and correct the live GitHub Pages team access-code submission failure at `toolbox.adster.ca`.
 - [x] Verify valid access-code submission and persisted session behavior in the custom-domain static artifact.
+- [x] Diagnose and correct the unresponsive Open Toolbox submission reported on the live custom-domain Pages build.
+- [x] Verify visible valid-code navigation and invalid-code feedback in a production-equivalent static browser session.
 - [x] Define the protected external-proxy topology, identity gate, server-side sheet access, and secure edit-webhook workflow for a GitHub Pages deployment.
 - [x] Add a dedicated empty-source state when the authorized Sheet returns no prompt rows.
 - [x] Verify source load, search, selection, and manual refresh in the Prompt Library mobile layout.
