@@ -17,4 +17,10 @@ describe("GitHub Pages SPA fallback", () => {
     expect(index).toContain("GitHub Pages SPA fallback");
     expect(index).toContain("history.replaceState");
   });
+
+  it("ships the supplied favicon and blocks crawler indexing in the application document", () => {
+    const index = fs.readFileSync(path.join(projectRoot, "client/index.html"), "utf8");
+    expect(index).toContain('<meta name="robots" content="noindex, nofollow" />');
+    expect(index).toContain('rel="icon" type="image/png" sizes="32x32" href="/manus-storage/adster-toolbox-favicon-32x32_e9f7d4f8.png"');
+  });
 });
