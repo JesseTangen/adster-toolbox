@@ -187,3 +187,5 @@
 - [x] Verify restored Blog and Product styles in desktop/mobile previews, JPG exports, tests, and build output.
 - [x] Add the supplied favicon to the Toolbox application and GitHub Pages artifact.
 - [x] Add and validate the requested `noindex, nofollow` robots meta directive across build outputs.
+- [x] Move the supplied favicon into the Git repository public assets and replace the managed-storage URL.
+- [x] Verify the GitHub Pages artifact serves the repository-hosted favicon from the custom-domain root.
