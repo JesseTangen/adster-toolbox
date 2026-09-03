@@ -11,9 +11,11 @@ export const wireframeSectionTypes = [
 export type WireframeSectionType = (typeof wireframeSectionTypes)[number];
 
 export const multiColumnContentStyles = [
-  { id: "feature", label: "Feature", defaultTitle: "Ways to move the work forward", itemLabel: "Feature", media: ["image", "icon"], supportsReadMore: true, hasSummary: true, hasPrice: false, hasCart: false },
-  { id: "service", label: "Service", defaultTitle: "How we can help", itemLabel: "Service", media: ["image", "icon", "none"], supportsReadMore: true, hasSummary: true, hasPrice: false, hasCart: false },
-  { id: "collection", label: "Product collection", defaultTitle: "Explore collections", itemLabel: "Collection", media: ["image"], supportsReadMore: true, hasSummary: false, hasPrice: false, hasCart: false },
+  { id: "feature", label: "Feature", defaultTitle: "Ways to move the work forward", itemLabel: "Feature", media: ["image", "icon"], supportsReadMore: true, hasSummary: true, hasAuthor: false, hasPrice: false, hasCart: false },
+  { id: "blog", label: "Blog", defaultTitle: "Latest insights", itemLabel: "Post", media: ["image"], supportsReadMore: true, hasSummary: true, hasAuthor: true, hasPrice: false, hasCart: false },
+  { id: "service", label: "Service", defaultTitle: "How we can help", itemLabel: "Service", media: ["image", "icon", "none"], supportsReadMore: true, hasSummary: true, hasAuthor: false, hasPrice: false, hasCart: false },
+  { id: "collection", label: "Product collection", defaultTitle: "Explore collections", itemLabel: "Collection", media: ["image"], supportsReadMore: true, hasSummary: false, hasAuthor: false, hasPrice: false, hasCart: false },
+  { id: "product", label: "Product", defaultTitle: "Featured products", itemLabel: "Product", media: ["image"], supportsReadMore: false, hasSummary: false, hasAuthor: false, hasPrice: true, hasCart: true },
 ] as const;
 
 export type MultiColumnContentStyle = (typeof multiColumnContentStyles)[number]["id"];

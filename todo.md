@@ -183,3 +183,5 @@
 - [x] Define the protected external-proxy topology, identity gate, server-side sheet access, and secure edit-webhook workflow for a GitHub Pages deployment.
 - [x] Add a dedicated empty-source state when the authorized Sheet returns no prompt rows.
 - [x] Verify source load, search, selection, and manual refresh in the Prompt Library mobile layout.
+- [x] Restore Blog and Product content-style options in the Wireframe Builder Multi column section.
+- [x] Verify restored Blog and Product styles in desktop/mobile previews, JPG exports, tests, and build output.

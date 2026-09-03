@@ -13,7 +13,19 @@ describe("wireframe core", () => {
     expect(wireframeSectionDefinitions.find(item => item.type === "split")?.variants.map(variant => variant.id)).toEqual(["image-left", "image-right"]);
     expect(wireframeSectionDefinitions.find(item => item.type === "columns")?.variants.map(variant => variant.id)).toEqual(["two", "three", "four"]);
     expect(wireframeSectionDefinitions.map(item => item.type)).not.toEqual(expect.arrayContaining(["articles", "products"]));
-    expect(multiColumnContentStyles.map(style => style.id)).toEqual(["feature", "service", "collection"]);
+    expect(multiColumnContentStyles.map(style => style.id)).toEqual(["feature", "blog", "service", "collection", "product"]);
+    expect(multiColumnContentStyles.find(style => style.id === "blog")).toMatchObject({
+      media: ["image"],
+      supportsReadMore: true,
+      hasAuthor: true,
+      hasSummary: true,
+    });
+    expect(multiColumnContentStyles.find(style => style.id === "product")).toMatchObject({
+      media: ["image"],
+      supportsReadMore: false,
+      hasPrice: true,
+      hasCart: true,
+    });
   });
 
   it("creates editable sections and reorders them without changing their content", () => {

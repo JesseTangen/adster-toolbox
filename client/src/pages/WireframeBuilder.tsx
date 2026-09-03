@@ -115,8 +115,11 @@ function PreviewSection({ section, selected, mode, onSelect, onDrop, onDragStart
     return shell(<div className={isMobile ? "p-5" : "p-7"}><h2 className="text-2xl font-semibold">{section.title}</h2><div className={`wireframe-card-grid mt-6 grid gap-3 ${columnClass}`}>{Array.from({ length: itemCount }, (_, index) => index + 1).map(item => <div key={item} className={`${useCards ? "border border-neutral-300 bg-white p-3" : "py-3"}`}>
       {section.multiColumnMedia !== "none" ? section.multiColumnMedia === "icon" ? <div className="flex h-14 w-14 items-center justify-center border border-neutral-300 bg-neutral-100"><Sparkles className="h-4 w-4 text-neutral-600" /></div> : <div className="flex h-16 items-end border border-neutral-300 bg-neutral-200 p-2 font-mono text-[8px] uppercase tracking-[0.1em] text-neutral-500">{mediaLabel}</div> : null}
       <p className="mt-3 text-[11px] font-semibold">{contentStyle.itemLabel} {item}</p>
+      {contentStyle.hasAuthor ? <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.08em] text-neutral-500">Author name</p> : null}
       {contentStyle.hasSummary ? <p className="mt-1 text-[9px] leading-4 text-neutral-500">Brief summary describing the main value or supporting detail.</p> : null}
+      {contentStyle.hasPrice ? <p className="mt-2 text-[10px] font-semibold text-neutral-800">$00.00</p> : null}
       {showReadMore ? <span className="mt-3 inline-block text-[9px] font-medium text-neutral-800">Read more →</span> : null}
+      {contentStyle.hasCart ? <span className="mt-3 inline-block border border-neutral-400 bg-neutral-100 px-2.5 py-1.5 text-[9px] font-medium text-neutral-800">Add to cart</span> : null}
     </div>)}</div>{section.showSeeAll ? <span className="mt-5 flex w-full items-center justify-center border border-neutral-400 bg-neutral-200 px-4 py-2.5 text-[10px] font-medium text-neutral-900">See All</span> : null}</div>);
   }
   if (section.type === "split") {
