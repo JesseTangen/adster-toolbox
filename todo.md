@@ -193,3 +193,5 @@
 - [x] Add automatic saves and named project management controls to Wireframe Builder.
 - [x] Add automatic saves and named project management controls to Sitemap Planner.
 - [x] Validate IndexedDB retrieval, rename, duplicate, delete, persistence, responsive controls, tests, and Pages output.
+- [x] Move Saved wireframes and Saved sitemaps into full-width desktop rows beneath their module headers.
+- [x] Verify the new desktop layout and retained mobile stacked behavior across both modules.
