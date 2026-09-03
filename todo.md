@@ -189,3 +189,7 @@
 - [x] Add and validate the requested `noindex, nofollow` robots meta directive across build outputs.
 - [x] Move the supplied favicon into the Git repository public assets and replace the managed-storage URL.
 - [x] Verify the GitHub Pages artifact serves the repository-hosted favicon from the custom-domain root.
+- [x] Create a migration-safe IndexedDB saved-project store shared by Wireframe Builder and Sitemap Planner.
+- [x] Add automatic saves and named project management controls to Wireframe Builder.
+- [x] Add automatic saves and named project management controls to Sitemap Planner.
+- [x] Validate IndexedDB retrieval, rename, duplicate, delete, persistence, responsive controls, tests, and Pages output.

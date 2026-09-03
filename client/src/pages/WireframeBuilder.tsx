@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { SavedProjectsCard } from "@/components/SavedProjectsCard";
+import { cloneSavedProjectData, createSavedProject, deleteSavedProject, listSavedProjects, normalizeProjectName, saveSavedProject, type SavedProject } from "@/lib/savedProjects";
 import {
   createWireframeSection,
   getMultiColumnContentStyle,
@@ -34,7 +36,7 @@ import {
   Sparkles,
   Trash2,
 } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const initialSections: WireframeSection[] = [
@@ -57,6 +59,18 @@ const typeIcons: Record<WireframeSectionType, typeof PanelTop> = {
 };
 
 const categoryOrder = ["Frame", "Content"] as const;
+
+type WireframeProjectData = {
+  sections: WireframeSection[];
+  selectedId: string;
+  previewMode: "desktop" | "mobile";
+};
+
+const defaultWireframeData = (): WireframeProjectData => ({
+  sections: initialSections.map(section => ({ ...section })),
+  selectedId: initialSections.find(section => !isWireframeBoundarySection(section))?.id ?? "",
+  previewMode: "desktop",
+});
 
 function PreviewSection({ section, selected, mode, onSelect, onDrop, onDragStart }: {
   section: WireframeSection;
@@ -194,19 +208,126 @@ function WireframeRows({
 }
 
 export default function WireframeBuilder() {
-  const [sections, setSections] = useState<WireframeSection[]>(initialSections);
-  const [selectedId, setSelectedId] = useState(initialSections.find(section => !isWireframeBoundarySection(section))?.id ?? "");
+  const [sections, setSections] = useState<WireframeSection[]>(() => defaultWireframeData().sections);
+  const [selectedId, setSelectedId] = useState(() => defaultWireframeData().selectedId);
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [projectName, setProjectName] = useState("Campaign landing page");
+  const [projects, setProjects] = useState<SavedProject<WireframeProjectData>[]>([]);
+  const [activeProjectId, setActiveProjectId] = useState("");
+  const [saveStatus, setSaveStatus] = useState<"loading" | "saving" | "saved" | "error">("loading");
   const [isExporting, setIsExporting] = useState<"desktop" | "mobile" | null>(null);
   const desktopExportRef = useRef<HTMLDivElement>(null);
   const mobileExportRef = useRef<HTMLDivElement>(null);
+  const saveTimer = useRef<number | undefined>(undefined);
 
   const selectedIndex = sections.findIndex(section => section.id === selectedId);
   const selected = sections[selectedIndex] ?? sections.find(section => !isWireframeBoundarySection(section)) ?? sections[0];
   const selectedDefinition = selected ? getWireframeSectionDefinition(selected.type) : undefined;
   const selectedIsBoundary = selected ? isWireframeBoundarySection(selected) : false;
   const groupedDefinitions = useMemo(() => categoryOrder.filter(category => category !== "Frame").map(category => ({ category, items: wireframeSectionDefinitions.filter(item => item.category === category) })), []);
+
+  const applyProject = (project: SavedProject<WireframeProjectData>) => {
+    const data = cloneSavedProjectData(project.data);
+    setActiveProjectId(project.id);
+    setProjectName(project.name);
+    setSections(data.sections.length > 0 ? data.sections : defaultWireframeData().sections);
+    setSelectedId(data.selectedId || data.sections.find(section => !isWireframeBoundarySection(section))?.id || "");
+    setPreviewMode(data.previewMode === "mobile" ? "mobile" : "desktop");
+    setSaveStatus("saved");
+  };
+
+  useEffect(() => {
+    let active = true;
+    const loadProjects = async () => {
+      try {
+        const savedProjects = await listSavedProjects<WireframeProjectData>("wireframe");
+        if (!active) return;
+        if (savedProjects.length > 0) {
+          setProjects(savedProjects);
+          applyProject(savedProjects[0]!);
+          return;
+        }
+        const project = createSavedProject("wireframe", "Campaign landing page", defaultWireframeData());
+        await saveSavedProject(project);
+        if (!active) return;
+        setProjects([project]);
+        applyProject(project);
+      } catch {
+        if (!active) return;
+        setSaveStatus("error");
+        toast.error("Saved wireframes are unavailable in this browser.");
+      }
+    };
+    void loadProjects();
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!activeProjectId || saveStatus === "loading") return;
+    window.clearTimeout(saveTimer.current);
+    setSaveStatus("saving");
+    saveTimer.current = window.setTimeout(() => {
+      const project: SavedProject<WireframeProjectData> = {
+        id: activeProjectId,
+        kind: "wireframe",
+        name: normalizeProjectName(projectName, "Untitled wireframe"),
+        data: { sections: cloneSavedProjectData(sections), selectedId, previewMode },
+        createdAt: projects.find(item => item.id === activeProjectId)?.createdAt ?? Date.now(),
+        updatedAt: Date.now(),
+      };
+      void saveSavedProject(project).then(() => {
+        setProjects(current => [project, ...current.filter(item => item.id !== project.id)].sort((left, right) => right.updatedAt - left.updatedAt));
+        setSaveStatus("saved");
+      }).catch(() => setSaveStatus("error"));
+    }, 450);
+    return () => window.clearTimeout(saveTimer.current);
+  }, [activeProjectId, projectName, sections, selectedId, previewMode]);
+
+  const openProject = (id: string) => {
+    const project = projects.find(item => item.id === id);
+    if (!project) return;
+    window.clearTimeout(saveTimer.current);
+    applyProject(project);
+    toast.success(`${project.name} opened`);
+  };
+
+  const createProject = async (copyCurrent = false) => {
+    window.clearTimeout(saveTimer.current);
+    const data = copyCurrent ? cloneSavedProjectData({ sections, selectedId, previewMode }) : defaultWireframeData();
+    const name = copyCurrent ? `${normalizeProjectName(projectName, "Untitled wireframe")} copy` : "Untitled wireframe";
+    const project = createSavedProject("wireframe", name, data);
+    try {
+      await saveSavedProject(project);
+      setProjects(current => [project, ...current]);
+      applyProject(project);
+      toast.success(copyCurrent ? "Wireframe copied" : "New wireframe created");
+    } catch {
+      setSaveStatus("error");
+      toast.error("The new wireframe could not be saved locally.");
+    }
+  };
+
+  const removeProject = async () => {
+    window.clearTimeout(saveTimer.current);
+    const currentIndex = projects.findIndex(item => item.id === activeProjectId);
+    const fallback = projects.find(item => item.id !== activeProjectId);
+    try {
+      await deleteSavedProject(activeProjectId);
+      if (fallback) {
+        setProjects(current => current.filter(item => item.id !== activeProjectId));
+        applyProject(fallback);
+      } else {
+        const project = createSavedProject("wireframe", "Untitled wireframe", defaultWireframeData());
+        await saveSavedProject(project);
+        setProjects([project]);
+        applyProject(project);
+      }
+      toast.success("Wireframe deleted");
+    } catch {
+      setSaveStatus("error");
+      toast.error("The wireframe could not be deleted locally.");
+    }
+  };
 
   const addSection = (type: WireframeSectionType, index?: number) => {
     if (type === "header" || type === "footer") return;
@@ -303,12 +424,13 @@ export default function WireframeBuilder() {
 
       <div className="mt-5 grid gap-5 2xl:grid-cols-[260px_minmax(0,1fr)_300px]">
         <aside className="space-y-4 2xl:sticky 2xl:top-24 2xl:self-start">
+          <SavedProjectsCard label="wireframes" projectNameLabel="Wireframe name" projects={projects} activeProjectId={activeProjectId} projectName={projectName} status={saveStatus} onSelect={openProject} onProjectNameChange={setProjectName} onNew={() => { void createProject(false); }} onDuplicate={() => { void createProject(true); }} onDelete={() => { void removeProject(); }} />
           <div className="rounded-2xl border border-border/80 bg-card/80 p-4 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]"><div className="flex items-center justify-between"><div><p className="text-sm font-semibold">Section library</p><p className="mt-1 text-[11px] leading-4 text-muted-foreground">Drag a section onto the canvas or add it at the end.</p></div><Plus className="h-4 w-4 text-primary" /></div></div>
           {groupedDefinitions.map(group => <div key={group.category} className="rounded-2xl border border-border/80 bg-card/70 p-3 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]"><p className="px-1 pb-2 font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{group.category}</p><div className="space-y-1.5">{group.items.map(definition => { const Icon = typeIcons[definition.type]; return <div key={definition.type} draggable onDragStart={event => { event.dataTransfer.effectAllowed = "copy"; event.dataTransfer.setData("application/x-adster-wireframe-new", definition.type); }} className="group flex cursor-grab items-center gap-2 rounded-xl border border-transparent px-2 py-2.5 transition hover:border-primary/25 hover:bg-primary/[0.035] active:cursor-grabbing"><Icon className="h-4 w-4 shrink-0 text-primary" /><div className="min-w-0 flex-1"><p className="text-[11px] font-medium">{definition.label}</p><p className="mt-0.5 truncate text-[9px] text-muted-foreground">{definition.description}</p></div><button onClick={() => addSection(definition.type)} className="flex h-6 w-6 items-center justify-center rounded-md text-primary opacity-0 transition hover:bg-primary/10 focus:opacity-100 group-hover:opacity-100" aria-label={`Add ${definition.label}`}><Plus className="h-3.5 w-3.5" /></button></div>; })}</div></div>)}
         </aside>
 
         <main className="min-w-0">
-          <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-border/80 bg-white/70 p-3 shadow-[0_16px_38px_-30px_rgba(0,92,145,0.42)] sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2"><Eye className="h-4 w-4 text-primary" /><div><p className="text-xs font-semibold">Page canvas</p><p className="text-[10px] text-muted-foreground">Drag sections to reorder; select one to refine its intent.</p></div></div><Input value={projectName} onChange={event => setProjectName(event.target.value)} aria-label="Wireframe project name" className="h-9 max-w-xs rounded-lg bg-white text-xs" /></div>
+          <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-border/80 bg-white/70 p-3 shadow-[0_16px_38px_-30px_rgba(0,92,145,0.42)] sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2"><Eye className="h-4 w-4 text-primary" /><div><p className="text-xs font-semibold">Page canvas</p><p className="text-[10px] text-muted-foreground">Drag sections to reorder; select one to refine its intent.</p></div></div><span className="max-w-xs truncate rounded-lg border border-border bg-white px-3 py-2 font-mono text-[9px] uppercase tracking-[0.08em] text-muted-foreground">{projectName || "Untitled wireframe"}</span></div>
           <div className="overflow-auto rounded-[1.5rem] border border-border/80 bg-[#eaf5fa]/70 p-3 shadow-[0_20px_55px_-40px_rgba(0,92,145,0.55)] sm:p-5">
             <div data-wireframe-canvas="preview" className={`light-wireframe-document mx-auto overflow-hidden rounded-lg border border-[#c9dce8] bg-[#f6fbff] shadow-[0_20px_45px_-32px_rgba(20,63,91,0.55)] transition-[max-width] duration-200 ${previewMode === "mobile" ? "max-w-[390px]" : "max-w-[1040px]"}`}>
               <div className="flex items-center justify-between border-b border-[#d7e4ee] bg-white px-4 py-2" data-export-hide="true"><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-primary" /><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">{projectName || "Untitled wireframe"}</span></div><span className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">{previewMode} preview</span></div>

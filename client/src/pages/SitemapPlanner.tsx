@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SavedProjectsCard } from "@/components/SavedProjectsCard";
+import { cloneSavedProjectData, createSavedProject, deleteSavedProject, listSavedProjects, normalizeProjectName, saveSavedProject, type SavedProject } from "@/lib/savedProjects";
 import {
   addSitemapChild,
   cloneSitemapTree,
@@ -16,18 +18,25 @@ import {
   type SitemapPageKind,
 } from "@adster/sitemap-core";
 import { ChevronDown, ChevronUp, FilePlus2, FolderTree, Layers3, Link2, Map, Network, Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "adster-sitemap-planner-tree";
 const SELECTED_STORAGE_KEY = "adster-sitemap-planner-selected";
 
-function loadTree() {
+type SitemapProjectData = {
+  tree: SitemapPage;
+  selectedId: string;
+};
+
+const defaultSitemapData = (): SitemapProjectData => ({ tree: cloneSitemapTree(defaultSitemap), selectedId: "home" });
+
+function loadLegacySitemapData(): SitemapProjectData {
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") as SitemapPage | null;
-    return parsed?.id ? parsed : cloneSitemapTree(defaultSitemap);
+    return { tree: parsed?.id ? parsed : cloneSitemapTree(defaultSitemap), selectedId: localStorage.getItem(SELECTED_STORAGE_KEY) || "home" };
   } catch {
-    return cloneSitemapTree(defaultSitemap);
+    return defaultSitemapData();
   }
 }
 
@@ -61,13 +70,117 @@ function CanvasNode({ page, depth, selectedId, onSelect }: { page: SitemapPage; 
 }
 
 export default function SitemapPlanner() {
-  const [tree, setTree] = useState<SitemapPage>(loadTree);
-  const [selectedId, setSelectedId] = useState(() => localStorage.getItem(SELECTED_STORAGE_KEY) || "home");
+  const [tree, setTree] = useState<SitemapPage>(() => defaultSitemapData().tree);
+  const [selectedId, setSelectedId] = useState("home");
+  const [projectName, setProjectName] = useState("Website sitemap");
+  const [projects, setProjects] = useState<SavedProject<SitemapProjectData>[]>([]);
+  const [activeProjectId, setActiveProjectId] = useState("");
+  const [saveStatus, setSaveStatus] = useState<"loading" | "saving" | "saved" | "error">("loading");
+  const saveTimer = useRef<number | undefined>(undefined);
   const selected = findSitemapPage(tree, selectedId) ?? tree;
   const stats = useMemo(() => getSitemapStats(tree), [tree]);
 
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(tree)); }, [tree]);
-  useEffect(() => { localStorage.setItem(SELECTED_STORAGE_KEY, selected.id); }, [selected.id]);
+  const applyProject = (project: SavedProject<SitemapProjectData>) => {
+    const data = cloneSavedProjectData(project.data);
+    setActiveProjectId(project.id);
+    setProjectName(project.name);
+    setTree(data.tree?.id ? data.tree : cloneSitemapTree(defaultSitemap));
+    setSelectedId(data.selectedId || "home");
+    setSaveStatus("saved");
+  };
+
+  useEffect(() => {
+    let active = true;
+    const loadProjects = async () => {
+      try {
+        const savedProjects = await listSavedProjects<SitemapProjectData>("sitemap");
+        if (!active) return;
+        if (savedProjects.length > 0) {
+          setProjects(savedProjects);
+          applyProject(savedProjects[0]!);
+          return;
+        }
+        const legacyData = loadLegacySitemapData();
+        const project = createSavedProject("sitemap", "Website sitemap", legacyData);
+        await saveSavedProject(project);
+        if (!active) return;
+        setProjects([project]);
+        applyProject(project);
+      } catch {
+        if (!active) return;
+        setSaveStatus("error");
+        toast.error("Saved sitemaps are unavailable in this browser.");
+      }
+    };
+    void loadProjects();
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!activeProjectId || saveStatus === "loading") return;
+    window.clearTimeout(saveTimer.current);
+    setSaveStatus("saving");
+    saveTimer.current = window.setTimeout(() => {
+      const project: SavedProject<SitemapProjectData> = {
+        id: activeProjectId,
+        kind: "sitemap",
+        name: normalizeProjectName(projectName, "Untitled sitemap"),
+        data: { tree: cloneSavedProjectData(tree), selectedId },
+        createdAt: projects.find(item => item.id === activeProjectId)?.createdAt ?? Date.now(),
+        updatedAt: Date.now(),
+      };
+      void saveSavedProject(project).then(() => {
+        setProjects(current => [project, ...current.filter(item => item.id !== project.id)].sort((left, right) => right.updatedAt - left.updatedAt));
+        setSaveStatus("saved");
+      }).catch(() => setSaveStatus("error"));
+    }, 450);
+    return () => window.clearTimeout(saveTimer.current);
+  }, [activeProjectId, projectName, selectedId, tree]);
+
+  const openProject = (id: string) => {
+    const project = projects.find(item => item.id === id);
+    if (!project) return;
+    window.clearTimeout(saveTimer.current);
+    applyProject(project);
+    toast.success(`${project.name} opened`);
+  };
+
+  const createProject = async (copyCurrent = false) => {
+    window.clearTimeout(saveTimer.current);
+    const data = copyCurrent ? cloneSavedProjectData({ tree, selectedId }) : defaultSitemapData();
+    const name = copyCurrent ? `${normalizeProjectName(projectName, "Untitled sitemap")} copy` : "Untitled sitemap";
+    const project = createSavedProject("sitemap", name, data);
+    try {
+      await saveSavedProject(project);
+      setProjects(current => [project, ...current]);
+      applyProject(project);
+      toast.success(copyCurrent ? "Sitemap copied" : "New sitemap created");
+    } catch {
+      setSaveStatus("error");
+      toast.error("The new sitemap could not be saved locally.");
+    }
+  };
+
+  const removeProject = async () => {
+    window.clearTimeout(saveTimer.current);
+    const fallback = projects.find(item => item.id !== activeProjectId);
+    try {
+      await deleteSavedProject(activeProjectId);
+      if (fallback) {
+        setProjects(current => current.filter(item => item.id !== activeProjectId));
+        applyProject(fallback);
+      } else {
+        const project = createSavedProject("sitemap", "Untitled sitemap", defaultSitemapData());
+        await saveSavedProject(project);
+        setProjects([project]);
+        applyProject(project);
+      }
+      toast.success("Sitemap deleted");
+    } catch {
+      setSaveStatus("error");
+      toast.error("The sitemap could not be deleted locally.");
+    }
+  };
 
   const addChild = (parentId = selected.id) => {
     const id = `page-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
@@ -100,7 +213,7 @@ export default function SitemapPlanner() {
       </header>
 
       <div className="mt-5 grid gap-5 2xl:grid-cols-[280px_minmax(0,1fr)_300px]">
-        <aside className="space-y-3 2xl:sticky 2xl:top-24 2xl:self-start"><div className="rounded-2xl border border-border/80 bg-card/80 p-4 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]"><div className="flex items-center gap-2"><FolderTree className="h-4 w-4 text-primary" /><div><p className="text-sm font-semibold">Page tree</p><p className="mt-1 text-[11px] leading-4 text-muted-foreground">Select a page, then add child pages to build the site hierarchy.</p></div></div></div><div className="rounded-2xl border border-border/80 bg-card/70 p-2 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]"><ul role="tree" aria-label="Sitemap pages" className="space-y-1"><TreeNode page={tree} depth={0} selectedId={selected.id} onSelect={setSelectedId} /></ul></div></aside>
+        <aside className="space-y-3 2xl:sticky 2xl:top-24 2xl:self-start"><SavedProjectsCard label="sitemaps" projectNameLabel="Sitemap name" projects={projects} activeProjectId={activeProjectId} projectName={projectName} status={saveStatus} onSelect={openProject} onProjectNameChange={setProjectName} onNew={() => { void createProject(false); }} onDuplicate={() => { void createProject(true); }} onDelete={() => { void removeProject(); }} /><div className="rounded-2xl border border-border/80 bg-card/80 p-4 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]"><div className="flex items-center gap-2"><FolderTree className="h-4 w-4 text-primary" /><div><p className="text-sm font-semibold">Page tree</p><p className="mt-1 text-[11px] leading-4 text-muted-foreground">Select a page, then add child pages to build the site hierarchy.</p></div></div></div><div className="rounded-2xl border border-border/80 bg-card/70 p-2 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]"><ul role="tree" aria-label="Sitemap pages" className="space-y-1"><TreeNode page={tree} depth={0} selectedId={selected.id} onSelect={setSelectedId} /></ul></div></aside>
 
         <main className="min-w-0"><section className="rounded-[1.5rem] border border-border/80 bg-white/70 p-5 shadow-[0_20px_55px_-40px_rgba(0,92,145,0.55)] dark:bg-[#102b40] sm:p-7"><div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div className="max-w-2xl"><p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-primary">Navigation architecture</p><h1 className="mt-2 font-editorial text-3xl leading-tight tracking-tight sm:text-4xl">Map the website before production begins</h1><p className="mt-3 text-sm leading-6 text-muted-foreground">Plan page relationships, identify navigation depth, and create a simple shared source of truth for strategy, content, and development.</p></div><div data-sitemap-stats className="grid grid-cols-2 gap-2 rounded-2xl border border-primary/15 bg-primary/[0.035] p-3 sm:w-16 sm:grid-cols-1 sm:justify-items-center sm:gap-3 sm:text-center"><div data-sitemap-stat="pages"><p className="font-mono text-[8px] uppercase tracking-[0.1em] text-primary">Pages</p><p className="mt-1 text-xl font-semibold">{stats.pages}</p></div><div data-sitemap-stat="depth"><p className="font-mono text-[8px] uppercase tracking-[0.1em] text-primary">Depth</p><p className="mt-1 text-xl font-semibold">{stats.maxDepth + 1}</p></div></div></div></section><section className="mt-5 rounded-[1.5rem] border border-border/80 bg-card/70 p-4 shadow-[0_20px_55px_-40px_rgba(0,92,145,0.45)] sm:p-6"><div className="mb-4 flex items-center gap-2"><Map className="h-4 w-4 text-primary" /><p className="text-sm font-semibold">Website navigation tree</p><p className="text-[10px] text-muted-foreground">Select a page to refine its details.</p></div><ul role="tree" aria-label="Website navigation canvas" className="space-y-2"><CanvasNode page={tree} depth={0} selectedId={selected.id} onSelect={setSelectedId} /></ul></section></main>
 
