@@ -195,3 +195,5 @@
 - [x] Validate IndexedDB retrieval, rename, duplicate, delete, persistence, responsive controls, tests, and Pages output.
 - [x] Move Saved wireframes and Saved sitemaps into full-width desktop rows beneath their module headers.
 - [x] Verify the new desktop layout and retained mobile stacked behavior across both modules.
+- [x] Add a client-ready Sitemap Planner PDF export and download control.
+- [x] Verify exported PDF content, filename, responsive download control, tests, and build output.

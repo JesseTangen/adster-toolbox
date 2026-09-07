@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SavedProjectsCard } from "@/components/SavedProjectsCard";
 import { cloneSavedProjectData, createSavedProject, deleteSavedProject, listSavedProjects, normalizeProjectName, saveSavedProject, type SavedProject } from "@/lib/savedProjects";
+import { downloadSitemapPdf } from "@/lib/sitemapPdf";
 import {
   addSitemapChild,
   cloneSitemapTree,
@@ -17,7 +18,7 @@ import {
   type SitemapPage,
   type SitemapPageKind,
 } from "@adster/sitemap-core";
-import { ChevronDown, ChevronUp, FilePlus2, FolderTree, Layers3, Link2, Map, Network, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, FilePlus2, FolderTree, Layers3, Link2, Map, Network, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -76,6 +77,7 @@ export default function SitemapPlanner() {
   const [projects, setProjects] = useState<SavedProject<SitemapProjectData>[]>([]);
   const [activeProjectId, setActiveProjectId] = useState("");
   const [saveStatus, setSaveStatus] = useState<"loading" | "saving" | "saved" | "error">("loading");
+  const [isExporting, setIsExporting] = useState(false);
   const saveTimer = useRef<number | undefined>(undefined);
   const selected = findSitemapPage(tree, selectedId) ?? tree;
   const stats = useMemo(() => getSitemapStats(tree), [tree]);
@@ -205,11 +207,23 @@ export default function SitemapPlanner() {
     toast.success("Sitemap reset to the starter structure");
   };
 
+  const exportPdf = async () => {
+    setIsExporting(true);
+    try {
+      const filename = downloadSitemapPdf({ tree, projectName, pages: stats.pages, depth: stats.maxDepth + 1 });
+      toast.success(`${filename} download started`);
+    } catch {
+      toast.error("The sitemap PDF could not be created. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-[1600px] pb-10">
       <header className="sticky top-0 z-30 flex flex-col gap-4 border-b border-border/80 bg-background/95 py-4 backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><Network className="h-5 w-5" /></div><div className="min-w-0"><p className="font-editorial text-xl leading-none tracking-tight">Sitemap Planner</p><p className="mt-1 font-mono text-[9px] uppercase tracking-[0.13em] text-muted-foreground">Adster Creative Toolbox</p></div></div>
-        <div className="flex flex-wrap gap-2"><Button onClick={() => addChild("home")} size="sm" className="h-9 gap-1.5 rounded-xl px-3 text-xs"><Plus className="h-3.5 w-3.5" />Add top-level page</Button><Button onClick={resetTree} size="sm" variant="outline" className="h-9 rounded-xl bg-white px-3 text-xs dark:bg-[#102b40]">Reset starter tree</Button></div>
+        <div className="flex flex-wrap gap-2"><Button onClick={exportPdf} disabled={isExporting} size="sm" variant="outline" className="h-9 gap-1.5 rounded-xl bg-white px-3 text-xs dark:bg-[#102b40]"><Download className="h-3.5 w-3.5" />{isExporting ? "Preparing PDF" : "Download PDF"}</Button><Button onClick={() => addChild("home")} size="sm" className="h-9 gap-1.5 rounded-xl px-3 text-xs"><Plus className="h-3.5 w-3.5" />Add top-level page</Button><Button onClick={resetTree} size="sm" variant="outline" className="h-9 rounded-xl bg-white px-3 text-xs dark:bg-[#102b40]">Reset starter tree</Button></div>
       </header>
 
       <div className="mt-5"><SavedProjectsCard label="sitemaps" projectNameLabel="Sitemap name" projects={projects} activeProjectId={activeProjectId} projectName={projectName} status={saveStatus} onSelect={openProject} onProjectNameChange={setProjectName} onNew={() => { void createProject(false); }} onDuplicate={() => { void createProject(true); }} onDelete={() => { void removeProject(); }} /></div>
