@@ -197,3 +197,5 @@
 - [x] Verify the new desktop layout and retained mobile stacked behavior across both modules.
 - [x] Add a client-ready Sitemap Planner PDF export and download control.
 - [x] Verify exported PDF content, filename, responsive download control, tests, and build output.
+- [x] Remove Toolbox branding from the Sitemap PDF header and use the sitemap name as its title.
+- [x] Verify the revised PDF header, title, download flow, tests, and build output.

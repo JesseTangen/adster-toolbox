@@ -23,29 +23,12 @@ function pageHeader(document: jsPDF, projectName: string, pageCount: number, sta
   document.rect(0, 0, PAGE_WIDTH, 118, "F");
   document.setDrawColor(205, 227, 239);
   document.line(0, 118, PAGE_WIDTH, 118);
-  document.setFillColor(0, 174, 239);
-  document.roundedRect(PAGE_MARGIN, 34, 20, 20, 6, 6, "F");
-  document.setTextColor(255, 255, 255);
-  document.setFont("helvetica", "bold");
-  document.setFontSize(13);
-  document.text("a", PAGE_MARGIN + 6.5, 49);
-  document.setTextColor(40, 62, 78);
-  document.setFont("helvetica", "bold");
-  document.setFontSize(9);
-  document.text("ADSTER CREATIVE TOOLBOX", PAGE_MARGIN + 29, 43);
-  document.setFont("helvetica", "normal");
-  document.setTextColor(103, 127, 142);
-  document.setFontSize(7);
-  document.text("CLIENT REVIEW", PAGE_MARGIN + 29, 55);
 
   document.setTextColor(35, 56, 72);
   document.setFont("helvetica", "bold");
-  document.setFontSize(22);
-  document.text("Sitemap review", PAGE_MARGIN, 91);
-  document.setFont("helvetica", "normal");
-  document.setTextColor(93, 115, 128);
-  document.setFontSize(9);
-  document.text(projectName || "Untitled sitemap", PAGE_MARGIN + 148, 90);
+  document.setFontSize(24);
+  const title = document.splitTextToSize(projectName || "Untitled sitemap", PAGE_WIDTH - PAGE_MARGIN * 2 - 120)[0] ?? "Untitled sitemap";
+  document.text(title, PAGE_MARGIN, 77);
 
   const statBlocks = [
     { label: "PAGES", value: String(stats.pages) },

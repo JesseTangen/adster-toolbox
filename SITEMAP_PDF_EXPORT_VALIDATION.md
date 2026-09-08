@@ -5,3 +5,7 @@ The Sitemap Planner export produces a landscape letter PDF titled **Sitemap revi
 The browser export check confirmed that the Download PDF control produces a file ending in `-sitemap-review.pdf`. PDF inspection confirmed a valid one-page letter PDF with extractable sitemap content for the starter tree; the visual review confirmed the hierarchy lines, page cards, stat badges, and footer are legible.
 
 The live Planner capture confirms **Download PDF** is available in the module header before the top-level-page and reset controls. After export, the interface reports the generated review filename and download-start feedback without altering the current saved sitemap.
+
+## Header simplification
+
+The revised PDF header removes the former Toolbox masthead and generic **Sitemap review** label. The active sitemap name is now the sole document title, while the page and depth totals remain available at the right edge for review context.
