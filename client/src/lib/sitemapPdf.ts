@@ -7,7 +7,8 @@ const PAGE_WIDTH = 792;
 const PAGE_HEIGHT = 612;
 const PAGE_MARGIN = 44;
 const ROW_HEIGHT = 46;
-const CONTENT_START_Y = 166;
+const HEADER_HEIGHT = 59;
+const CONTENT_START_Y = 101;
 
 export function flattenSitemapForPdf(page: SitemapPage, depth = 0): SitemapPdfEntry[] {
   return [{ ...page, depth }, ...page.children.flatMap(child => flattenSitemapForPdf(child, depth + 1))];
@@ -20,15 +21,15 @@ export function sitemapPdfFilename(projectName: string) {
 
 function pageHeader(document: jsPDF, projectName: string, pageCount: number, stats: { pages: number; depth: number }) {
   document.setFillColor(246, 251, 255);
-  document.rect(0, 0, PAGE_WIDTH, 118, "F");
+  document.rect(0, 0, PAGE_WIDTH, HEADER_HEIGHT, "F");
   document.setDrawColor(205, 227, 239);
-  document.line(0, 118, PAGE_WIDTH, 118);
+  document.line(0, HEADER_HEIGHT, PAGE_WIDTH, HEADER_HEIGHT);
 
   document.setTextColor(35, 56, 72);
   document.setFont("helvetica", "bold");
-  document.setFontSize(24);
+  document.setFontSize(20);
   const title = document.splitTextToSize(projectName || "Untitled sitemap", PAGE_WIDTH - PAGE_MARGIN * 2 - 120)[0] ?? "Untitled sitemap";
-  document.text(title, PAGE_MARGIN, 77);
+  document.text(title, PAGE_MARGIN, 37);
 
   const statBlocks = [
     { label: "PAGES", value: String(stats.pages) },
@@ -38,14 +39,14 @@ function pageHeader(document: jsPDF, projectName: string, pageCount: number, sta
     const x = PAGE_WIDTH - PAGE_MARGIN - 104 + index * 52;
     document.setFillColor(255, 255, 255);
     document.setDrawColor(215, 230, 239);
-    document.roundedRect(x, 74, 46, 34, 7, 7, "FD");
+    document.roundedRect(x, 13, 46, 34, 7, 7, "FD");
     document.setTextColor(0, 150, 210);
     document.setFont("helvetica", "bold");
     document.setFontSize(6);
-    document.text(stat.label, x + 23, 84, { align: "center" });
+    document.text(stat.label, x + 23, 23, { align: "center" });
     document.setTextColor(37, 59, 75);
     document.setFontSize(13);
-    document.text(stat.value, x + 23, 101, { align: "center" });
+    document.text(stat.value, x + 23, 40, { align: "center" });
   });
 
   document.setTextColor(109, 130, 143);

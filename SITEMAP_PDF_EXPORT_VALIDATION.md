@@ -9,3 +9,7 @@ The live Planner capture confirms **Download PDF** is available in the module he
 ## Header simplification
 
 The revised PDF header removes the former Toolbox masthead and generic **Sitemap review** label. The active sitemap name is now the sole document title, while the page and depth totals remain available at the right edge for review context.
+
+## Compact header
+
+The export heading band has been reduced from 118 to 59 points, a 50% reduction. The sitemap title and page/depth cards remain fully contained in the compact heading, and the navigation hierarchy begins below the new header with sufficient whitespace for clear client review.
