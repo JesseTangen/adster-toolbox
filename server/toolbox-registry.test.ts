@@ -4,24 +4,17 @@ import { toolboxCategories, toolboxTools } from "@adster/toolbox-config";
 import { toolboxCardClassNames } from "@adster/toolbox-ui";
 
 describe("Strategist Toolbox registry", () => {
-  it("exposes Local Schema as the available route-based first module", () => {
+  it("exposes Schema Builder as the available type-aware schema workspace", () => {
     expect(toolboxTools).toContainEqual(
       expect.objectContaining({
-        id: "local-schema",
-        name: "LocalBusiness Schema",
-        path: "/local-schema",
-        status: "available",
-      }),
-    );
-    expect(toolboxTools).toContainEqual(
-      expect.objectContaining({
-        id: "faq-schema",
-        name: "FAQ Schema",
-        path: "/faq-schema",
+        id: "schema-builder",
+        name: "Schema Builder",
+        path: "/schema-builder",
         status: "available",
         category: "Schema",
       }),
     );
+    expect(toolboxTools.some(tool => tool.id === "local-schema" || tool.id === "faq-schema")).toBe(false);
   });
 
   it("defines discovery categories for current and future tool modules", () => {

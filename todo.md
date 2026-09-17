@@ -205,3 +205,7 @@
 - [x] Build the FAQ Schema workspace with multiple question-and-answer controls and session autosave.
 - [x] Activate FAQ Schema in the Toolbox registry, dashboard, and shared navigation.
 - [x] Validate FAQ JSON-LD generation, session workflows, responsive UI, full-stack build, Pages build, and checkpoint.
+- [x] Define a unified Schema Builder draft model that selects LocalBusiness or FAQPage JSON-LD structures.
+- [x] Build a Schema Builder workspace with conditional type fields and type-aware saved schemas.
+- [x] Replace separate schema modules in Toolbox discovery and navigation with Schema Builder while retaining compatible direct routes.
+- [x] Validate the selected and unselected states, persistence, responsive UI, tests, full-stack build, Pages build, and checkpoint.

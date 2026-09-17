@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import LocalSchema from "./pages/LocalSchema";
 import PromptLibrary from "./pages/PromptLibrary";
 import QaChecklists from "./pages/QaChecklists";
+import SchemaBuilder from "./pages/SchemaBuilder";
 import SitemapPlanner from "./pages/SitemapPlanner";
 import TeamAccess from "./pages/TeamAccess";
 import WireframeBuilder from "./pages/WireframeBuilder";
@@ -22,6 +23,7 @@ function AppRoutes({ onSignOut }: { onSignOut: () => void }) {
     <DashboardLayout onSignOut={onSignOut}>
       <Switch>
         <Route path={"/"} component={Home} />
+        <Route path={"/schema-builder"} component={SchemaBuilder} />
         <Route path={"/local-schema"} component={LocalSchema} />
         <Route path={"/faq-schema"} component={FaqSchema} />
         <Route path={"/wireframe-builder"} component={WireframeBuilder} />

@@ -12,20 +12,11 @@ export type ToolboxTool = {
 
 export const toolboxTools: ToolboxTool[] = [
   {
-    id: "local-schema",
-    name: "LocalBusiness Schema",
+    id: "schema-builder",
+    name: "Schema Builder",
     category: "Schema",
-    description: "Build, validate, save, and copy LocalBusiness JSON-LD for location pages.",
-    path: "/local-schema",
-    status: "available",
-    eyebrow: "Structured data",
-  },
-  {
-    id: "faq-schema",
-    name: "FAQ Schema",
-    category: "Schema",
-    description: "Build, validate, save, and copy FAQPage JSON-LD with multiple visible question-and-answer pairs.",
-    path: "/faq-schema",
+    description: "Build, validate, save, and copy LocalBusiness and FAQPage JSON-LD from one type-aware workspace.",
+    path: "/schema-builder",
     status: "available",
     eyebrow: "Structured data",
   },
