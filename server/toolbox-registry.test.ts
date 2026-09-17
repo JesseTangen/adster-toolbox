@@ -13,6 +13,15 @@ describe("Strategist Toolbox registry", () => {
         status: "available",
       }),
     );
+    expect(toolboxTools).toContainEqual(
+      expect.objectContaining({
+        id: "faq-schema",
+        name: "FAQ Schema",
+        path: "/faq-schema",
+        status: "available",
+        category: "Schema",
+      }),
+    );
   });
 
   it("defines discovery categories for current and future tool modules", () => {

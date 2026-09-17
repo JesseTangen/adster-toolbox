@@ -201,3 +201,7 @@
 - [x] Verify the revised PDF header, title, download flow, tests, and build output.
 - [x] Reduce the Sitemap PDF heading band by 50% and reposition its title and statistics.
 - [x] Verify the compact PDF header, hierarchy spacing, download workflow, tests, and build output.
+- [x] Define the FAQPage draft model, JSON-LD builder, and validation rules against Schema.org.
+- [x] Build the FAQ Schema workspace with multiple question-and-answer controls and session autosave.
+- [x] Activate FAQ Schema in the Toolbox registry, dashboard, and shared navigation.
+- [x] Validate FAQ JSON-LD generation, session workflows, responsive UI, full-stack build, Pages build, and checkpoint.

@@ -14,7 +14,7 @@ import {
 import { useIsMobile } from "@/hooks/useMobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { headerLogoSrc } from "@/lib/headerLogo";
-import { BookOpen, Braces, ClipboardCheck, LayoutDashboard, LogOut, Network, Moon, PanelLeft, Sparkles, Sun, LayoutPanelTop } from "lucide-react";
+import { BookOpen, Braces, CircleHelp, ClipboardCheck, LayoutDashboard, LogOut, Network, Moon, PanelLeft, Sparkles, Sun, LayoutPanelTop } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -22,6 +22,7 @@ import { useLocation } from "wouter";
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Braces, label: "LocalBusiness Schema", path: "/local-schema" },
+  { icon: CircleHelp, label: "FAQ Schema", path: "/faq-schema" },
   { icon: LayoutPanelTop, label: "Wireframe Builder", path: "/wireframe-builder" },
   { icon: Network, label: "Sitemap Planner", path: "/sitemap-planner" },
   { icon: ClipboardCheck, label: "QA Checklists", path: "/qa-checklists" },

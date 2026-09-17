@@ -21,6 +21,15 @@ export const toolboxTools: ToolboxTool[] = [
     eyebrow: "Structured data",
   },
   {
+    id: "faq-schema",
+    name: "FAQ Schema",
+    category: "Schema",
+    description: "Build, validate, save, and copy FAQPage JSON-LD with multiple visible question-and-answer pairs.",
+    path: "/faq-schema",
+    status: "available",
+    eyebrow: "Structured data",
+  },
+  {
     id: "knowledge-base",
     name: "Knowledge Base",
     category: "Knowledge",

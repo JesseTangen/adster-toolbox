@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Braces,
+  CircleHelp,
   ClipboardCheck,
   Clock3,
   Network,
@@ -21,6 +22,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 const toolIcons: Record<ToolboxTool["id"], typeof Braces> = {
   "local-schema": Braces,
+  "faq-schema": CircleHelp,
   "knowledge-base": BookOpen,
   "wireframe-builder": LayoutPanelTop,
   "sitemap-planner": Network,

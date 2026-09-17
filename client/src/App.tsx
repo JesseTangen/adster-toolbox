@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TEAM_ACCESS_SESSION_KEY } from "./lib/teamAccess";
 import { trpc } from "./lib/trpc";
+import FaqSchema from "./pages/FaqSchema";
 import Home from "./pages/Home";
 import LocalSchema from "./pages/LocalSchema";
 import PromptLibrary from "./pages/PromptLibrary";
@@ -22,6 +23,7 @@ function AppRoutes({ onSignOut }: { onSignOut: () => void }) {
       <Switch>
         <Route path={"/"} component={Home} />
         <Route path={"/local-schema"} component={LocalSchema} />
+        <Route path={"/faq-schema"} component={FaqSchema} />
         <Route path={"/wireframe-builder"} component={WireframeBuilder} />
         <Route path={"/sitemap-planner"} component={SitemapPlanner} />
         <Route path={"/qa-checklists"} component={QaChecklists} />
