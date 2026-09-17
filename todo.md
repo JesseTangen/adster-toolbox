@@ -209,3 +209,5 @@
 - [x] Build a Schema Builder workspace with conditional type fields and type-aware saved schemas.
 - [x] Replace separate schema modules in Toolbox discovery and navigation with Schema Builder while retaining compatible direct routes.
 - [x] Validate the selected and unselected states, persistence, responsive UI, tests, full-stack build, Pages build, and checkpoint.
+- [x] Restyle the Schema type selector to match the LocalBusiness @type picker.
+- [x] Validate the matching picker interaction, responsive presentation, tests, builds, and checkpoint.

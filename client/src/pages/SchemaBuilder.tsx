@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LocalBusinessTypePicker } from "@/components/LocalBusinessTypePicker";
+import { SchemaTypePicker } from "@/components/SchemaTypePicker";
 import {
   AlertCircle,
   ArrowUpRight,
@@ -28,7 +29,6 @@ import {
   getUnifiedSchemaName,
   isLocalBusinessType,
   schemaDays,
-  schemaBuilderTypes,
   type FaqQuestionDraft,
   type SchemaBuilderType,
   type UnifiedSchemaDraft,
@@ -276,7 +276,7 @@ export default function SchemaBuilder() {
               <SectionTitle index="01" title="Identity & classification" description={hasType ? "Name the workspace and define the selected schema structure." : "Name this workspace, then choose the type of structured data to create."} />
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2"><FieldLabel name="workspace name" hint="Session label" /><Input value={draft.label} onChange={event => updateSchema({ label: event.target.value })} className={fieldClass} placeholder="e.g. Downtown location or Services FAQ" /></div>
-                <div className="sm:col-span-2"><FieldLabel name="Schema type" hint="Choose a starting structure" /><select aria-label="Schema type" value={draft.schemaType} onChange={event => updateSchema({ schemaType: event.target.value as SchemaBuilderType })} className={fieldClass}>{schemaBuilderTypes.map(type => <option key={type || "unselected"} value={type}>{type ? type : "Please select"}</option>)}</select></div>
+                <div className="sm:col-span-2"><FieldLabel name="Schema type" hint="Choose a starting structure" /><SchemaTypePicker value={draft.schemaType} onValueChange={value => updateSchema({ schemaType: value })} /></div>
                 {isLocalBusiness ? <>
                   <div className="sm:col-span-2"><FieldLabel name="@type" hint="131 LocalBusiness types & subtypes" /><LocalBusinessTypePicker value={getEffectiveType(localDraft)} onValueChange={changeLocalBusinessType} /></div>
                   <div className="sm:col-span-2"><FieldLabel name="name" /><Input value={localDraft.name} onChange={event => updateLocal("name", event.target.value)} className={fieldClass} placeholder="Business name" /></div>

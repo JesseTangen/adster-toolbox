@@ -19,3 +19,7 @@ The unified **Schema Builder** replaces separate schema-tool discovery with a ty
 ## Automated and build verification
 
 The complete Vitest suite passed with **21 test files and 49 tests**, including four dedicated unified-schema core tests. TypeScript checking passed. The full-stack `pnpm build` and custom-domain GitHub Pages `pnpm build:pages` targets both completed successfully, and the Pages artifact contains Schema Builder.
+
+## Schema type picker refinement
+
+The native Schema type `select` was replaced with the same Popover/Command picker pattern used by the LocalBusiness `@type` control. Both controls now share the two-line, monospace-label trigger, chevron affordance, rounded popover surface, option checkmark, keyboard-accessible command items, hover/focus styling, and responsive width. Browser verification confirmed the menu exposes **Please select**, **LocalBusiness**, and **FAQPage** with concise descriptions; selecting LocalBusiness updates the trigger and displays the matching editor. The full suite passed with **22 test files and 51 tests**, along with TypeScript, full-stack, and GitHub Pages builds.
