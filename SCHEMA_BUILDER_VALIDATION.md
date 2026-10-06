@@ -27,3 +27,9 @@ The native Schema type `select` was replaced with the same Popover/Command picke
 ## LocalBusiness `@id` refinement
 
 LocalBusiness output now includes an `@id` directly after `@context` whenever the canonical URL is supplied. It uses the canonical URL without any existing fragment and appends `#organization`, e.g. `https://www.heritagelaw.com/#organization`. Empty URL inputs continue to omit `@id`; an existing URL fragment is replaced rather than producing an invalid double fragment. Regression coverage asserts the generated value and the serialized property ordering.
+
+## HowTo schema addition
+
+The Schema Builder now supports **HowTo** alongside LocalBusiness and FAQPage. Its Schema.org-aligned workspace collects a visible instruction title and description; optional canonical URL, feature image, estimated cost, yield, ISO 8601 prep/perform/total time, supplies, and tools; plus ordered visible steps. Each populated step emits an `@type: HowToStep`, its one-based `position`, optional title/image, and visible `text`. Empty values and incomplete steps are omitted from JSON-LD, while the live check guides missing steps and invalid URLs or durations. Existing saved browser sessions are migration-safe: drafts created before HowTo support receive a fresh, empty HowTo section on restoration.
+
+Browser verification selected HowTo from the shared picker, entered a two-step instruction, confirmed live `HowTo` JSON-LD with positions 1 and 2, ISO duration, official documentation link, and session restoration after reload. Visual review at 1440 px and 390 px confirmed readable layouts with no document-level horizontal overflow.

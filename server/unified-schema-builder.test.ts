@@ -53,15 +53,30 @@ describe("unified Schema Builder core", () => {
     });
   });
 
-  it("clones nested LocalBusiness schedules and FAQ questions with fresh identifiers", () => {
+  it("builds HowTo JSON-LD after HowTo is selected", () => {
+    const draft = createUnifiedSchemaDraft("HowTo");
+    draft.howTo.name = "Prepare a campaign brief";
+    draft.howTo.steps = [{ id: "step-1", name: "Gather inputs", text: "Collect the client goals and source materials.", image: "" }];
+
+    expect(buildUnifiedSchema(draft)).toMatchObject({
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: "Prepare a campaign brief",
+      step: [{ "@type": "HowToStep", position: 1, name: "Gather inputs", text: "Collect the client goals and source materials." }],
+    });
+  });
+
+  it("clones nested LocalBusiness schedules, FAQ questions, and HowTo steps with fresh identifiers", () => {
     const draft = createUnifiedSchemaDraft("FAQPage");
     draft.faqPage.questions = [{ id: "faq-1", question: "Question", answer: "Answer" }];
     draft.localBusiness.openingHoursRows = [{ id: "hours-1", dayOfWeek: ["Monday"], opens: "09:00", closes: "17:00" }];
+    draft.howTo.steps = [{ id: "step-1", name: "Step", text: "Instruction", image: "" }];
 
     const clone = cloneUnifiedSchemaDraft(draft);
 
     expect(clone.id).not.toBe(draft.id);
     expect(clone.faqPage.questions[0]?.id).not.toBe(draft.faqPage.questions[0]?.id);
     expect(clone.localBusiness.openingHoursRows[0]?.id).not.toBe(draft.localBusiness.openingHoursRows[0]?.id);
+    expect(clone.howTo.steps[0]?.id).not.toBe(draft.howTo.steps[0]?.id);
   });
 });

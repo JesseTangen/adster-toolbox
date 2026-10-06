@@ -213,3 +213,6 @@
 - [x] Validate the matching picker interaction, responsive presentation, tests, builds, and checkpoint.
 - [x] Add a URL-derived `@id` to LocalBusiness JSON-LD output.
 - [x] Verify LocalBusiness `@id` output, regression tests, builds, and checkpoint.
+- [x] Define a Schema.org-aligned HowTo draft, JSON-LD generator, and validation rules.
+- [x] Add the HowTo type, step editor, and optional instruction details to Schema Builder with session-safe persistence.
+- [x] Validate HowTo JSON-LD output, selected/unselected workflows, responsiveness, full tests, builds, and checkpoint.

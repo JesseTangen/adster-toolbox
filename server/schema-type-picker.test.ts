@@ -12,10 +12,11 @@ describe("Schema type picker", () => {
     expect(pickerSource).toContain("min-h-12");
   });
 
-  it("keeps Please select, LocalBusiness, and FAQPage as the selectable starting types", () => {
+  it("keeps Please select, LocalBusiness, FAQPage, and HowTo as the selectable starting types", () => {
     expect(pickerSource).toContain('value: ""');
     expect(pickerSource).toContain('value: "LocalBusiness"');
     expect(pickerSource).toContain('value: "FAQPage"');
+    expect(pickerSource).toContain('value: "HowTo"');
     expect(getSchemaBuilderTypeLabel("")).toBe("Please select");
   });
 });

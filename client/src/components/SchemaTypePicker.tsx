@@ -16,6 +16,7 @@ const schemaTypeOptions: Array<{
   { value: "", description: "Choose a Schema.org structure" },
   { value: "LocalBusiness", description: "Location and business entity data" },
   { value: "FAQPage", description: "Visible questions and accepted answers" },
+  { value: "HowTo", description: "Step-by-step instructions and materials" },
 ];
 
 type SchemaTypePickerProps = {

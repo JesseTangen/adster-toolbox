@@ -22,6 +22,7 @@ import {
   buildUnifiedSchema,
   cloneUnifiedSchemaDraft,
   createFaqQuestionDraft,
+  createHowToStepDraft,
   createOpeningHoursRow,
   createUnifiedSchemaDraft,
   getEffectiveType,
@@ -30,6 +31,7 @@ import {
   isLocalBusinessType,
   schemaDays,
   type FaqQuestionDraft,
+  type HowToStepDraft,
   type SchemaBuilderType,
   type UnifiedSchemaDraft,
   validateUnifiedSchemaDraft,
@@ -45,6 +47,13 @@ type AutoSaveStatus = "idle" | "saving" | "saved";
 
 const SESSION_STORAGE_KEY = "schema-builder-entries";
 const ACTIVE_ENTRY_STORAGE_KEY = "schema-builder-active-entry";
+
+function normalizeRestoredDraft(draft: UnifiedSchemaDraft): UnifiedSchemaDraft {
+  return {
+    ...draft,
+    howTo: draft.howTo ?? createUnifiedSchemaDraft("HowTo").howTo,
+  };
+}
 
 const fieldClass =
   "h-10 rounded-xl border-border/80 bg-white/75 px-3 text-[13px] shadow-[0_1px_0_rgba(255,255,255,0.7)] placeholder:text-muted-foreground/65 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/15 dark:bg-[#102b40] dark:shadow-none";
@@ -85,8 +94,10 @@ export default function SchemaBuilder() {
   const serializedSchema = useMemo(() => JSON.stringify(schema, null, 2), [schema]);
   const isLocalBusiness = draft.schemaType === "LocalBusiness";
   const isFaqPage = draft.schemaType === "FAQPage";
+  const isHowTo = draft.schemaType === "HowTo";
   const hasType = Boolean(draft.schemaType);
   const localDraft = draft.localBusiness;
+  const howToDraft = draft.howTo;
   const subtypeFields = {
     food: isLocalBusiness && isLocalBusinessType(getEffectiveType(localDraft), "FoodEstablishment"),
     medical: isLocalBusiness && isLocalBusinessType(getEffectiveType(localDraft), "MedicalBusiness"),
@@ -98,7 +109,7 @@ export default function SchemaBuilder() {
     try {
       const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
       if (saved) {
-        const restoredEntries = JSON.parse(saved) as SavedSchema[];
+        const restoredEntries = (JSON.parse(saved) as SavedSchema[]).map(entry => ({ ...entry, draft: normalizeRestoredDraft(entry.draft) }));
         setEntries(restoredEntries);
         const activeId = sessionStorage.getItem(ACTIVE_ENTRY_STORAGE_KEY);
         const activeEntry = restoredEntries.find(entry => entry.id === activeId);
@@ -167,6 +178,15 @@ export default function SchemaBuilder() {
     updateFaq("questions", draft.faqPage.questions.map(item => item.id === id ? { ...item, ...update } : item));
   };
 
+  const updateHowTo = <K extends keyof UnifiedSchemaDraft["howTo"]>(field: K, value: UnifiedSchemaDraft["howTo"][K]) => {
+    setDraft(current => ({ ...current, howTo: { ...current.howTo, [field]: value } }));
+    setHasDraftChanges(true);
+  };
+
+  const updateHowToStep = (id: string, update: Partial<HowToStepDraft>) => {
+    updateHowTo("steps", howToDraft.steps.map(item => item.id === id ? { ...item, ...update } : item));
+  };
+
   const updateHoursRow = (id: string, update: Partial<(typeof localDraft.openingHoursRows)[number]>) => {
     updateLocal("openingHoursRows", localDraft.openingHoursRows.map(row => row.id === id ? { ...row, ...update } : row));
   };
@@ -189,7 +209,7 @@ export default function SchemaBuilder() {
   };
 
   const loadEntry = (entry: SavedSchema) => {
-    setDraft(entry.draft);
+    setDraft(normalizeRestoredDraft(entry.draft));
     setActiveEntryId(entry.id);
     sessionStorage.setItem(ACTIVE_ENTRY_STORAGE_KEY, entry.id);
     setHasDraftChanges(false);
@@ -232,8 +252,8 @@ export default function SchemaBuilder() {
   const statusTone = validation.errors.length > 0 ? "issue" : validation.recommendations.length > 0 ? "review" : "ready";
   const statusText = validation.errors.length > 0 ? "Needs correction" : validation.recommendations.length > 0 ? "Ready to complete" : "Schema ready";
   const autoSaveText = autoSaveStatus === "saving" ? "Saving to session" : autoSaveStatus === "saved" ? "Saved to session" : "Session workspace";
-  const documentationUrl = isFaqPage ? "https://schema.org/FAQPage" : "https://schema.org/LocalBusiness";
-  const documentationLabel = isFaqPage ? "Read FAQPage documentation" : "Read LocalBusiness documentation";
+  const documentationUrl = isFaqPage ? "https://schema.org/FAQPage" : isHowTo ? "https://schema.org/HowTo" : "https://schema.org/LocalBusiness";
+  const documentationLabel = isFaqPage ? "Read FAQPage documentation" : isHowTo ? "Read HowTo documentation" : "Read LocalBusiness documentation";
 
   return (
     <div className="mx-auto w-full max-w-[1600px] pb-10">
@@ -281,6 +301,10 @@ export default function SchemaBuilder() {
                   <div className="sm:col-span-2"><FieldLabel name="@type" hint="131 LocalBusiness types & subtypes" /><LocalBusinessTypePicker value={getEffectiveType(localDraft)} onValueChange={changeLocalBusinessType} /></div>
                   <div className="sm:col-span-2"><FieldLabel name="name" /><Input value={localDraft.name} onChange={event => updateLocal("name", event.target.value)} className={fieldClass} placeholder="Business name" /></div>
                   <div className="sm:col-span-2"><FieldLabel name="description" /><Textarea value={localDraft.description} onChange={event => updateLocal("description", event.target.value)} className={textareaClass} placeholder="A concise description of the business." /></div>
+                </> : null}
+                {isHowTo ? <>
+                  <div className="sm:col-span-2"><FieldLabel name="name" hint="Visible instruction title" /><Input value={howToDraft.name} onChange={event => updateHowTo("name", event.target.value)} className={fieldClass} placeholder="e.g. How to change a flat tire" /></div>
+                  <div className="sm:col-span-2"><FieldLabel name="description" hint="Optional summary" /><Textarea value={howToDraft.description} onChange={event => updateHowTo("description", event.target.value)} className={textareaClass} placeholder="A concise summary of the instructions." /></div>
                 </> : null}
               </div>
             </div>
@@ -335,6 +359,29 @@ export default function SchemaBuilder() {
               <div className="space-y-4">{draft.faqPage.questions.map((item, index) => <article key={item.id} className="rounded-xl border border-border/80 bg-secondary/[0.18] p-4 dark:bg-[#102b40]/60"><div className="flex items-center justify-between gap-3"><p className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">FAQ {String(index + 1).padStart(2, "0")}</p><button onClick={() => updateFaq("questions", draft.faqPage.questions.length > 1 ? draft.faqPage.questions.filter(question => question.id !== item.id) : [createFaqQuestionDraft()])} aria-label={`Remove FAQ ${index + 1}`} className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Trash2 className="h-3.5 w-3.5" /></button></div><div className="mt-3 space-y-4"><div><FieldLabel name="Question" hint="Exact visible question" /><Input aria-label={`Question ${index + 1}`} value={item.question} onChange={event => updateFaqQuestion(item.id, { question: event.target.value })} className={fieldClass} placeholder="e.g. What services do you offer?" /></div><div><FieldLabel name="Answer" hint="Exact visible answer" /><Textarea aria-label={`Answer ${index + 1}`} value={item.answer} onChange={event => updateFaqQuestion(item.id, { answer: event.target.value })} className={textareaClass} placeholder="Write the answer exactly as visitors can read it on the page." /></div></div></article>)}</div>
               <Button type="button" variant="outline" onClick={() => updateFaq("questions", [...draft.faqPage.questions, createFaqQuestionDraft()])} className="mt-4 h-9 w-full gap-2 rounded-xl border-dashed bg-transparent text-[12px] hover:bg-secondary/70"><Plus className="h-3.5 w-3.5" /> Add question and answer</Button>
             </div> : null}
+            {isHowTo ? <>
+              <div className="rounded-2xl border border-border/80 bg-card/80 p-5 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] sm:p-6">
+                <SectionTitle index="02" title="Instruction details" description="Add the canonical page, timing, materials, and tools that are visible or useful with these instructions." />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="sm:col-span-2"><FieldLabel name="url" hint="Canonical page URL" /><Input aria-label="HowTo URL" value={howToDraft.url} onChange={event => updateHowTo("url", event.target.value)} className={fieldClass} placeholder="https://example.com/how-to" /></div>
+                  <div className="sm:col-span-2"><FieldLabel name="image" hint="Optional feature image URL" /><Input aria-label="HowTo image" value={howToDraft.image} onChange={event => updateHowTo("image", event.target.value)} className={fieldClass} placeholder="https://example.com/images/how-to.jpg" /></div>
+                  <div><FieldLabel name="estimatedCost" hint="Optional" /><Input aria-label="HowTo estimated cost" value={howToDraft.estimatedCost} onChange={event => updateHowTo("estimatedCost", event.target.value)} className={fieldClass} placeholder="e.g. $20" /></div>
+                  <div><FieldLabel name="yield" hint="Optional result" /><Input aria-label="HowTo yield" value={howToDraft.yield} onChange={event => updateHowTo("yield", event.target.value)} className={fieldClass} placeholder="e.g. One completed project" /></div>
+                  <div><FieldLabel name="prepTime" hint="ISO 8601, e.g. PT15M" /><Input aria-label="HowTo preparation time" value={howToDraft.prepTime} onChange={event => updateHowTo("prepTime", event.target.value)} className={fieldClass} placeholder="PT15M" /></div>
+                  <div><FieldLabel name="performTime" hint="ISO 8601, e.g. PT1H" /><Input aria-label="HowTo perform time" value={howToDraft.performTime} onChange={event => updateHowTo("performTime", event.target.value)} className={fieldClass} placeholder="PT1H" /></div>
+                  <div className="sm:col-span-2"><FieldLabel name="totalTime" hint="ISO 8601, e.g. PT1H15M" /><Input aria-label="HowTo total time" value={howToDraft.totalTime} onChange={event => updateHowTo("totalTime", event.target.value)} className={fieldClass} placeholder="PT1H15M" /></div>
+                  <div><FieldLabel name="supply" hint="One per line or comma-separated" /><Textarea aria-label="HowTo supplies" value={howToDraft.supply} onChange={event => updateHowTo("supply", event.target.value)} className={textareaClass} placeholder="e.g. Spare tire, Wheel wedges" /></div>
+                  <div><FieldLabel name="tool" hint="One per line or comma-separated" /><Textarea aria-label="HowTo tools" value={howToDraft.tool} onChange={event => updateHowTo("tool", event.target.value)} className={textareaClass} placeholder="e.g. Jack, Lug wrench" /></div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-border/80 bg-card/80 p-5 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] sm:p-6">
+                <SectionTitle index="03" title="Steps" description="Add each instruction in the same sequence and wording visitors can follow on the published page." />
+                <div className="mb-4 rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-2.5 text-[11px] leading-4 text-muted-foreground"><span className="font-medium text-foreground">Visible-content reminder.</span> HowTo markup should describe a genuine step-by-step process that visitors can follow on the page.</div>
+                <div className="space-y-4">{howToDraft.steps.map((item, index) => <article key={item.id} className="rounded-xl border border-border/80 bg-secondary/[0.18] p-4 dark:bg-[#102b40]/60"><div className="flex items-center justify-between gap-3"><p className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Step {String(index + 1).padStart(2, "0")}</p><button onClick={() => updateHowTo("steps", howToDraft.steps.length > 1 ? howToDraft.steps.filter(step => step.id !== item.id) : [createHowToStepDraft()])} aria-label={`Remove HowTo step ${index + 1}`} className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Trash2 className="h-3.5 w-3.5" /></button></div><div className="mt-3 grid gap-4 sm:grid-cols-2"><div><FieldLabel name="name" hint="Optional step title" /><Input aria-label={`HowTo step ${index + 1} name`} value={item.name} onChange={event => updateHowToStep(item.id, { name: event.target.value })} className={fieldClass} placeholder="e.g. Prepare the work area" /></div><div><FieldLabel name="image" hint="Optional step image URL" /><Input aria-label={`HowTo step ${index + 1} image`} value={item.image} onChange={event => updateHowToStep(item.id, { image: event.target.value })} className={fieldClass} placeholder="https://example.com/images/step.jpg" /></div><div className="sm:col-span-2"><FieldLabel name="text" hint="Exact visible instruction" /><Textarea aria-label={`HowTo step ${index + 1} text`} value={item.text} onChange={event => updateHowToStep(item.id, { text: event.target.value })} className={textareaClass} placeholder="Describe the action visitors should take for this step." /></div></div></article>)}</div>
+                <Button type="button" variant="outline" onClick={() => updateHowTo("steps", [...howToDraft.steps, createHowToStepDraft()])} className="mt-4 h-9 w-full gap-2 rounded-xl border-dashed bg-transparent text-[12px] hover:bg-secondary/70"><Plus className="h-3.5 w-3.5" /> Add step</Button>
+              </div>
+            </> : null}
           </section>
 
           <aside className="min-w-0 space-y-5 2xl:sticky 2xl:top-24 2xl:self-start">
@@ -344,7 +391,18 @@ export default function SchemaBuilder() {
               <div className="border-t border-white/10 bg-black/10 px-5 py-3 text-[10px] leading-4 text-white/45">Copy the complete script tag and place it in the source of the page containing this structured data.</div>
             </div>
 
-            {hasType ? <><div className="rounded-2xl border border-border/80 bg-card/80 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]"><div className="flex items-start justify-between gap-3 border-b border-border/70 px-5 py-4"><div><p className="text-[13px] font-semibold">Schema check</p><p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">Property-level guidance as you build.</p></div><span className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] uppercase tracking-[0.08em] ${statusTone === "ready" ? "bg-primary/10 text-primary" : statusTone === "review" ? "bg-[#e0f6ff] text-[#08769f] dark:bg-primary/15 dark:text-primary" : "bg-destructive/10 text-destructive"}`}>{statusText}</span></div><div className="space-y-3 p-4"><div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-2.5 text-[11px] leading-4 text-muted-foreground">{isFaqPage ? <><span className="font-medium text-foreground">FAQPage structure.</span> Each mainEntity item needs a Question name and one accepted Answer text value.</> : <><span className="font-medium text-foreground">Specification note.</span> Schema.org does not prescribe universally required LocalBusiness properties; this check separates recommended details from formatting corrections.</>}</div>{validation.errors.map((issue, index) => <div key={`${issue.label}-${index}`} className="flex gap-2 rounded-xl bg-destructive/[0.055] px-3 py-2.5 text-[11px] leading-4 text-destructive"><AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" /><span><b className="font-mono font-medium">{issue.label}</b> — {issue.message}</span></div>)}{validation.recommendations.map((issue, index) => <div key={`${issue.label}-${index}`} className="flex gap-2 text-[11px] leading-4 text-muted-foreground"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" /><span><b className="font-mono font-medium text-foreground/75">{issue.label}</b> — {issue.message}</span></div>)}{validation.errors.length === 0 && validation.recommendations.length === 0 ? <div className="flex items-center gap-2 rounded-xl bg-primary/[0.06] px-3 py-2.5 text-[11px] text-primary"><Check className="h-3.5 w-3.5" /> {isFaqPage ? "Every FAQ entry has a question and accepted answer." : "No formatting or enrichment suggestions remain."}</div> : null}</div></div>
+            {hasType ? <>
+              <div className="rounded-2xl border border-border/80 bg-card/80 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)]">
+                <div className="flex items-start justify-between gap-3 border-b border-border/70 px-5 py-4"><div><p className="text-[13px] font-semibold">Schema check</p><p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">Property-level guidance as you build.</p></div><span className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] uppercase tracking-[0.08em] ${statusTone === "ready" ? "bg-primary/10 text-primary" : statusTone === "review" ? "bg-[#e0f6ff] text-[#08769f] dark:bg-primary/15 dark:text-primary" : "bg-destructive/10 text-destructive"}`}>{statusText}</span></div>
+                <div className="space-y-3 p-4">
+                  <div className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-2.5 text-[11px] leading-4 text-muted-foreground">
+                    {isFaqPage ? <><span className="font-medium text-foreground">FAQPage structure.</span> Each mainEntity item needs a Question name and one accepted Answer text value.</> : isHowTo ? <><span className="font-medium text-foreground">HowTo structure.</span> Each published instruction should map to one ordered HowToStep with visible text.</> : <><span className="font-medium text-foreground">Specification note.</span> Schema.org does not prescribe universally required LocalBusiness properties; this check separates recommended details from formatting corrections.</>}
+                  </div>
+                  {validation.errors.map((issue, index) => <div key={`${issue.label}-${index}`} className="flex gap-2 rounded-xl bg-destructive/[0.055] px-3 py-2.5 text-[11px] leading-4 text-destructive"><AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" /><span><b className="font-mono font-medium">{issue.label}</b> — {issue.message}</span></div>)}
+                  {validation.recommendations.map((issue, index) => <div key={`${issue.label}-${index}`} className="flex gap-2 text-[11px] leading-4 text-muted-foreground"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" /><span><b className="font-mono font-medium text-foreground/75">{issue.label}</b> — {issue.message}</span></div>)}
+                  {validation.errors.length === 0 && validation.recommendations.length === 0 ? <div className="flex items-center gap-2 rounded-xl bg-primary/[0.06] px-3 py-2.5 text-[11px] text-primary"><Check className="h-3.5 w-3.5" /> {isFaqPage ? "Every FAQ entry has a question and accepted answer." : isHowTo ? "Every populated instruction step has valid visible text." : "No formatting or enrichment suggestions remain."}</div> : null}
+                </div>
+              </div>
               <a href={documentationUrl} target="_blank" rel="noreferrer" className="group flex items-center justify-between rounded-2xl border border-border/80 bg-card/65 px-4 py-3.5 text-[12px] shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] transition hover:border-primary/30 hover:bg-card"><span className="flex items-center gap-2 text-muted-foreground"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary"><Globe2 className="h-3.5 w-3.5 text-primary" /></span>{documentationLabel}</span><ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground transition group-hover:text-primary" /></a></> : null}
           </aside>
         </div>

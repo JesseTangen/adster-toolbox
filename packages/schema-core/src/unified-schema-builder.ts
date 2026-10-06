@@ -5,6 +5,12 @@ import {
   validateFaqSchemaDraft,
 } from "./faq-schema-builder";
 import {
+  buildHowToSchema,
+  createHowToSchemaDraft,
+  type HowToSchemaDraft,
+  validateHowToSchemaDraft,
+} from "./howto-schema-builder";
+import {
   buildLocalBusinessSchema,
   createSchemaDraft,
   type SchemaDraft,
@@ -12,7 +18,7 @@ import {
   validateSchemaDraft,
 } from "./schema-builder";
 
-export const schemaBuilderTypes = ["", "LocalBusiness", "FAQPage"] as const;
+export const schemaBuilderTypes = ["", "LocalBusiness", "FAQPage", "HowTo"] as const;
 export type SchemaBuilderType = (typeof schemaBuilderTypes)[number];
 
 export type UnifiedSchemaDraft = {
@@ -21,6 +27,7 @@ export type UnifiedSchemaDraft = {
   schemaType: SchemaBuilderType;
   localBusiness: SchemaDraft;
   faqPage: FaqSchemaDraft;
+  howTo: HowToSchemaDraft;
 };
 
 export type UnifiedSchemaValidationIssue = Pick<ValidationIssue, "label" | "message" | "severity"> & {
@@ -34,6 +41,7 @@ export function createUnifiedSchemaDraft(schemaType: SchemaBuilderType = ""): Un
     schemaType,
     localBusiness: createSchemaDraft(),
     faqPage: createFaqSchemaDraft(),
+    howTo: createHowToSchemaDraft(),
   };
 }
 
@@ -45,6 +53,7 @@ export function getUnifiedSchemaName(draft: UnifiedSchemaDraft) {
   if (draft.label.trim()) return draft.label.trim();
   if (draft.schemaType === "LocalBusiness") return draft.localBusiness.name.trim() || "Untitled LocalBusiness";
   if (draft.schemaType === "FAQPage") return draft.faqPage.questions.find(item => item.question.trim())?.question.trim() || "Untitled FAQPage";
+  if (draft.schemaType === "HowTo") return draft.howTo.name.trim() || "Untitled HowTo";
   return "Untitled schema";
 }
 
@@ -54,6 +63,9 @@ export function buildUnifiedSchema(draft: UnifiedSchemaDraft) {
   }
   if (draft.schemaType === "FAQPage") {
     return buildFaqPageSchema({ ...draft.faqPage, label: draft.label });
+  }
+  if (draft.schemaType === "HowTo") {
+    return buildHowToSchema({ ...draft.howTo, label: draft.label });
   }
   return { "@context": "https://schema.org" };
 }
@@ -74,7 +86,9 @@ export function validateUnifiedSchemaDraft(draft: UnifiedSchemaDraft) {
 
   const validation = draft.schemaType === "LocalBusiness"
     ? validateSchemaDraft({ ...draft.localBusiness, label: draft.label })
-    : validateFaqSchemaDraft({ ...draft.faqPage, label: draft.label });
+    : draft.schemaType === "FAQPage"
+      ? validateFaqSchemaDraft({ ...draft.faqPage, label: draft.label })
+      : validateHowToSchemaDraft({ ...draft.howTo, label: draft.label });
 
   errors.push(...validation.errors.map(issue => ({ ...issue, field: String(issue.field) })));
   recommendations.push(...validation.recommendations.map(issue => ({ ...issue, field: String(issue.field) })));
@@ -96,6 +110,11 @@ export function cloneUnifiedSchemaDraft(draft: UnifiedSchemaDraft): UnifiedSchem
       ...draft.faqPage,
       id: crypto.randomUUID(),
       questions: draft.faqPage.questions.map(item => ({ ...item, id: crypto.randomUUID() })),
+    },
+    howTo: {
+      ...draft.howTo,
+      id: crypto.randomUUID(),
+      steps: draft.howTo.steps.map(item => ({ ...item, id: crypto.randomUUID() })),
     },
   };
 }
