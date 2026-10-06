@@ -33,6 +33,7 @@ describe("LocalBusiness schema builder", () => {
 
     expect(buildLocalBusinessSchema(draft)).toMatchObject({
       "@context": "https://schema.org",
+      "@id": "https://example.com#organization",
       "@type": "Restaurant",
       name: "Example Restaurant",
       openingHoursSpecification: [
@@ -44,6 +45,7 @@ describe("LocalBusiness schema builder", () => {
       address: { "@type": "PostalAddress", addressLocality: "Denver" },
       geo: { "@type": "GeoCoordinates", latitude: "39.7392", longitude: "-104.9903" },
     });
+    expect(Object.keys(buildLocalBusinessSchema(draft)).slice(0, 3)).toEqual(["@context", "@id", "@type"]);
   });
 
   it("groups separately entered matching weekday hours and leaves unstructured closing notes untouched", () => {
@@ -80,6 +82,19 @@ describe("LocalBusiness schema builder", () => {
     expect(schema).toEqual({
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
+    });
+  });
+
+  it("derives a stable organization @id from the canonical URL", () => {
+    const schema = buildLocalBusinessSchema({
+      ...createSchemaDraft(),
+      url: " https://www.heritagelaw.com/#old-fragment ",
+    });
+
+    expect(schema).toMatchObject({
+      "@context": "https://schema.org",
+      "@id": "https://www.heritagelaw.com/#organization",
+      url: " https://www.heritagelaw.com/#old-fragment ",
     });
   });
 

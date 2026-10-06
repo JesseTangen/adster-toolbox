@@ -211,3 +211,5 @@
 - [x] Validate the selected and unselected states, persistence, responsive UI, tests, full-stack build, Pages build, and checkpoint.
 - [x] Restyle the Schema type selector to match the LocalBusiness @type picker.
 - [x] Validate the matching picker interaction, responsive presentation, tests, builds, and checkpoint.
+- [x] Add a URL-derived `@id` to LocalBusiness JSON-LD output.
+- [x] Verify LocalBusiness `@id` output, regression tests, builds, and checkpoint.

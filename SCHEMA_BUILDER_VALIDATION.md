@@ -23,3 +23,7 @@ The complete Vitest suite passed with **21 test files and 49 tests**, including 
 ## Schema type picker refinement
 
 The native Schema type `select` was replaced with the same Popover/Command picker pattern used by the LocalBusiness `@type` control. Both controls now share the two-line, monospace-label trigger, chevron affordance, rounded popover surface, option checkmark, keyboard-accessible command items, hover/focus styling, and responsive width. Browser verification confirmed the menu exposes **Please select**, **LocalBusiness**, and **FAQPage** with concise descriptions; selecting LocalBusiness updates the trigger and displays the matching editor. The full suite passed with **22 test files and 51 tests**, along with TypeScript, full-stack, and GitHub Pages builds.
+
+## LocalBusiness `@id` refinement
+
+LocalBusiness output now includes an `@id` directly after `@context` whenever the canonical URL is supplied. It uses the canonical URL without any existing fragment and appends `#organization`, e.g. `https://www.heritagelaw.com/#organization`. Empty URL inputs continue to omit `@id`; an existing URL fragment is replaced rather than producing an invalid double fragment. Regression coverage asserts the generated value and the serialized property ordering.

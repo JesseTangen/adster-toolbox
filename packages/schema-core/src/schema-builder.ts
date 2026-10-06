@@ -182,6 +182,11 @@ export function getEffectiveType(draft: SchemaDraft) {
   return draft.businessSubtype || draft.businessType || "LocalBusiness";
 }
 
+function getOrganizationId(url: string) {
+  const canonicalUrl = url.trim().replace(/#.*$/, "");
+  return canonicalUrl ? `${canonicalUrl}#organization` : undefined;
+}
+
 export function buildLocalBusinessSchema(draft: SchemaDraft) {
   const address = compact({
     "@type": "PostalAddress",
@@ -205,6 +210,7 @@ export function buildLocalBusinessSchema(draft: SchemaDraft) {
 
   const schema = compact({
     "@context": "https://schema.org",
+    "@id": getOrganizationId(draft.url),
     "@type": getEffectiveType(draft),
     name: draft.name,
     description: draft.description,
