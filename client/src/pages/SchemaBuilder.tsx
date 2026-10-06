@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { AreaServedEditor } from "@/components/AreaServedEditor";
 import { LocalBusinessTypePicker } from "@/components/LocalBusinessTypePicker";
 import { SchemaTypePicker } from "@/components/SchemaTypePicker";
 import {
@@ -29,6 +30,7 @@ import {
   getSchemaBuilderTypeLabel,
   getUnifiedSchemaName,
   isLocalBusinessType,
+  normalizeAreaServed,
   schemaDays,
   type FaqQuestionDraft,
   type HowToStepDraft,
@@ -51,6 +53,10 @@ const ACTIVE_ENTRY_STORAGE_KEY = "schema-builder-active-entry";
 function normalizeRestoredDraft(draft: UnifiedSchemaDraft): UnifiedSchemaDraft {
   return {
     ...draft,
+    localBusiness: {
+      ...draft.localBusiness,
+      areaServed: normalizeAreaServed(draft.localBusiness?.areaServed),
+    },
     howTo: draft.howTo ?? createUnifiedSchemaDraft("HowTo").howTo,
   };
 }
@@ -348,7 +354,7 @@ export default function SchemaBuilder() {
               {(subtypeFields.food || subtypeFields.medical || subtypeFields.professional || subtypeFields.store) ? <div className="rounded-2xl border border-primary/20 bg-primary/[0.025] p-5 shadow-[0_18px_44px_-34px_oklch(0.3_0.03_50)] sm:p-6"><SectionTitle index="04" title={`${getEffectiveType(localDraft)} details`} description="These fields appear because of the selected LocalBusiness type." /><div className="grid gap-4 sm:grid-cols-2">
                 {subtypeFields.food ? <><div><FieldLabel name="servesCuisine" hint="Comma-separated" /><Input value={localDraft.servesCuisine} onChange={event => updateLocal("servesCuisine", event.target.value)} className={fieldClass} placeholder="Italian, Pizza" /></div><div><FieldLabel name="menu" /><Input value={localDraft.menu} onChange={event => updateLocal("menu", event.target.value)} className={fieldClass} placeholder="https://example.com/menu" /></div><label className="sm:col-span-2 flex cursor-pointer items-center gap-3 rounded-xl border border-border/80 bg-white/75 px-3 py-3 text-[13px] dark:bg-[#102b40]"><input type="checkbox" checked={localDraft.acceptsReservations} onChange={event => updateLocal("acceptsReservations", event.target.checked)} className="h-4 w-4 accent-primary" /><span><span className="font-mono text-[11px] font-medium">acceptsReservations</span><span className="ml-2 text-muted-foreground">Reservation availability</span></span></label></> : null}
                 {subtypeFields.medical ? <div className="sm:col-span-2"><FieldLabel name="medicalSpecialty" /><Input value={localDraft.medicalSpecialty} onChange={event => updateLocal("medicalSpecialty", event.target.value)} className={fieldClass} placeholder="e.g. Dentistry" /></div> : null}
-                {subtypeFields.professional ? <div className="sm:col-span-2"><FieldLabel name="areaServed" /><Input value={localDraft.areaServed} onChange={event => updateLocal("areaServed", event.target.value)} className={fieldClass} placeholder="e.g. Denver metropolitan area" /></div> : null}
+                {subtypeFields.professional ? <div className="sm:col-span-2"><FieldLabel name="areaServed" hint="Add each city, state, or country separately" /><AreaServedEditor value={localDraft.areaServed} onChange={value => updateLocal("areaServed", value)} /></div> : null}
                 {subtypeFields.store ? <><div><FieldLabel name="currenciesAccepted" /><Input value={localDraft.currenciesAccepted} onChange={event => updateLocal("currenciesAccepted", event.target.value)} className={fieldClass} placeholder="USD" /></div><div><FieldLabel name="paymentAccepted" /><Input value={localDraft.paymentAccepted} onChange={event => updateLocal("paymentAccepted", event.target.value)} className={fieldClass} placeholder="Cash, Credit Card" /></div></> : null}
               </div></div> : null}
             </> : null}

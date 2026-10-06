@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildLocalBusinessSchema, createOpeningHoursRow, createSchemaDraft, findLocalBusinessType, isLocalBusinessType, localBusinessTypes, validateSchemaDraft } from "@adster/schema-core";
+import { buildLocalBusinessSchema, createOpeningHoursRow, createSchemaDraft, findLocalBusinessType, isLocalBusinessType, localBusinessTypes, normalizeAreaServed, validateSchemaDraft } from "@adster/schema-core";
 
 describe("LocalBusiness schema builder", () => {
   it("includes the full unique LocalBusiness descendant catalog and resolves core subtype relationships", () => {
@@ -96,6 +96,31 @@ describe("LocalBusiness schema builder", () => {
       "@id": "https://www.heritagelaw.com/#organization",
       url: " https://www.heritagelaw.com/#old-fragment ",
     });
+  });
+
+  it("emits repeatable typed service areas and safely migrates legacy service-area text", () => {
+    const schema = buildLocalBusinessSchema({
+      ...createSchemaDraft(),
+      businessSubtype: "LegalService",
+      areaServed: [
+        { id: "city", type: "City", name: "Edmonton" },
+        { id: "state", type: "State", name: "Alberta" },
+        { id: "country", type: "Country", name: "Canada" },
+        { id: "blank", type: "City", name: "  " },
+      ],
+    });
+
+    expect(schema).toMatchObject({
+      areaServed: [
+        { "@type": "City", name: "Edmonton" },
+        { "@type": "State", name: "Alberta" },
+        { "@type": "Country", name: "Canada" },
+      ],
+    });
+    expect(normalizeAreaServed("Edmonton, Alberta").map(item => [item.type, item.name])).toEqual([
+      ["City", "Edmonton"],
+      ["City", "Alberta"],
+    ]);
   });
 
   it("reports malformed values and missing recommendations without inventing Schema.org required fields", () => {

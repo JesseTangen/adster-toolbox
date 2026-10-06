@@ -66,10 +66,11 @@ describe("unified Schema Builder core", () => {
     });
   });
 
-  it("clones nested LocalBusiness schedules, FAQ questions, and HowTo steps with fresh identifiers", () => {
+  it("clones LocalBusiness schedules and service areas, FAQ questions, and HowTo steps with fresh identifiers", () => {
     const draft = createUnifiedSchemaDraft("FAQPage");
     draft.faqPage.questions = [{ id: "faq-1", question: "Question", answer: "Answer" }];
     draft.localBusiness.openingHoursRows = [{ id: "hours-1", dayOfWeek: ["Monday"], opens: "09:00", closes: "17:00" }];
+    draft.localBusiness.areaServed = [{ id: "area-1", type: "City", name: "Edmonton" }];
     draft.howTo.steps = [{ id: "step-1", name: "Step", text: "Instruction", image: "" }];
 
     const clone = cloneUnifiedSchemaDraft(draft);
@@ -77,6 +78,7 @@ describe("unified Schema Builder core", () => {
     expect(clone.id).not.toBe(draft.id);
     expect(clone.faqPage.questions[0]?.id).not.toBe(draft.faqPage.questions[0]?.id);
     expect(clone.localBusiness.openingHoursRows[0]?.id).not.toBe(draft.localBusiness.openingHoursRows[0]?.id);
+    expect(clone.localBusiness.areaServed[0]?.id).not.toBe(draft.localBusiness.areaServed[0]?.id);
     expect(clone.howTo.steps[0]?.id).not.toBe(draft.howTo.steps[0]?.id);
   });
 });

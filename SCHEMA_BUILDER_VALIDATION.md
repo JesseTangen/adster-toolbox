@@ -33,3 +33,17 @@ LocalBusiness output now includes an `@id` directly after `@context` whenever th
 The Schema Builder now supports **HowTo** alongside LocalBusiness and FAQPage. Its Schema.org-aligned workspace collects a visible instruction title and description; optional canonical URL, feature image, estimated cost, yield, ISO 8601 prep/perform/total time, supplies, and tools; plus ordered visible steps. Each populated step emits an `@type: HowToStep`, its one-based `position`, optional title/image, and visible `text`. Empty values and incomplete steps are omitted from JSON-LD, while the live check guides missing steps and invalid URLs or durations. Existing saved browser sessions are migration-safe: drafts created before HowTo support receive a fresh, empty HowTo section on restoration.
 
 Browser verification selected HowTo from the shared picker, entered a two-step instruction, confirmed live `HowTo` JSON-LD with positions 1 and 2, ISO duration, official documentation link, and session restoration after reload. Visual review at 1440 px and 390 px confirmed readable layouts with no document-level horizontal overflow.
+
+## Typed LocalBusiness service areas
+
+Professional LocalBusiness subtypes, including LegalService, now use a repeatable **areaServed** editor. Each row has an explicit City, State, or Country selector and one corresponding area name, with add/remove controls. The resulting output uses a typed Schema.org object array, for example:
+
+```json
+"areaServed": [
+  { "@type": "City", "name": "Edmonton" },
+  { "@type": "State", "name": "Alberta" },
+  { "@type": "Country", "name": "Canada" }
+]
+```
+
+Blank rows are omitted. Legacy saved text entries are migrated to City entries while preserving each existing name; typed saved rows, duplication, and reload persistence retain individual row identifiers. Browser verification selected LegalService, entered Edmonton/Alberta/Canada across all three types, confirmed the precise JSON-LD values, and verified restoration after reload. Desktop and 390 px mobile checks showed no document-level horizontal overflow.

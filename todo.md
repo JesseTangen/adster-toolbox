@@ -216,3 +216,6 @@
 - [x] Define a Schema.org-aligned HowTo draft, JSON-LD generator, and validation rules.
 - [x] Add the HowTo type, step editor, and optional instruction details to Schema Builder with session-safe persistence.
 - [x] Validate HowTo JSON-LD output, selected/unselected workflows, responsiveness, full tests, builds, and checkpoint.
+- [x] Replace singular LocalBusiness areaServed text with repeatable typed City, State, and Country entries.
+- [x] Preserve legacy service-area drafts and emit typed areaServed JSON-LD objects.
+- [x] Verify repeatable service-area workflows, JSON-LD, session persistence, responsive UI, tests, builds, and checkpoint.

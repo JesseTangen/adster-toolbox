@@ -13,6 +13,7 @@ import {
 import {
   buildLocalBusinessSchema,
   createSchemaDraft,
+  normalizeAreaServed,
   type SchemaDraft,
   type ValidationIssue,
   validateSchemaDraft,
@@ -104,6 +105,7 @@ export function cloneUnifiedSchemaDraft(draft: UnifiedSchemaDraft): UnifiedSchem
     localBusiness: {
       ...draft.localBusiness,
       id: crypto.randomUUID(),
+      areaServed: normalizeAreaServed(draft.localBusiness.areaServed).map(item => ({ ...item, id: crypto.randomUUID() })),
       openingHoursRows: draft.localBusiness.openingHoursRows.map(row => ({ ...row, id: crypto.randomUUID() })),
     },
     faqPage: {

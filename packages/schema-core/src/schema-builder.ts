@@ -3,6 +3,15 @@ export type BusinessFamily = string;
 export const schemaDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 export type SchemaDay = (typeof schemaDays)[number];
 
+export const areaServedTypes = ["City", "State", "Country"] as const;
+export type AreaServedType = (typeof areaServedTypes)[number];
+
+export type AreaServedEntry = {
+  id: string;
+  type: AreaServedType;
+  name: string;
+};
+
 export type OpeningHoursRow = {
   id: string;
   dayOfWeek: SchemaDay[];
@@ -37,7 +46,7 @@ export type SchemaDraft = {
   menu: string;
   acceptsReservations: boolean;
   medicalSpecialty: string;
-  areaServed: string;
+  areaServed: AreaServedEntry[];
   currenciesAccepted: string;
   paymentAccepted: string;
 };
@@ -76,7 +85,7 @@ export const createSchemaDraft = (): SchemaDraft => ({
   menu: "",
   acceptsReservations: false,
   medicalSpecialty: "",
-  areaServed: "",
+  areaServed: [createAreaServedEntry()],
   currenciesAccepted: "",
   paymentAccepted: "",
 });
@@ -96,6 +105,31 @@ function splitLines(value: string) {
     .split(/\n|,/)
     .map(item => item.trim())
     .filter(Boolean);
+}
+
+export function createAreaServedEntry(type: AreaServedType = "City"): AreaServedEntry {
+  return { id: crypto.randomUUID(), type, name: "" };
+}
+
+export function normalizeAreaServed(value: unknown): AreaServedEntry[] {
+  if (typeof value === "string") {
+    return splitLines(value).map(name => ({ ...createAreaServedEntry(), name }));
+  }
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap(item => {
+    if (typeof item === "string") {
+      return splitLines(item).map(name => ({ ...createAreaServedEntry(), name }));
+    }
+    if (!item || typeof item !== "object") return [];
+    const candidate = item as Partial<AreaServedEntry>;
+    const type = areaServedTypes.includes(candidate.type as AreaServedType) ? candidate.type as AreaServedType : "City";
+    return [{
+      id: typeof candidate.id === "string" && candidate.id ? candidate.id : crypto.randomUUID(),
+      type,
+      name: typeof candidate.name === "string" ? candidate.name : "",
+    }];
+  });
 }
 
 const dayAliases: Record<string, SchemaDay> = {
@@ -207,6 +241,9 @@ export function buildLocalBusinessSchema(draft: SchemaDraft) {
   const openingHoursSpecification = usesStructuredHours ? structuredHours : groupOpeningHours(openingHours);
   const sameAs = splitLines(draft.sameAs);
   const servesCuisine = splitLines(draft.servesCuisine);
+  const areaServed = normalizeAreaServed(draft.areaServed)
+    .filter(item => item.name.trim().length > 0)
+    .map(item => ({ "@type": item.type, name: item.name.trim() }));
 
   const schema = compact({
     "@context": "https://schema.org",
@@ -228,7 +265,7 @@ export function buildLocalBusinessSchema(draft: SchemaDraft) {
     menu: draft.menu,
     acceptsReservations: draft.acceptsReservations ? true : undefined,
     medicalSpecialty: draft.medicalSpecialty,
-    areaServed: draft.areaServed,
+    areaServed,
     currenciesAccepted: draft.currenciesAccepted,
     paymentAccepted: draft.paymentAccepted,
   });

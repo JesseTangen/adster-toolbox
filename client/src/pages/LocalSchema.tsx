@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { AreaServedEditor } from "@/components/AreaServedEditor";
 import { LocalBusinessTypePicker } from "@/components/LocalBusinessTypePicker";
 import {
   AlertCircle,
@@ -21,6 +22,7 @@ import {
   createOpeningHoursRow,
   createSchemaDraft,
   getEffectiveType,
+  normalizeAreaServed,
   SchemaDraft,
   schemaDays,
   validateSchemaDraft,
@@ -42,6 +44,10 @@ const fieldClass =
   "h-10 rounded-xl border-border/80 bg-white/75 px-3 text-[13px] shadow-[0_1px_0_rgba(255,255,255,0.7)] placeholder:text-muted-foreground/65 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/15 dark:bg-[#102b40] dark:shadow-none";
 const textareaClass =
   "min-h-[92px] w-full resize-y rounded-xl border border-border/80 bg-white/75 px-3 py-2.5 text-[13px] leading-5 shadow-[0_1px_0_rgba(255,255,255,0.7)] outline-none placeholder:text-muted-foreground/65 transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15 dark:bg-[#102b40] dark:shadow-none";
+
+function normalizeRestoredDraft(draft: SchemaDraft): SchemaDraft {
+  return { ...draft, areaServed: normalizeAreaServed(draft.areaServed) };
+}
 
 function FieldLabel({ name, hint }: { name: string; hint?: string }) {
   return (
@@ -88,7 +94,7 @@ export default function LocalSchema() {
     try {
       const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
       if (saved) {
-        const restoredEntries = JSON.parse(saved) as SavedSchema[];
+        const restoredEntries = (JSON.parse(saved) as SavedSchema[]).map(entry => ({ ...entry, draft: normalizeRestoredDraft(entry.draft) }));
         setEntries(restoredEntries);
         const activeId = sessionStorage.getItem(ACTIVE_ENTRY_STORAGE_KEY);
         const activeEntry = restoredEntries.find(entry => entry.id === activeId);
@@ -168,7 +174,7 @@ export default function LocalSchema() {
   };
 
   const loadEntry = (entry: SavedSchema) => {
-    setDraft(entry.draft);
+    setDraft(normalizeRestoredDraft(entry.draft));
     setActiveEntryId(entry.id);
     sessionStorage.setItem(ACTIVE_ENTRY_STORAGE_KEY, entry.id);
     setHasDraftChanges(false);
@@ -183,6 +189,7 @@ export default function LocalSchema() {
       label: entry.draft.label ? `${entry.draft.label} copy` : "Location copy",
       openingHoursRows: entry.draft.openingHoursRows ?? [],
       open24Hours: entry.draft.open24Hours ?? false,
+      areaServed: normalizeAreaServed(entry.draft.areaServed).map(item => ({ ...item, id: crypto.randomUUID() })),
     };
     persistDraft(duplicate);
     setDraft(duplicate);
@@ -348,7 +355,7 @@ export default function LocalSchema() {
                     </label>
                   </> : null}
                   {subtypeFields.medical ? <div className="sm:col-span-2"><FieldLabel name="medicalSpecialty" /> <Input value={draft.medicalSpecialty} onChange={event => updateDraft("medicalSpecialty", event.target.value)} className={fieldClass} placeholder="e.g. Dentistry" /></div> : null}
-                  {subtypeFields.professional ? <div className="sm:col-span-2"><FieldLabel name="areaServed" /> <Input value={draft.areaServed} onChange={event => updateDraft("areaServed", event.target.value)} className={fieldClass} placeholder="e.g. Denver metropolitan area" /></div> : null}
+                  {subtypeFields.professional ? <div className="sm:col-span-2"><FieldLabel name="areaServed" hint="Add each city, state, or country separately" /> <AreaServedEditor value={draft.areaServed} onChange={value => updateDraft("areaServed", value)} /></div> : null}
                   {subtypeFields.store ? <>
                     <div><FieldLabel name="currenciesAccepted" /> <Input value={draft.currenciesAccepted} onChange={event => updateDraft("currenciesAccepted", event.target.value)} className={fieldClass} placeholder="USD" /></div>
                     <div><FieldLabel name="paymentAccepted" /> <Input value={draft.paymentAccepted} onChange={event => updateDraft("paymentAccepted", event.target.value)} className={fieldClass} placeholder="Cash, Credit Card" /></div>
