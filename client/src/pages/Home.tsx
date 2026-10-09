@@ -9,7 +9,6 @@ import {
   Clock3,
   Network,
   Search,
-  BadgeCheck,
   Sparkles,
   LayoutPanelTop,
 } from "lucide-react";
@@ -28,7 +27,6 @@ const toolIcons: Record<ToolboxTool["id"], typeof Braces> = {
   "wireframe-builder": LayoutPanelTop,
   "sitemap-planner": Network,
   "qa-checklists": ClipboardCheck,
-  "approved-tools": BadgeCheck,
   "prompt-library": Sparkles,
 };
 

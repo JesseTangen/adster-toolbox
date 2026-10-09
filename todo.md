@@ -222,3 +222,5 @@
 - [x] Define an updateable Approved Tools catalog with the Campaign URL Builder and Canva external links.
 - [x] Build the searchable, category-filtered Approved Tools directory with safe new-tab link handling.
 - [x] Activate Approved Tools in the Toolbox registry, sidebar, and routing, then validate desktop/mobile interactions, tests, builds, and checkpoint.
+- [x] Reconcile the latest GitHub dashboard change with the existing Approved Tools registration.
+- [x] Verify the Approved Tools card renders in the main dashboard and restore a passing build.

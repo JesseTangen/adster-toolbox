@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import { checklistDefinitions } from "@adster/checklists";
 import { toolboxCategories, toolboxTools } from "@adster/toolbox-config";
 import { toolboxCardClassNames } from "@adster/toolbox-ui";
+
+const dashboardSource = readFileSync("client/src/pages/Home.tsx", "utf8");
 
 describe("Strategist Toolbox registry", () => {
   it("exposes Schema Builder as the available type-aware schema workspace", () => {
@@ -46,6 +49,8 @@ describe("Strategist Toolbox registry", () => {
       status: "available",
       category: "Knowledge",
     }));
+    expect(dashboardSource).toContain('"approved-tools": BadgeCheck');
+    expect(dashboardSource).toContain("matchingTools.map");
   });
 
   it("exposes shared UI and a structured QA checklist contract", () => {
