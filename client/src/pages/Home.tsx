@@ -72,8 +72,7 @@ export default function Home() {
       <section className="mt-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-primary">Tool directory</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight">Find the right workspace</h2>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight">Tool directory</h2>
             <p className="mt-1.5 text-sm text-muted-foreground">Search the shared catalog or filter by the type of strategic work.</p>
           </div>
         </div>
