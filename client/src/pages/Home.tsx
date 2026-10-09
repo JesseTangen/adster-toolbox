@@ -50,7 +50,7 @@ export default function Home() {
   const checklistItemCount = checklistDefinitions.reduce((count, checklist) => count + getChecklistItemCount(checklist), 0);
 
   const openTool = (tool: ToolboxTool) => {
-    if (tool.path) {
+    if (tool.status === "available" && tool.path) {
       setLocation(tool.path);
       return;
     }
@@ -105,7 +105,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="toolbox-directory-grid mt-5 grid gap-4">
           {matchingTools.map(tool => {
             const Icon = toolIcons[tool.id];
             const available = tool.status === "available";

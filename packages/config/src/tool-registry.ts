@@ -70,7 +70,7 @@ export const toolboxTools: ToolboxTool[] = [
     category: "Planning",
     description: "Load, search, and copy approved research, planning, and production prompts from the team’s Google Sheet.",
     path: "/prompt-library",
-    status: "available",
+    status: "planned",
     eyebrow: "Reusable prompts",
   },
 ];

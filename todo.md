@@ -224,3 +224,5 @@
 - [x] Activate Approved Tools in the Toolbox registry, sidebar, and routing, then validate desktop/mobile interactions, tests, builds, and checkpoint.
 - [x] Reconcile the latest GitHub dashboard change with the existing Approved Tools registration.
 - [x] Verify the Approved Tools card renders in the main dashboard and restore a passing build.
+- [x] Preserve Prompt Library implementation while presenting it as a coming-soon module in discovery and navigation.
+- [x] Expand the dashboard directory to three columns at a 1200px minimum viewport width and verify responsive behavior.

@@ -26,11 +26,11 @@ const menuItems = [
   { icon: Network, label: "Sitemap Planner", path: "/sitemap-planner" },
   { icon: ClipboardCheck, label: "QA Checklists", path: "/qa-checklists" },
   { icon: BadgeCheck, label: "Approved Tools", path: "/approved-tools" },
-  { icon: Sparkles, label: "Prompt Library", path: "/prompt-library" },
 ];
 
 const plannedMenuItems = [
   { icon: BookOpen, label: "Knowledge Base" },
+  { icon: Sparkles, label: "Prompt Library" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

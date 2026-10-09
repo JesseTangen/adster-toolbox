@@ -5,6 +5,8 @@ import { toolboxCategories, toolboxTools } from "@adster/toolbox-config";
 import { toolboxCardClassNames } from "@adster/toolbox-ui";
 
 const dashboardSource = readFileSync("client/src/pages/Home.tsx", "utf8");
+const globalStyles = readFileSync("client/src/index.css", "utf8");
+const appSource = readFileSync("client/src/App.tsx", "utf8");
 
 describe("Strategist Toolbox registry", () => {
   it("exposes Schema Builder as the available type-aware schema workspace", () => {
@@ -25,10 +27,10 @@ describe("Strategist Toolbox registry", () => {
     expect(toolboxTools.every(tool => tool.category !== undefined)).toBe(true);
   });
 
-  it("keeps Knowledge Base planned while activating Prompt Library from its route", () => {
+  it("keeps Knowledge Base and Prompt Library in the coming-soon catalog", () => {
     expect(toolboxTools).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "knowledge-base", name: "Knowledge Base", status: "planned", category: "Knowledge" }),
-      expect.objectContaining({ id: "prompt-library", name: "Prompt Library", path: "/prompt-library", status: "available", category: "Planning" }),
+      expect.objectContaining({ id: "prompt-library", name: "Prompt Library", path: "/prompt-library", status: "planned", category: "Planning" }),
     ]));
     expect(toolboxTools.some(tool => tool.id === "other-schema")).toBe(false);
   });
@@ -51,6 +53,14 @@ describe("Strategist Toolbox registry", () => {
     }));
     expect(dashboardSource).toContain('"approved-tools": BadgeCheck');
     expect(dashboardSource).toContain("matchingTools.map");
+  });
+
+  it("keeps the Prompt Library implementation route while presenting it as coming soon", () => {
+    expect(dashboardSource).toContain('tool.status === "available" && tool.path');
+    expect(appSource).toContain('<Route path={"/prompt-library"} component={PromptLibrary} />');
+    expect(dashboardSource).toContain("toolbox-directory-grid");
+    expect(globalStyles).toContain("@media (min-width: 1200px)");
+    expect(globalStyles).toContain("repeat(3, minmax(0, 1fr))");
   });
 
   it("exposes shared UI and a structured QA checklist contract", () => {
