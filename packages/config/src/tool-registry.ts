@@ -29,6 +29,15 @@ export const toolboxTools: ToolboxTool[] = [
     eyebrow: "Shared knowledge",
   },
   {
+    id: "approved-tools",
+    name: "Approved Tools",
+    category: "Knowledge",
+    description: "Find approved external tools for campaign tracking, design, and strategic production work.",
+    path: "/approved-tools",
+    status: "available",
+    eyebrow: "External resources",
+  },
+  {
     id: "wireframe-builder",
     name: "Wireframe Builder",
     category: "Planning",

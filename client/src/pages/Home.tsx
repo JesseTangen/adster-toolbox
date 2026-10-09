@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ArrowUpRight,
+  BadgeCheck,
   BookOpen,
   Braces,
   ClipboardCheck,
@@ -21,6 +22,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 const toolIcons: Record<ToolboxTool["id"], typeof Braces> = {
   "schema-builder": Braces,
+  "approved-tools": BadgeCheck,
   "knowledge-base": BookOpen,
   "wireframe-builder": LayoutPanelTop,
   "sitemap-planner": Network,

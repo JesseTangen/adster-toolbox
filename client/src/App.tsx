@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TEAM_ACCESS_SESSION_KEY } from "./lib/teamAccess";
 import { trpc } from "./lib/trpc";
+import ApprovedTools from "./pages/ApprovedTools";
 import FaqSchema from "./pages/FaqSchema";
 import Home from "./pages/Home";
 import LocalSchema from "./pages/LocalSchema";
@@ -23,6 +24,7 @@ function AppRoutes({ onSignOut }: { onSignOut: () => void }) {
     <DashboardLayout onSignOut={onSignOut}>
       <Switch>
         <Route path={"/"} component={Home} />
+        <Route path={"/approved-tools"} component={ApprovedTools} />
         <Route path={"/schema-builder"} component={SchemaBuilder} />
         <Route path={"/local-schema"} component={LocalSchema} />
         <Route path={"/faq-schema"} component={FaqSchema} />

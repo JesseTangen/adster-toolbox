@@ -219,3 +219,6 @@
 - [x] Replace singular LocalBusiness areaServed text with repeatable typed City, State, and Country entries.
 - [x] Preserve legacy service-area drafts and emit typed areaServed JSON-LD objects.
 - [x] Verify repeatable service-area workflows, JSON-LD, session persistence, responsive UI, tests, builds, and checkpoint.
+- [x] Define an updateable Approved Tools catalog with the Campaign URL Builder and Canva external links.
+- [x] Build the searchable, category-filtered Approved Tools directory with safe new-tab link handling.
+- [x] Activate Approved Tools in the Toolbox registry, sidebar, and routing, then validate desktop/mobile interactions, tests, builds, and checkpoint.

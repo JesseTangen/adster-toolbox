@@ -38,6 +38,16 @@ describe("Strategist Toolbox registry", () => {
     ]));
   });
 
+  it("activates Approved Tools as the external-resource directory", () => {
+    expect(toolboxTools).toContainEqual(expect.objectContaining({
+      id: "approved-tools",
+      name: "Approved Tools",
+      path: "/approved-tools",
+      status: "available",
+      category: "Knowledge",
+    }));
+  });
+
   it("exposes shared UI and a structured QA checklist contract", () => {
     expect(toolboxCardClassNames.available).toContain("border-primary");
     expect(checklistDefinitions).toHaveLength(5);
